@@ -1,0 +1,14 @@
+node_modules
+dist
+.env
+.env.local
+.env.*.local
+.env.production
+deploy/production.env
+*.log
+.DS_Store
+.firebase
+.idea/
+.vscode/
+secrets/
+tsconfig.tsbuildinfo

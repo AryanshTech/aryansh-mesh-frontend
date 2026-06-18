@@ -1,0 +1,1000 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading…",
+    "retry": "Retry",
+    "back": "Back",
+    "create": "Create",
+    "submit": "Submit",
+    "close": "Close",
+    "appName": "AryanshMesh",
+    "yes": "Yes",
+    "no": "No",
+    "comingSoon": "This feature will be available when the backend API is ready.",
+    "apiPendingTitle": "Backend API pending",
+    "readOnly": "Read-only access",
+    "locale": {
+      "en": "EN",
+      "fr": "FR",
+      "toggle": "Switch language"
+    }
+  },
+  "auth": {
+    "loginTitle": "Sign in to Business Manager",
+    "loginSubtitle": "Manage your business content in one place.",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign in",
+    "forgotPassword": "Forgot password?",
+    "forgotPasswordTitle": "Reset your password",
+    "forgotPasswordSubtitle": "Enter your email and we'll send a reset link.",
+    "sendResetLink": "Send reset link",
+    "resetSentTitle": "Check your email",
+    "resetSentDescription": "If an account exists for that email, a reset link has been sent.",
+    "acceptInviteTitle": "Accept invitation",
+    "acceptInviteSubtitle": "Set your password to join the team.",
+    "acceptInviteCta": "Accept an invitation",
+    "setPassword": "Set password",
+    "inviteOnlyHint": "Accounts are created by invitation from your platform admin or business owner. Use the credentials you were given to sign in.",
+    "noAccount": "Received an invitation email?",
+    "signUpTitle": "Create your account",
+    "signUpSubtitle": "Complete registration using your invitation.",
+    "signUpInviteRequired": "You need a valid invitation token from your administrator. Self-service signup is not enabled yet.",
+    "inviteToken": "Invitation token",
+    "confirmPassword": "Confirm password",
+    "createAccount": "Create account",
+    "alreadyHaveAccount": "Already have an account? Sign in",
+    "signUpSuccess": "Account created. Welcome!",
+    "errors": {
+      "invalidCredential": "Incorrect email or password.",
+      "invalidEmail": "Enter a valid email address.",
+      "tooManyRequests": "Too many attempts. Try again later.",
+      "userDisabled": "This account has been disabled.",
+      "emailInUse": "An account with this email already exists.",
+      "weakPassword": "Password must be at least 8 characters.",
+      "passwordMismatch": "Passwords do not match.",
+      "signInFailed": "Sign in failed. Check your credentials and try again.",
+      "authNotConfigured": "Authentication service is not configured. Contact your administrator.",
+      "resetLinkInvalid": "This reset link is invalid. Request a new one.",
+      "resetLinkExpired": "This reset link has expired. Request a new one.",
+      "noMembership": "No access found for this account. You need an invitation from an administrator."
+    }
+  },
+  "shell": {
+    "productSwitcher": {
+      "business": "Business Manager",
+      "marketing": "Marketing Hub"
+    },
+    "nav": {
+      "collapse": "Collapse",
+      "logout": "Sign out"
+    }
+  },
+  "business": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "business": "Business",
+      "products": "Products",
+      "costs": "Costs",
+      "clients": "Clients",
+      "locations": "Locations",
+      "testimonials": "Testimonials",
+      "content": "Custom content",
+      "bookings": "Bookings",
+      "publish": "Publish",
+      "settings": "Settings",
+      "team": "Team",
+      "account": "Account",
+      "tenants": "Tenants",
+      "menu": "Menu",
+      "platform": "Platform",
+      "workspace": "Workspace",
+      "language": "Language",
+      "english": "EN",
+      "french": "FR",
+      "userMenu": "User menu",
+      "logout": "Log out",
+      "draftPending": "Draft changes pending"
+    },
+    "empty": {
+      "dashboardMessage": "Get started by adding your first product.",
+      "dashboardCta": "Add Product",
+      "productsMessage": "No products yet. Add your first product to show on your website.",
+      "productsCta": "Add Product",
+      "costsMessage": "No costs recorded. Track expenses to understand margins.",
+      "costsCta": "Add Cost",
+      "clientsMessage": "No clients yet. Add contacts you work with.",
+      "clientsCta": "Add Client",
+      "testimonialsMessage": "No testimonials yet. Add reviews from happy customers.",
+      "testimonialsCta": "Add Testimonial",
+      "publishMessage": "Everything is published. No pending changes.",
+      "teamMessage": "Invite team members to help manage your business.",
+      "teamCta": "Invite Member",
+      "tenantsMessage": "No tenants yet. Create your first client business.",
+      "tenantsCta": "Create Tenant"
+    },
+    "errors": {
+      "network": "Connection failed. Check your network and try again.",
+      "unauthorized": "Session expired. Please sign in again.",
+      "forbidden": "You don't have permission for this action.",
+      "notFound": "This item was deleted or doesn't exist.",
+      "validation": "Please fix the errors below.",
+      "uploadTooLarge": "File must be under 5 MB.",
+      "invalidFileType": "Only JPG, PNG, and WebP are allowed.",
+      "tenantSuspended": "Your account has been suspended. Contact Aryansh Tech."
+    },
+    "badges": {
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived",
+      "suspended": "Suspended"
+    },
+    "pages": {
+      "dashboard": "Dashboard",
+      "business": "Business Profile",
+      "products": "Products",
+      "costs": "Costs",
+      "clients": "Clients",
+      "locations": "Locations",
+      "testimonials": "Testimonials",
+      "content": "Custom content",
+      "bookings": "Bookings",
+      "publish": "Publish",
+      "team": "Team Settings",
+      "account": "Account Settings",
+      "tenants": "Tenants",
+      "onboarding": "Onboarding"
+    },
+    "admin": {
+      "tenants": {
+        "title": "Tenants",
+        "description": "Manage client businesses on the platform.",
+        "create": "Create tenant",
+        "createDescription": "Register a new client business on the platform.",
+        "created": "Tenant created successfully.",
+        "notFound": "Tenant not found.",
+        "empty": {
+          "title": "No tenants yet",
+          "description": "Create your first client business to get started.",
+          "cta": "Create tenant"
+        },
+        "form": {
+          "name": "Business name",
+          "slug": "URL slug",
+          "currency": "Currency",
+          "timezone": "Timezone",
+          "submit": "Create tenant"
+        },
+        "table": {
+          "name": "Name",
+          "slug": "Slug",
+          "status": "Status",
+          "createdAt": "Created"
+        },
+        "detail": {
+          "overview": "Overview",
+          "plan": "Plan",
+          "onboarding": "Onboarding complete",
+          "inviteOwner": "Invite owner",
+          "inviteOwnerHint": "Send an invitation to the business owner.",
+          "sendInvite": "Send invitation",
+          "inviteSent": "Invitation created. Share the link with the owner.",
+          "inviteSentEmail": "Invitation email sent to {{email}}.",
+          "inviteResent": "Invitation email resent to {{email}} with the same link.",
+          "inviteResentLink": "Existing invitation resent to {{email}}. Share the link below.",
+          "inviteLinkTitle": "Invitation link",
+          "inviteLinkHint": "Copy this link and send it to the business owner.",
+          "inviteLinkCopied": "Invitation link copied.",
+          "manageTenant": "Manage business",
+          "managingTenant": "Managing {{name}}",
+          "managingTenantHint": "You are editing this tenant as platform admin.",
+          "managingShort": "Tenant workspace",
+          "backToTenant": "Back to tenant details"
+        },
+        "errors": {
+          "slugConflict": "This slug is already in use.",
+          "slugFormat": "Use lowercase letters, numbers, and hyphens only."
+        }
+      }
+    },
+    "upload": {
+      "dropzone": "Drag and drop an image, or click to browse",
+      "hint": "JPG, PNG, or WebP up to 5 MB",
+      "success": "Image uploaded."
+    },
+    "dashboard": {
+      "loadError": "Could not load dashboard stats.",
+      "refreshing": "Updating stats…",
+      "recentActivity": "Recent activity",
+      "noActivity": "No recent activity",
+      "stats": {
+        "products": "Products",
+        "clients": "Clients",
+        "testimonials": "Testimonials",
+        "costs": "Costs",
+        "publish": "Publish status"
+      },
+      "activity": {
+        "type": "Type",
+        "date": "Date"
+      }
+    },
+    "onboarding": {
+      "title": "Welcome",
+      "subtitle": "Set up your business profile.",
+      "hint": "Tell us about your business to get started.",
+      "businessName": "Business name",
+      "complete": "Complete onboarding",
+      "completeSuccess": "Onboarding complete. Welcome!"
+    },
+    "business": {
+      "subtitle": "Company profile, branding, and contact details.",
+      "saved": "Business profile saved.",
+      "loadError": "Could not load business profile.",
+      "form": {
+        "legalName": "Legal name",
+        "tagline": "Tagline",
+        "description": "Description",
+        "phone": "Phone",
+        "website": "Website",
+        "logo": "Logo",
+        "allowedWebsiteOrigins": "Website domains (CORS)",
+        "allowedWebsiteOriginsPlaceholder": "https://your-site.com\nhttp://localhost:3000",
+        "allowedWebsiteOriginsHint": "One origin per line. Add every URL where your public website runs so it can call the CRM API. Changes apply within about a minute.",
+        "address": "Address",
+        "street": "Street",
+        "city": "City",
+        "state": "Province / State",
+        "postalCode": "Postal code",
+        "country": "Country",
+        "social": "Social media",
+        "facebook": "Facebook",
+        "instagram": "Instagram",
+        "linkedin": "LinkedIn",
+        "twitter": "X (Twitter)"
+      }
+    },
+    "products": {
+      "subtitle": "Manage your product catalog.",
+      "saved": "Product saved.",
+      "created": "Product created.",
+      "loadError": "Could not load products.",
+      "empty": {
+        "title": "No products yet"
+      },
+      "table": {
+        "name": "Name",
+        "price": "Price",
+        "status": "Status"
+      },
+      "form": {
+        "title": "Product",
+        "createTitle": "New product",
+        "name": "Product name",
+        "description": "Description",
+        "sku": "SKU",
+        "category": "Category",
+        "price": "Price",
+        "cost": "Cost",
+        "images": "Product images"
+      }
+    },
+    "costs": {
+      "subtitle": "Track business expenses.",
+      "saved": "Cost saved.",
+      "created": "Cost created.",
+      "deleted": "Cost deleted.",
+      "loadError": "Could not load costs.",
+      "deleteTitle": "Delete cost?",
+      "deleteDescription": "This cost entry will be permanently removed.",
+      "empty": {
+        "title": "No costs yet"
+      },
+      "table": {
+        "label": "Label",
+        "amount": "Amount",
+        "date": "Date"
+      },
+      "form": {
+        "title": "Cost",
+        "createTitle": "New cost",
+        "label": "Label",
+        "amount": "Amount",
+        "currency": "Currency",
+        "category": "Category",
+        "date": "Date",
+        "notes": "Notes"
+      }
+    },
+    "clients": {
+      "subtitle": "Manage client contacts.",
+      "saved": "Client saved.",
+      "created": "Client created.",
+      "deleted": "Client deleted.",
+      "loadError": "Could not load clients.",
+      "deleteTitle": "Delete client?",
+      "deleteDescription": "This client will be permanently removed.",
+      "empty": {
+        "title": "No clients yet"
+      },
+      "table": {
+        "name": "Name",
+        "email": "Email",
+        "company": "Company"
+      },
+      "form": {
+        "title": "Client",
+        "createTitle": "New client",
+        "name": "Name",
+        "phone": "Phone",
+        "company": "Company",
+        "tags": "Tags",
+        "tagsHint": "Comma-separated",
+        "notes": "Notes"
+      }
+    },
+    "locations": {
+      "subtitle": "Manage store locations for maps and multi-branch websites.",
+      "saved": "Location saved.",
+      "created": "Location created.",
+      "deleted": "Location deleted.",
+      "loadError": "Could not load locations.",
+      "deleteTitle": "Delete location?",
+      "deleteDescription": "This location will be archived and removed from published sites.",
+      "primary": "Primary",
+      "empty": {
+        "title": "No locations yet",
+        "message": "Add branches with addresses and map coordinates for your public website.",
+        "cta": "Add location"
+      },
+      "table": {
+        "name": "Name",
+        "city": "City",
+        "coordinates": "Coordinates",
+        "status": "Status"
+      },
+      "form": {
+        "title": "Location",
+        "createTitle": "New location",
+        "name": "Location name",
+        "slug": "URL slug",
+        "slugHint": "Auto-generated from name if empty",
+        "phone": "Phone",
+        "sortOrder": "Display order",
+        "address": "Address",
+        "coordinates": "Map coordinates",
+        "coordinatesHint": "Used by your website map — find lat/lng in Google Maps.",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "primary": "Primary location",
+        "images": "Location photos",
+        "imagesHint": "Venue photos shown on the map and location pages (e.g. terrace, interior)."
+      }
+    },
+    "testimonials": {
+      "subtitle": "Customer reviews and testimonials.",
+      "saved": "Testimonial saved.",
+      "created": "Testimonial created.",
+      "deleted": "Testimonial deleted.",
+      "loadError": "Could not load testimonials.",
+      "deleteTitle": "Delete testimonial?",
+      "deleteDescription": "This testimonial will be permanently removed.",
+      "empty": {
+        "title": "No testimonials yet"
+      },
+      "table": {
+        "author": "Author",
+        "rating": "Rating",
+        "status": "Status"
+      },
+      "form": {
+        "title": "Testimonial",
+        "createTitle": "New testimonial",
+        "author": "Author",
+        "quote": "Quote",
+        "rating": "Rating",
+        "photo": "Photo"
+      }
+    },
+    "content": {
+      "subtitle": "Flexible data groups for your website — prices, FAQs, team cards, or anything else.",
+      "saved": "Custom content saved.",
+      "created": "Custom content created.",
+      "deleted": "Custom content deleted.",
+      "loadError": "Could not load custom content.",
+      "deleteTitle": "Delete custom content?",
+      "deleteDescription": "This collection will be archived and removed from published sites.",
+      "empty": {
+        "title": "No custom content yet",
+        "message": "Create named groups (e.g. prices, faqs) with title, value, description, and optional images.",
+        "cta": "Add collection"
+      },
+      "table": {
+        "label": "Name",
+        "key": "API key",
+        "items": "Items",
+        "status": "Status"
+      },
+      "form": {
+        "title": "Custom content",
+        "createTitle": "New collection",
+        "label": "Display name",
+        "key": "API key",
+        "keyHint": "Used on your website as snapshot.content.prices — lowercase letters, numbers, hyphens.",
+        "collectionDescription": "Collection description",
+        "status": "Status",
+        "statusDraft": "Draft",
+        "statusPublished": "Published",
+        "sortOrder": "Display order",
+        "items": "Items",
+        "addItem": "Add item",
+        "noItems": "No items yet. Add entries your website will display.",
+        "itemNumber": "Item {{number}}",
+        "itemTitle": "Title",
+        "itemValue": "Value",
+        "itemDescription": "Description",
+        "itemImage": "Image",
+        "saveBeforeImage": "Save the collection first, then you can upload images for each item."
+      }
+    },
+    "publish": {
+      "subtitle": "Review and publish changes to your website.",
+      "action": "Publish to website",
+      "success": "Published version {{version}}.",
+      "loadError": "Could not load publish status.",
+      "draftCounts": "Pending changes",
+      "draftCountsHint": "Items with unpublished edits by type.",
+      "status": {
+        "title": "Status",
+        "pending": "Changes pending",
+        "upToDate": "Up to date",
+        "version": "Version",
+        "lastPublished": "Last published",
+        "never": "Never published"
+      },
+      "embed": {
+        "title": "Website connection",
+        "description": "Add this script to your client website to load live data.",
+        "hint": "Paste before </body> on any HTML or React site. Use window.BusinessManager in your app.",
+        "copied": "Embed script copied.",
+        "unavailable": "Tenant slug not available yet.",
+        "apiUrl": "Public API: {{url}}"
+      },
+      "connectorGuide": {
+        "title": "Website developer guide",
+        "description": "Full API reference: tenant, business, products, locations, testimonials, bookings, and CORS.",
+        "hint": "Copy this markdown and share it with your website developer. It lists every field the public API provides.",
+        "copy": "Copy guide",
+        "copied": "Integration guide copied."
+      }
+    },
+    "bookings": {
+      "subtitle": "Reservations submitted from your website.",
+      "loadError": "Could not load bookings.",
+      "empty": {
+        "title": "No bookings yet",
+        "description": "Bookings from your website will appear here."
+      },
+      "table": {
+        "date": "Date",
+        "time": "Time",
+        "name": "Guest",
+        "phone": "Phone",
+        "guests": "Party size",
+        "status": "Status"
+      }
+    },
+    "team": {
+      "subtitle": "Invite and manage team members.",
+      "invite": "Invite member",
+      "inviteHint": "Send an invitation to join your team.",
+      "sendInvite": "Send invitation",
+      "inviteSent": "Invitation sent.",
+      "inviteSentEmail": "Invitation email sent to {{email}}.",
+      "inviteResent": "Invitation email resent to {{email}}.",
+      "inviteResentLink": "Existing invitation link copied. Share it with {{email}}.",
+      "inviteLinkCopied": "Invitation link copied to clipboard.",
+      "loadError": "Could not load team members.",
+      "emptyHint": "Invite team members to collaborate.",
+      "table": {
+        "email": "Email",
+        "role": "Role",
+        "joined": "Joined"
+      },
+      "roles": {
+        "admin": "Admin",
+        "editor": "Editor",
+        "viewer": "Viewer"
+      }
+    },
+    "account": {
+      "profile": "Profile",
+      "profileDescription": "Your account information.",
+      "password": "Password",
+      "passwordHint": "Firebase sends a secure reset link to your email address.",
+      "sendPasswordReset": "Send password reset email",
+      "language": "Language",
+      "languageDescription": "Choose your preferred language."
+    },
+    "invite": {
+      "comingSoon": "Invite acceptance will be available when the backend invite API is ready.",
+      "missingTokenTitle": "Missing invitation",
+      "missingToken": "This link is invalid. Ask your administrator for a new invitation.",
+      "acceptInstructions": "Create an account or sign in with the email that received the invitation.",
+      "signInToAccept": "Sign in to accept invitation",
+      "signUpForTenant": "You are joining {{tenant}}. Use the email address that received the invitation.",
+      "emailMismatch": "This invitation was sent to a different email address.",
+      "indexBuilding": "The server is still setting up. Wait a minute and try again."
+    }
+  },
+  "marketing": {
+    "app": {
+      "name": "Aryansh Marketing Hub",
+      "tagline": "GTM propulsé par l'IA pour les agences"
+    },
+    "nav": {
+      "companies": "Entreprises",
+      "admin": "Administration",
+      "signOut": "Déconnexion",
+      "language": "Langue",
+      "workspace": "Espace de travail",
+      "administration": "Administration",
+      "users": "Utilisateurs",
+      "allCompanies": "Toutes les entreprises",
+      "agencyOverview": "Vue d'ensemble agence",
+      "dashboard": "Tableau de bord",
+      "studio": "Studio marketing",
+      "onboarding": "Intégration",
+      "spy": "Veille concurrentielle",
+      "brandMemory": "Mémoire de marque",
+      "content": "Studio contenu",
+      "creative": "Studio créatif",
+      "social": "Calendrier social",
+      "crm": "Pipeline CRM",
+      "gtmModules": "Modules GTM",
+      "localeEn": "EN",
+      "localeFr": "FR"
+    },
+    "breadcrumb": {
+      "companies": "Entreprises",
+      "projects": "Projets"
+    },
+    "auth": {
+      "signIn": "Se connecter",
+      "email": "Courriel",
+      "password": "Mot de passe",
+      "signingIn": "Connexion…",
+      "invalidCredentials": "Courriel ou mot de passe invalide",
+      "welcomeTitle": "Bon retour",
+      "welcomeSubtitle": "Connectez-vous à votre centre de commande marketing",
+      "panelQuote": "Aryansh Marketing Hub unifie l'intégration, la veille concurrentielle, le contenu et le CRM pour chaque projet client.",
+      "panelAttribution": "Équipe agence Aryansh",
+      "featureOnboarding": "L'intégration guidée construit une mémoire de marque vivante",
+      "featureGtm": "Veille, contenu et social dans une chaîne GTM unique",
+      "featureCrm": "Contacts et affaires liés à chaque entreprise"
+    },
+    "agency": {
+      "title": "Vue d'ensemble agence",
+      "subtitle": "Santé du portefeuille pour toutes les entreprises clientes",
+      "statCompanies": "Entreprises au total",
+      "statCompaniesHint": "Comptes clients actifs",
+      "statNewMonth": "Nouvelles ce mois",
+      "statNewMonthHint": "Entreprises créées dans les 30 derniers jours",
+      "statProjects": "Projets actifs",
+      "statProjectsHint": "Projets pour toutes les entreprises",
+      "spotlightTitle": "Votre centre de commande GTM",
+      "spotlightDescription": "Gérez les entreprises, lancez les workflows IA et approuvez le contenu depuis un espace sombre unifié.",
+      "viewCompanies": "Voir toutes les entreprises",
+      "recentCompanies": "Entreprises récentes"
+    },
+    "companies": {
+      "title": "Entreprises",
+      "subtitle": "Gérer les entreprises clientes et leurs projets",
+      "create": "Nouvelle entreprise",
+      "companyCode": "Code entreprise",
+      "companyName": "Nom de l'entreprise",
+      "empty": "Aucune entreprise. Créez votre première entreprise pour commencer.",
+      "creating": "Création…",
+      "tableCode": "Code",
+      "tableName": "Nom",
+      "tableCreated": "Créé",
+      "statTotal": "Entreprises au total",
+      "statTotalHint": "Comptes clients actifs",
+      "statNewMonth": "Nouvelles ce mois",
+      "statNewMonthHint": "Entreprises créées dans les 30 derniers jours",
+      "statProjects": "Projets ouverts",
+      "statProjectsHint": "Projets pour toutes les entreprises",
+      "tableTitle": "Toutes les entreprises",
+      "tableDescription": "Sélectionnez une ligne pour ouvrir les projets et workflows GTM."
+    },
+    "projects": {
+      "title": "Projets",
+      "subtitle": "Projets pour {company}",
+      "create": "Nouveau projet",
+      "projectName": "Nom du projet",
+      "empty": "Aucun projet. Créez un projet pour démarrer votre flux GTM.",
+      "open": "Ouvrir le tableau de bord",
+      "tableName": "Nom",
+      "tableOnboarding": "Intégration",
+      "tableCreated": "Créé",
+      "tableActions": "Actions",
+      "statTotal": "Projets au total",
+      "statTotalHint": "Pour cette entreprise",
+      "tableTitle": "Projets",
+      "tableDescription": "Ouvrez un tableau de bord pour lancer les workflows GTM."
+    },
+    "projectDashboard": {
+      "title": "Tableau de bord projet",
+      "subtitle": "Chaîne GTM et actions rapides",
+      "gtmChain": "Chaîne de flux GTM",
+      "quickActions": "Actions rapides",
+      "running": "En cours…",
+      "cadenceTitle": "Cadence de contenu",
+      "cadenceDescription": "Rythme hebdomadaire recommandé pour ce projet.",
+      "cadenceBlog": "1 blog / semaine",
+      "cadenceSocial": "5 posts sociaux / semaine",
+      "cadenceSpy": "Scan concurrentiel mensuel",
+      "viewCalendar": "Voir le calendrier social",
+      "recentJobs": "Jobs agent récents",
+      "agentPipeline": "Pipeline agent",
+      "noJobs": "Aucun job agent. Lancez un workflow pour commencer.",
+      "openWorkspace": "Ouvrir l'espace chat",
+      "steps": {
+        "onboarding": "Intégration",
+        "spy": "Veille concurrentielle",
+        "brandMemory": "Mémoire de marque",
+        "content": "Contenu",
+        "social": "Social",
+        "crm": "CRM"
+      },
+      "actions": {
+        "runSpy": "Lancer la veille",
+        "writeBlog": "Rédiger un blog",
+        "scheduleSocial": "Planifier la semaine sociale"
+      }
+    },
+    "onboarding": {
+      "title": "Intégration projet",
+      "subtitle": "Construire le contexte de marque par des questions guidées",
+      "statusTitle": "Statut d'intégration",
+      "prompt": "Répondez aux questions d'intégration pour construire votre mémoire de marque. Chaque réponse fait avancer le flux.",
+      "placeholder": "Tapez votre réponse ici…",
+      "submit": "Soumettre la réponse",
+      "submitting": "Envoi…"
+    },
+    "onboardingStatus": {
+      "NOT_STARTED": "Non démarré",
+      "IN_PROGRESS": "En cours",
+      "COMPLETE": "Terminé"
+    },
+    "spy": {
+      "title": "Veille concurrentielle",
+      "subtitle": "Suivre les concurrents et lancer les workflows de renseignement",
+      "runSpy": "Lancer la veille",
+      "running": "Veille en cours…",
+      "addCompetitor": "Ajouter un concurrent",
+      "competitorName": "Nom du concurrent",
+      "competitorUrl": "URL du site",
+      "tableTitle": "Concurrents",
+      "tableDescription": "Concurrents suivis pour ce projet.",
+      "tableName": "Nom",
+      "tableUrl": "URL",
+      "tableLastProfiled": "Dernier profil",
+      "empty": "Aucun concurrent. Ajoutez-en un et lancez la veille.",
+      "never": "Jamais"
+    },
+    "brandMemory": {
+      "title": "Mémoire de marque",
+      "subtitle": "Document markdown vivant synchronisé avec les workflows agent",
+      "live": "EN DIRECT",
+      "editorTitle": "Éditeur mémoire de marque",
+      "version": "v{version}",
+      "placeholder": "# Mémoire de marque\n\nICP, ton, différenciation…",
+      "saveVersion": "Enregistrer une nouvelle version",
+      "saving": "Enregistrement…"
+    },
+    "content": {
+      "title": "Studio contenu",
+      "subtitle": "Réviser et approuver le contenu généré par l'IA",
+      "queueTitle": "File de contenu",
+      "queueDescription": "Éléments en attente de révision et d'approbation.",
+      "tableTitle": "Titre",
+      "tableType": "Type",
+      "tableStatus": "Statut",
+      "tableActions": "Actions",
+      "empty": "Aucun élément de contenu.",
+      "approve": "Approuver",
+      "reject": "Rejeter",
+      "rejectPrompt": "Pourquoi rejetez-vous ce contenu ?",
+      "rejectDefault": "Révision nécessaire"
+    },
+    "contentTypes": {
+      "BLOG": "Article de blog",
+      "LANDING_PAGE": "Page d'atterrissage",
+      "EMAIL": "Courriel",
+      "VIDEO_BRIEF": "Brief vidéo",
+      "AD_SCRIPT": "Script publicitaire"
+    },
+    "contentStatus": {
+      "IDEA": "Idée",
+      "DRAFTING": "Rédaction",
+      "HUMANIZING": "Humanisation",
+      "SCORING": "Évaluation",
+      "PENDING_APPROVAL": "En attente d'approbation",
+      "APPROVED": "Approuvé",
+      "PUBLISHED": "Publié",
+      "EXPORTED": "Exporté"
+    },
+    "creative": {
+      "title": "Studio créatif",
+      "subtitle": "Créations publicitaires et visuels",
+      "comingSoonTitle": "Bientôt disponible",
+      "comingSoonDescription": "Le studio créatif pour les assets publicitaires est en développement.",
+      "shellTitle": "Espace créatif",
+      "shellDescription": "Projet {projectId} — les workflows créatifs apparaîtront ici."
+    },
+    "social": {
+      "title": "Calendrier social",
+      "subtitle": "File de contenu lun–ven pour la semaine en cours",
+      "emptyDay": "Aucun post planifié",
+      "days": {
+        "monday": "Lundi",
+        "tuesday": "Mardi",
+        "wednesday": "Mercredi",
+        "thursday": "Jeudi",
+        "friday": "Vendredi"
+      }
+    },
+    "socialPlatforms": {
+      "LINKEDIN": "LinkedIn",
+      "X": "X",
+      "THREADS": "Threads",
+      "BLUESKY": "Bluesky",
+      "MASTODON": "Mastodon"
+    },
+    "socialStatus": {
+      "DRAFT": "Brouillon",
+      "PENDING_APPROVAL": "En attente",
+      "APPROVED": "Approuvé",
+      "SCHEDULED": "Planifié",
+      "PUBLISHED": "Publié"
+    },
+    "crm": {
+      "title": "Pipeline CRM",
+      "subtitle": "Contacts et affaires pour cette entreprise",
+      "contactsTab": "Contacts",
+      "dealsTab": "Affaires",
+      "contactsTitle": "Contacts",
+      "contactsDescription": "Personnes associées à cette entreprise.",
+      "dealsTitle": "Affaires",
+      "dealsDescription": "Pipeline pour l'entreprise {companyId}.",
+      "contactsEmpty": "Aucun contact.",
+      "dealsEmpty": "Aucune affaire.",
+      "tableName": "Nom",
+      "tableEmail": "Courriel",
+      "tableRole": "Rôle",
+      "tableCreated": "Créé",
+      "tableDealName": "Affaire",
+      "tableStage": "Étape",
+      "tableValue": "Valeur",
+      "tableStartDate": "Date de début"
+    },
+    "dealStages": {
+      "LEAD": "Piste",
+      "QUALIFIED": "Qualifié",
+      "PROPOSAL": "Proposition",
+      "WON": "Gagné",
+      "LOST": "Perdu"
+    },
+    "workflows": {
+      "SETUP_BRAND_CONTEXT": "Configurer le contexte de marque",
+      "RUN_SPY": "Veille concurrentielle",
+      "UPDATE_BRAND_MEMORY": "Mettre à jour la mémoire de marque",
+      "WRITE_BLOG_POST": "Rédiger un article",
+      "SCHEDULE_SOCIAL_WEEK": "Planifier la semaine sociale",
+      "CREATE_VIDEO_BRIEF": "Créer un brief vidéo",
+      "CREATE_AD_CREATIVE": "Créer une création publicitaire"
+    },
+    "jobStatus": {
+      "QUEUED": "En file",
+      "RUNNING": "En cours",
+      "COMPLETED": "Terminé",
+      "FAILED": "Échoué",
+      "PARTIAL": "Partiel"
+    },
+    "workspace": {
+      "editBrief": "Modifier le brief",
+      "outputsLibrary": "Bibliothèque de sorties",
+      "exportXlsx": "Exporter XLSX",
+      "exportCsv": "Exporter CSV",
+      "all": "Tout",
+      "copy": "Copier",
+      "copied": "Copié",
+      "delete": "Supprimer",
+      "savedAs": "Enregistré sous {label}",
+      "viewerReadOnly": "Accès lecture seule — le chat est désactivé",
+      "rateLimited": "Limite atteinte. Réessayez plus tard.",
+      "send": "Envoyer",
+      "attach": "Joindre une image",
+      "placeholder": "Tapez un message ou utilisez les raccourcis @…",
+      "briefTitle": "Brief du projet",
+      "briefPlaceholder": "Ton de marque, ICP, contraintes…",
+      "saveBrief": "Enregistrer le brief",
+      "saving": "Enregistrement…",
+      "chat": "Espace chat",
+      "noOutputs": "Aucune sortie enregistrée",
+      "mainThread": "Fil principal"
+    },
+    "chat": {
+      "quickGi": "@gi",
+      "quickStudio": "@studio",
+      "quickLifestyle": "@lifestyle",
+      "quickSave": "@save",
+      "noCommands": "Aucune commande"
+    },
+    "admin": {
+      "title": "Gestion des utilisateurs",
+      "subtitle": "Gérer les rôles des utilisateurs Marketing Hub",
+      "email": "Courriel",
+      "role": "Rôle",
+      "lastLogin": "Dernière connexion",
+      "updateRole": "Mettre à jour le rôle",
+      "statTotal": "Membres de l'équipe",
+      "statTotalHint": "Utilisateurs enregistrés",
+      "statAdmins": "Administrateurs",
+      "statAdminsHint": "Utilisateurs avec accès admin",
+      "tableTitle": "Utilisateurs",
+      "tableDescription": "Mettre à jour les rôles d'accès."
+    },
+    "common": {
+      "cancel": "Annuler",
+      "create": "Créer",
+      "save": "Enregistrer",
+      "loading": "Chargement…",
+      "error": "Une erreur est survenue",
+      "back": "Retour",
+      "confirmDelete": "Voulez-vous vraiment supprimer ceci ?"
+    },
+    "outputTypes": {
+      "GI": "Idéation vêtement",
+      "SP": "Photo studio",
+      "LP": "Photo lifestyle"
+    },
+    "roles": {
+      "ADMIN": "Administrateur",
+      "MEMBER": "Membre",
+      "VIEWER": "Lecteur"
+    },
+    "studio": {
+      "title": "Studio marketing",
+      "subtitle": "Fil d'activité, idées, pipeline contenu, styles et carte stratégique",
+      "pipelineTitle": "Pipeline agent GTM",
+      "tabs": {
+        "feed": "Fil",
+        "feedbacks": "Retours",
+        "ideas": "Idées de posts",
+        "content": "Contenu",
+        "styles": "Styles",
+        "audits": "Audits contenu",
+        "mindmap": "Carte mentale"
+      },
+      "feed": {
+        "empty": "Aucune activité. Les jobs agent et mises à jour apparaîtront ici."
+      },
+      "feedEventTypes": {
+        "AGENT_JOB": "Job agent",
+        "CONTENT": "Contenu",
+        "SOCIAL_POST": "Post social",
+        "POST_IDEA": "Idée de post",
+        "FEEDBACK": "Retour",
+        "STYLE_REFERENCE": "Référence de style"
+      },
+      "feedbackStatus": {
+        "OPEN": "Ouvert",
+        "IN_REVIEW": "En révision",
+        "RESOLVED": "Résolu"
+      },
+      "feedbackTarget": {
+        "CONTENT": "Contenu",
+        "SOCIAL_POST": "Post social"
+      },
+      "postIdeaStatus": {
+        "BACKLOG": "Backlog",
+        "READY": "Prêt",
+        "IN_PROGRESS": "En cours",
+        "DONE": "Terminé",
+        "ARCHIVED": "Archivé"
+      },
+      "ideas": {
+        "create": "Nouvelle idée",
+        "createTitle": "Créer une idée de post",
+        "titleLabel": "Titre",
+        "titlePlaceholder": "Accroche ou sujet…",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Détails optionnels…"
+      },
+      "styles": {
+        "addReference": "Ajouter une référence",
+        "addReferenceTitle": "Ajouter une référence de style",
+        "platform": "Plateforme",
+        "sourceUrl": "URL source",
+        "displayName": "Nom affiché",
+        "notes": "Notes",
+        "analyze": "Analyser",
+        "analyzing": "Analyse…",
+        "empty": "Aucune référence de style pour cette plateforme.",
+        "briefTitle": "Brief de style marketing",
+        "briefDescription": "Enregistrez votre voix de marque, piliers et direction créative.",
+        "industry": "Industrie",
+        "industryPlaceholder": "ex. SaaS B2B",
+        "tone": "Ton",
+        "tonePlaceholder": "ex. Confiant, accessible",
+        "pillars": "Piliers de contenu",
+        "pillarsPlaceholder": "Piliers séparés par des virgules",
+        "briefMarkdown": "Brief de design",
+        "briefPlaceholder": "# Style de marque\n\nDirection visuelle, accroches, formats…",
+        "saveBrief": "Enregistrer le profil de style"
+      },
+      "captures": {
+        "title": "Import extension",
+        "empty": "Aucune capture extension. Utilisez l'extension Style Scraper sur LinkedIn ou Instagram.",
+        "posts": "posts",
+        "designTab": "Directives design",
+        "contentTab": "Style de contenu",
+        "frameworkTab": "Cadre de publication",
+        "noDoc": "Analyse en attente ou indisponible.",
+        "useForPost": "Utiliser pour le prochain post",
+        "applyToBrief": "Appliquer au brief design",
+        "defaultIdeaTitle": "Idée de post inspirée"
+      },
+      "audits": {
+        "runTitle": "Audit contenu Firecrawl",
+        "runDescription": "Scrapez en masse une URL publique et exportez un tableur des modèles de contenu.",
+        "run": "Lancer l'audit",
+        "running": "Audit en cours…",
+        "export": "Exporter Excel",
+        "columns": {
+          "title": "Titre / accroche",
+          "format": "Format",
+          "pillar": "Pilier",
+          "summary": "Résumé"
+        }
+      },
+      "analyzeStatus": {
+        "PENDING": "En attente",
+        "COMPLETE": "Terminé",
+        "FAILED": "Échoué"
+      },
+      "platforms": {
+        "INSTAGRAM": "Instagram",
+        "TIKTOK": "TikTok",
+        "LINKEDIN": "LinkedIn",
+        "PRODUCT_HUNT": "Product Hunt",
+        "X": "X",
+        "YOUTUBE": "YouTube"
+      },
+      "mindmap": {
+        "save": "Enregistrer la carte",
+        "nodes": {
+          "client": "Client",
+          "channels": "Canaux",
+          "pillars": "Piliers"
+        }
+      },
+      "pipeline": {
+        "notStarted": "Non démarré",
+        "steps": {
+          "onboarding": "Intégration",
+          "spy": "Veille concurrentielle",
+          "brandMemory": "Mémoire de marque",
+          "content": "Contenu",
+          "social": "Social",
+          "creative": "Créatif"
+        }
+      }
+    }
+  }
+}

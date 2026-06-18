@@ -1,0 +1,27 @@
+import type { LucideIcon } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/design-system/components/ui/card';
+import { typographyClasses } from '@/design-system/tokens/typography';
+
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  description?: string;
+  icon: LucideIcon;
+}
+
+export function StatCard({ title, value, description, icon: Icon }: StatCardProps) {
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className={typographyClasses.caption}>{title}</CardTitle>
+        <Icon className="size-4 text-muted-foreground" />
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold tracking-tight">{value}</div>
+        {description && (
+          <p className={`mt-1 ${typographyClasses.caption}`}>{description}</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
