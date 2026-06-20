@@ -89,12 +89,9 @@ export function ProjectDashboardPage() {
 
   return (
     <CrmPageShell>
-      <PageHeader
-        title={project?.name ?? t('projectDashboard.title')}
-        description={t('projectDashboard.subtitle')}
-      />
+      <PageHeader description={t('projectDashboard.subtitle')} />
       {loading ? (
-        <Skeleton className="h-48 w-full rounded-xl" />
+        <Skeleton className="h-48 w-full rounded-lg" />
       ) : (
         <>
           <Card>
@@ -116,23 +113,26 @@ export function ProjectDashboardPage() {
                   const done = stepComplete(onboardingStatus, index);
                   return (
                     <div key={step.key} className="flex items-center gap-2">
-                      <Link
-                        to={`/marketing/projects/${projectId}/${step.path}`}
+                      <Button
+                        key={step.key}
+                        variant="outline"
+                        size="sm"
                         className={cn(
-                          'flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors',
-                          done
-                            ? 'border-primary/30 bg-primary/10'
-                            : 'border-border hover:bg-secondary'
+                          'rounded-pill-category gap-2',
+                          done && 'border-primary/30 bg-primary/10',
                         )}
+                        asChild
                       >
-                        <span
-                          className={cn(
-                            'size-2 rounded-full',
-                            done ? 'bg-primary' : 'bg-muted-foreground'
-                          )}
-                        />
-                        {t(`projectDashboard.steps.${step.key}`)}
-                      </Link>
+                        <Link to={`/marketing/projects/${projectId}/${step.path}`}>
+                          <span
+                            className={cn(
+                              'size-2 rounded-full',
+                              done ? 'bg-primary' : 'bg-muted',
+                            )}
+                          />
+                          {t(`projectDashboard.steps.${step.key}`)}
+                        </Link>
+                      </Button>
                       {index < GTM_STEPS.length - 1 && (
                         <span className="text-muted-foreground">→</span>
                       )}
@@ -167,25 +167,27 @@ export function ProjectDashboardPage() {
           </CardContent>
         </Card>
 
-        <div className="spotlight-card p-6">
-          <h3 className="font-display text-lg font-semibold">
-            {t('projectDashboard.cadenceTitle')}
-          </h3>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {t('projectDashboard.cadenceDescription')}
-          </p>
-          <div className="mt-4 flex gap-2">
-            <Badge variant="secondary">{t('projectDashboard.cadenceBlog')}</Badge>
-            <Badge variant="secondary">{t('projectDashboard.cadenceSocial')}</Badge>
-            <Badge variant="secondary">{t('projectDashboard.cadenceSpy')}</Badge>
-          </div>
-          <Button className="mt-4" variant="outline" size="sm" asChild>
-            <Link to={`/marketing/projects/${projectId}/social`}>
-              <CalendarIcon data-icon="inline-start" />
-              {t('projectDashboard.viewCalendar')}
-            </Link>
-          </Button>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('projectDashboard.cadenceTitle')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              {t('projectDashboard.cadenceDescription')}
+            </p>
+            <div className="mt-4 flex gap-2">
+              <Badge variant="secondary">{t('projectDashboard.cadenceBlog')}</Badge>
+              <Badge variant="secondary">{t('projectDashboard.cadenceSocial')}</Badge>
+              <Badge variant="secondary">{t('projectDashboard.cadenceSpy')}</Badge>
+            </div>
+            <Button className="mt-4" variant="outline" size="sm" asChild>
+              <Link to={`/marketing/projects/${projectId}/social`}>
+                <CalendarIcon data-icon="inline-start" />
+                {t('projectDashboard.viewCalendar')}
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
 
       <Card>

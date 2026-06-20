@@ -47,7 +47,6 @@ export function TenantListPage() {
   return (
     <CrmPageShell>
       <PageHeader
-        title={t('admin.tenants.title')}
         description={t('admin.tenants.description')}
         action={
           <Button onClick={() => navigate('/admin/tenants/new')}>

@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
+import { useParams } from 'react-router-dom';
 import { usePermissions } from '@/core/permissions/use-permissions';
 import { useAuth } from '@/core/auth/use-auth';
 import type { NavItemDef, NavRequirement, NavSectionDef } from '@/shell/navigation';
-import { NAV_SECTIONS } from '@/shell/navigation';
+import { buildProjectNavPath, MARKETING_PROJECT_NAV, NAV_SECTIONS } from '@/shell/navigation';
 
 function meetsRequirement(
   req: NavRequirement,
@@ -81,16 +82,28 @@ export function useFilteredNavSections(): NavSectionDef[] {
 
 export function useCommandNavLinks(): { labelKey: string; descriptionKey: string; to: string }[] {
   const sections = useFilteredNavSections();
+  const { projectId } = useParams();
+  const { canAccessMarketing } = usePermissions();
 
-  return useMemo(
-    () =>
-      sections.flatMap((section) =>
-        section.items.map((item) => ({
-          labelKey: item.labelKey,
-          descriptionKey: `${item.labelKey}Description`,
-          to: item.path,
-        })),
-      ),
-    [sections],
-  );
+  return useMemo(() => {
+    const topLevel = sections.flatMap((section) =>
+      section.items.map((item) => ({
+        labelKey: item.labelKey,
+        descriptionKey: `${item.labelKey}Description`,
+        to: item.path,
+      })),
+    );
+
+    if (!projectId || !canAccessMarketing) {
+      return topLevel;
+    }
+
+    const projectLinks = MARKETING_PROJECT_NAV.map((item) => ({
+      labelKey: item.labelKey,
+      descriptionKey: `${item.labelKey}Description`,
+      to: buildProjectNavPath(projectId, item.path),
+    }));
+
+    return [...topLevel, ...projectLinks];
+  }, [sections, projectId, canAccessMarketing]);
 }

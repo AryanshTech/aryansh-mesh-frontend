@@ -231,16 +231,17 @@ export function ThreadWorkspacePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-svh items-center justify-center">
-        <Spinner className="size-8" />
-      </div>
+      <CrmPageShell>
+        <div className="flex min-h-[40vh] items-center justify-center">
+          <Spinner className="size-8" />
+        </div>
+      </CrmPageShell>
     );
   }
 
   return (
     <CrmPageShell className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <PageHeader
-        title={t('workspace.chat')}
         action={
           canWrite ? (
             <Button size="sm" variant="outline" onClick={() => setBriefOpen(true)}>

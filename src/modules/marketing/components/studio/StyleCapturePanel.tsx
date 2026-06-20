@@ -3,6 +3,7 @@ import type { StyleCaptureResponse } from '@/modules/marketing/types/api';
 import { Badge } from '@/design-system/components/ui/badge';
 import { Button } from '@/design-system/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/design-system/components/ui/card';
+import { ScrollArea } from '@/design-system/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/design-system/components/ui/tabs';
 
 interface StyleCapturePanelProps {
@@ -128,8 +129,8 @@ function DocBlock({ text }: { text: string | null | undefined }) {
     );
   }
   return (
-    <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-lg border border-border bg-secondary/20 p-3 text-xs">
-      {text}
-    </pre>
+    <ScrollArea className="max-h-64 rounded-lg border border-border bg-muted/30">
+      <pre className="whitespace-pre-wrap p-3 text-xs">{text}</pre>
+    </ScrollArea>
   );
 }

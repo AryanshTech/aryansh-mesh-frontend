@@ -59,13 +59,13 @@ export function BrandMemoryPage() {
         description={t('brandMemory.subtitle')}
         action={
           <Badge variant="outline" className="gap-1.5">
-            <span className="size-2 animate-pulse rounded-full bg-green-500" />
+            <span className="size-2 animate-pulse rounded-full bg-success" />
             {t('brandMemory.live')}
           </Badge>
         }
       />
       {loading ? (
-        <Skeleton className="h-96 w-full rounded-xl" />
+        <Skeleton className="h-96 w-full rounded-lg" />
       ) : (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">

@@ -1,15 +1,24 @@
 import { Link } from 'react-router-dom';
+import { Box, MessageSquareQuote, Package, Receipt } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
 import { Badge } from '@/design-system/components/ui/badge';
 import { Button } from '@/design-system/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/design-system/components/ui/card';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
+import { StatCard } from '@/modules/marketing/components/dashboard/stat-card';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { PageHeader } from '@/shared/components/crm/PageHeader';
-import { appColors } from '@/design-system/tokens/colors';
+import { layout } from '@/design-system/tokens/layout';
 import { useDashboard } from '@/modules/business/features/dashboard/use-dashboard';
 import { useTenantScope } from '@/modules/business/hooks/use-tenant-scope';
+
+const STAT_ICONS = {
+  products: Package,
+  clients: Box,
+  testimonials: MessageSquareQuote,
+  costs: Receipt,
+} as const;
 
 export function DashboardPage() {
   const { t } = useTranslation();
@@ -50,7 +59,6 @@ export function DashboardPage() {
   return (
     <CrmPageShell>
       <PageHeader
-        title={t('pages.dashboard')}
         breadcrumbs={
           isWorkspace
             ? [
@@ -61,30 +69,27 @@ export function DashboardPage() {
         }
       />
 
-      {isFetching && (
+      {isFetching ? (
         <p className="text-xs text-muted-foreground">{t('dashboard.refreshing')}</p>
-      )}
+      ) : null}
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map(({ key, value, href }, index) => (
-          <Card
-            key={key}
-            className={appColors.dashboard.metricCard}
-            style={{ animationDelay: `${index * 60}ms` }}
-          >
-            <CardHeader className="pb-2">
-              <CardTitle className={appColors.dashboard.metricLabel}>
-                {t(`dashboard.stats.${key}`)}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex items-center justify-between">
-              <p className={appColors.dashboard.metricValue}>{value}</p>
-              <Button variant="ghost" size="sm" asChild>
-                <Link to={href}>{t('common.edit')}</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
+      <div className={`${layout.dashboard.section} grid gap-4 md:grid-cols-2 lg:grid-cols-4`}>
+        {stats.map(({ key, value, href }) => {
+          const Icon = STAT_ICONS[key];
+          return (
+            <StatCard
+              key={key}
+              title={t(`dashboard.stats.${key}`)}
+              value={value}
+              icon={Icon}
+              action={
+                <Button variant="link" size="sm" asChild className="h-auto p-0">
+                  <Link to={href}>{t('common.edit')}</Link>
+                </Button>
+              }
+            />
+          );
+        })}
       </div>
 
       <Card>
@@ -97,12 +102,12 @@ export function DashboardPage() {
               ? t('publish.status.pending')
               : t('publish.status.upToDate')}
           </Badge>
-          {data?.lastPublishedAt && (
+          {data?.lastPublishedAt ? (
             <p className="text-sm text-muted-foreground">
               {t('publish.status.lastPublished')}:{' '}
               {new Date(data.lastPublishedAt).toLocaleString()}
             </p>
-          )}
+          ) : null}
           <Button variant="outline" size="sm" className="w-fit" asChild>
             <Link to={path('/publish')}>{t('pages.publish')}</Link>
           </Button>

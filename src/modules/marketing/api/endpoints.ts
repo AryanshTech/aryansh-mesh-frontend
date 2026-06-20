@@ -80,28 +80,28 @@ export const companiesApi = {
   list: (token: string, page = 0, size = 20) =>
     apiFetch<CompaniesPageResponse>(`/companies?page=${page}&size=${size}`, token),
   get: (token: string, companyId: string) =>
-    apiFetch<CompanyResponse>(`/marketing/companies/${companyId}`, token),
+    apiFetch<CompanyResponse>(`/companies/${companyId}`, token),
   create: (token: string, body: CreateCompanyRequest) =>
-    apiFetch<CompanyResponse>('/marketing/companies', token, {
+    apiFetch<CompanyResponse>('/companies', token, {
       method: 'POST',
       body: JSON.stringify(body),
     }),
   update: (token: string, companyId: string, body: UpdateCompanyRequest) =>
-    apiFetch<CompanyResponse>(`/marketing/companies/${companyId}`, token, {
+    apiFetch<CompanyResponse>(`/companies/${companyId}`, token, {
       method: 'PUT',
       body: JSON.stringify(body),
     }),
   delete: (token: string, companyId: string) =>
-    apiFetch<void>(`/marketing/companies/${companyId}`, token, { method: 'DELETE' }),
+    apiFetch<void>(`/companies/${companyId}`, token, { method: 'DELETE' }),
 };
 
 export const projectsApi = {
   listByCompany: (token: string, companyId: string) =>
-    apiFetch<ProjectResponse[]>(`/marketing/companies/${companyId}/projects`, token),
+    apiFetch<ProjectResponse[]>(`/companies/${companyId}/projects`, token),
   get: (token: string, projectId: string) =>
     apiFetch<ProjectResponse>(`/projects/${projectId}`, token),
   create: (token: string, companyId: string, body: CreateProjectRequest) =>
-    apiFetch<ProjectResponse>(`/marketing/companies/${companyId}/projects`, token, {
+    apiFetch<ProjectResponse>(`/companies/${companyId}/projects`, token, {
       method: 'POST',
       body: JSON.stringify(body),
     }),
@@ -205,9 +205,9 @@ export const agentJobsApi = {
 
 export const contactsApi = {
   list: (token: string, companyId: string) =>
-    apiFetch<ContactResponse[]>(`/marketing/companies/${companyId}/contacts`, token),
+    apiFetch<ContactResponse[]>(`/companies/${companyId}/contacts`, token),
   create: (token: string, companyId: string, body: CreateContactRequest) =>
-    apiFetch<ContactResponse>(`/marketing/companies/${companyId}/contacts`, token, {
+    apiFetch<ContactResponse>(`/companies/${companyId}/contacts`, token, {
       method: 'POST',
       body: JSON.stringify(body),
     }),
@@ -215,14 +215,14 @@ export const contactsApi = {
 
 export const dealsApi = {
   list: (token: string, companyId: string) =>
-    apiFetch<DealResponse[]>(`/marketing/companies/${companyId}/deals`, token),
+    apiFetch<DealResponse[]>(`/companies/${companyId}/deals`, token),
   create: (token: string, companyId: string, body: CreateDealRequest) =>
-    apiFetch<DealResponse>(`/marketing/companies/${companyId}/deals`, token, {
+    apiFetch<DealResponse>(`/companies/${companyId}/deals`, token, {
       method: 'POST',
       body: JSON.stringify(body),
     }),
   patchStage: (token: string, companyId: string, id: string, body: PatchDealStageRequest) =>
-    apiFetch<DealResponse>(`/marketing/companies/${companyId}/deals/${id}/stage`, token, {
+    apiFetch<DealResponse>(`/companies/${companyId}/deals/${id}/stage`, token, {
       method: 'PATCH',
       body: JSON.stringify(body),
     }),

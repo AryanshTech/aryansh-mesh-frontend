@@ -83,9 +83,17 @@
       "noMembership": "Aucun accès trouvé pour ce compte. Une invitation est requise."
     }
   },
+  "kanban": {
+    "moveTo": "Déplacer vers {{column}}",
+    "moveMenu": "Déplacer vers une colonne",
+    "dragHandle": "Glisser la carte"
+  },
   "shell": {
     "expandSidebar": "Développer la barre latérale",
     "collapseSidebar": "Réduire la barre latérale",
+    "openNavigation": "Ouvrir la navigation",
+    "closeNavigation": "Fermer la navigation",
+    "skipToContent": "Aller au contenu principal",
     "footerCopyright": "© {{year}} Aryansh Tech",
     "theme": {
       "light": "Mode clair",
@@ -98,9 +106,32 @@
       "open": "Ouvrir la palette de commandes",
       "noMatches": "Aucune page correspondante"
     },
+    "productSwitcher": {
+      "label": "Produit",
+      "business": "Business",
+      "marketing": "Marketing"
+    },
+    "adminHub": {
+      "businesses": "Entreprises",
+      "marketing": "Marketing",
+      "noBusinesses": "Aucune entreprise pour le moment. Créez-en une pour commencer.",
+      "noCompanies": "Aucune entreprise marketing pour le moment.",
+      "noProjects": "Aucun projet pour {{company}} pour le moment.",
+      "backToBusinesses": "Toutes les entreprises",
+      "backToAll": "Tous les espaces",
+      "businessWorkspace": "Espace business",
+      "marketingCompany": "Entreprise marketing",
+      "loadingBusiness": "Chargement de l'entreprise…",
+      "loadingCompany": "Chargement de l'entreprise…",
+      "loadingProject": "Chargement du projet…"
+    },
     "nav": {
       "collapse": "Réduire",
       "logout": "Se déconnecter"
+    },
+    "userMenu": {
+      "label": "Menu utilisateur",
+      "account": "Paramètres du compte"
     }
   },
   "nav": {
@@ -125,7 +156,7 @@
     "bookingsDescription": "Demandes de réservation",
     "publish": "Site et publication",
     "publishDescription": "Site public et API",
-    "marketingOverview": "Aperçu marketing",
+    "marketingOverview": "Tableau de bord agence",
     "marketingOverviewDescription": "Tableau de bord agence",
     "companies": "Entreprises",
     "companiesDescription": "Entreprises clientes",
@@ -703,7 +734,9 @@
       "spotlightTitle": "Votre centre de commande GTM",
       "spotlightDescription": "Gérez les entreprises, lancez les workflows IA et approuvez le contenu depuis un espace sombre unifié.",
       "viewCompanies": "Voir toutes les entreprises",
-      "recentCompanies": "Entreprises récentes"
+      "recentCompanies": "Entreprises récentes",
+      "emptyTitle": "Aucune entreprise",
+      "emptyDescription": "Créez votre première entreprise cliente pour lancer les workflows GTM."
     },
     "companies": {
       "title": "Entreprises",
@@ -712,6 +745,7 @@
       "companyCode": "Code entreprise",
       "companyName": "Nom de l'entreprise",
       "empty": "Aucune entreprise. Créez votre première entreprise pour commencer.",
+      "emptyTitle": "Aucune entreprise",
       "creating": "Création…",
       "tableCode": "Code",
       "tableName": "Nom",
@@ -731,6 +765,7 @@
       "create": "Nouveau projet",
       "projectName": "Nom du projet",
       "empty": "Aucun projet. Créez un projet pour démarrer votre flux GTM.",
+      "emptyTitle": "Aucun projet",
       "open": "Ouvrir le tableau de bord",
       "tableName": "Nom",
       "tableOnboarding": "Intégration",
@@ -986,6 +1021,7 @@
     "studio": {
       "title": "Studio marketing",
       "subtitle": "Fil d'activité, idées, pipeline contenu, styles et carte stratégique",
+      "urlPlaceholder": "https://",
       "pipelineTitle": "Pipeline agent GTM",
       "tabs": {
         "feed": "Fil",

@@ -1,9 +1,10 @@
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, LayersIcon } from 'lucide-react';
 import { useEffect } from 'react';
-import { appColors } from '@/design-system/tokens/colors';
+import { layout } from '@/design-system/tokens/layout';
 import { cn } from '@/design-system/lib/utils';
+import { Button } from '@/design-system/components/ui/button';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
 import {
   Collapsible,
@@ -12,20 +13,30 @@ import {
 } from '@/design-system/components/ui/collapsible';
 import { useSidebarNavContext } from '@/modules/marketing/contexts/sidebar-nav-context';
 import { companyDisplayName } from '@/modules/marketing/hooks/company-display';
+import { useTenant } from '@/modules/business/features/admin/use-tenants';
 import {
   buildProjectNavPath,
-  isNavItemActive,
   MARKETING_PROJECT_NAV,
   type NavItemDef,
   type NavSectionDef,
 } from '@/shell/navigation';
+import { ProductSwitcher } from '@/shell/ProductSwitcher';
 import { useFilteredNavSections } from '@/shell/use-filtered-nav';
+import { useShellNavContext } from '@/shell/use-shell-nav-context';
 import { usePermissions } from '@/core/permissions/use-permissions';
+import { AdminHubNav } from '@/shell/sidebar/AdminHubNav';
+import { BusinessWorkspaceNav } from '@/shell/sidebar/BusinessWorkspaceNav';
+import { MarketingCompanyNav } from '@/shell/sidebar/MarketingContextNav';
+import { SidebarContextHeader } from '@/shell/sidebar/SidebarContextHeader';
+import { WorkspaceNavLink } from '@/shell/sidebar/WorkspaceNavLink';
 
 const SIDEBAR_STORAGE_KEY = 'aryansh_mesh_sidebar_collapsed';
 
 type ShellSidebarProps = {
   isCollapsed: boolean;
+  forceExpanded?: boolean;
+  onNavigate?: () => void;
+  className?: string;
 };
 
 function NavLinkItem({
@@ -33,56 +44,35 @@ function NavLinkItem({
   isCollapsed,
   currentPath,
   basePath = '',
+  onNavigate,
 }: {
   item: NavItemDef;
   isCollapsed: boolean;
   currentPath: string;
   basePath?: string;
+  onNavigate?: () => void;
 }) {
-  const { t } = useTranslation();
-  const Icon = item.icon;
-  const href = basePath
-    ? item.path
-      ? `${basePath}/${item.path.replace(/^\//, '')}`
-      : basePath
-    : item.path;
-  const isActive = isNavItemActive(currentPath, item, basePath);
-  const c = appColors.sidebar;
-  const label = t(item.labelKey);
-
   return (
-    <Link
-      to={href}
-      aria-current={isActive ? 'page' : undefined}
-      title={isCollapsed ? label : undefined}
-      className={cn(
-        'group relative flex items-center rounded-md border border-transparent px-2 py-2 outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-primary-focus/50',
-        isActive ? c.itemActive : c.item,
-        isCollapsed && 'justify-center px-2',
-      )}
-    >
-      {isActive && !isCollapsed ? (
-        <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-primary" />
-      ) : null}
-      <div className={cn('flex items-center gap-2.5', isCollapsed && 'justify-center')}>
-        <Icon
-          className={cn(
-            'size-4 shrink-0',
-            isActive ? 'text-primary' : 'text-ink-subtle group-hover:text-ink',
-          )}
-        />
-        {!isCollapsed ? (
-          <span className={cn('text-sm font-medium', isActive && 'text-primary')}>{label}</span>
-        ) : null}
-      </div>
-    </Link>
+    <WorkspaceNavLink
+      item={item}
+      basePath={basePath}
+      currentPath={currentPath}
+      isCollapsed={isCollapsed}
+      onNavigate={onNavigate}
+    />
   );
 }
 
-function MarketingTree({ isCollapsed }: { isCollapsed: boolean }) {
+function MarketingTree({
+  isCollapsed,
+  onNavigate,
+}: {
+  isCollapsed: boolean;
+  onNavigate?: () => void;
+}) {
   const { t } = useTranslation();
   const { pathname } = useLocation();
-  const { companyId, projectId } = useParams();
+  const { companyId, projectId } = useShellNavContext();
   const { canAccessMarketing } = usePermissions();
   const {
     companies,
@@ -105,9 +95,27 @@ function MarketingTree({ isCollapsed }: { isCollapsed: boolean }) {
     }
   }, [projectId, getProjectCompanyId, expandCompany]);
 
-  if (!canAccessMarketing || isCollapsed) return null;
+  if (!canAccessMarketing) return null;
 
   const projectBase = projectId ? `/marketing/projects/${projectId}` : '';
+
+  if (isCollapsed) {
+    if (!projectId) return null;
+    return (
+      <div className="mt-2 flex flex-col gap-0.5 border-t border-border pt-2">
+        {MARKETING_PROJECT_NAV.map((item) => (
+          <NavLinkItem
+            key={item.id}
+            item={item}
+            isCollapsed
+            currentPath={pathname}
+            basePath={projectBase}
+            onNavigate={onNavigate}
+          />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-1 pl-1">
@@ -123,33 +131,47 @@ function MarketingTree({ isCollapsed }: { isCollapsed: boolean }) {
               open={isExpanded}
               onOpenChange={() => toggleCompany(company.companyId)}
             >
-              <CollapsibleTrigger className="flex w-full items-center gap-1 rounded-md px-2 py-1.5 text-sm text-ink-subtle hover:bg-surface-1 hover:text-ink">
-                <ChevronRight
-                  className={cn('size-3.5 shrink-0 transition-transform', isExpanded && 'rotate-90')}
-                />
-                <span className="truncate">{companyDisplayName(company)}</span>
+              <CollapsibleTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="h-auto w-full justify-start gap-1 rounded-sm px-2 py-1.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+                >
+                  <ChevronRight
+                    className={cn('size-3.5 shrink-0 transition-transform', isExpanded && 'rotate-90')}
+                  />
+                  <span className="truncate">{companyDisplayName(company)}</span>
+                </Button>
               </CollapsibleTrigger>
               <CollapsibleContent className="flex flex-col gap-0.5 pl-4">
-                <Link
-                  to={`/marketing/companies/${company.companyId}`}
-                  className={cn(
-                    'rounded-md px-2 py-1.5 text-xs text-ink-subtle hover:bg-surface-1 hover:text-ink',
-                    pathname === `/marketing/companies/${company.companyId}` && 'bg-primary/10 text-primary',
-                  )}
-                >
-                  {t('nav.projects')}
-                </Link>
-                {projects.map((project) => (
+                <Button variant="ghost" asChild className="h-auto justify-start rounded-sm px-2 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
                   <Link
-                    key={project.projectId}
-                    to={buildProjectNavPath(project.projectId, '')}
+                    to={`/marketing/companies/${company.companyId}`}
+                    onClick={onNavigate}
                     className={cn(
-                      'truncate rounded-md px-2 py-1.5 text-xs text-ink-subtle hover:bg-surface-1 hover:text-ink',
-                      projectId === project.projectId && 'bg-primary/10 text-primary',
+                      pathname === `/marketing/companies/${company.companyId}` && 'bg-primary/10 text-primary',
                     )}
                   >
-                    {project.name}
+                    {t('nav.projects')}
                   </Link>
+                </Button>
+                {projects.map((project) => (
+                  <Button
+                    key={project.projectId}
+                    variant="ghost"
+                    asChild
+                    className="h-auto justify-start rounded-sm px-2 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
+                  >
+                    <Link
+                      to={buildProjectNavPath(project.projectId, '')}
+                      onClick={onNavigate}
+                      className={cn(
+                        'truncate',
+                        projectId === project.projectId && 'bg-primary/10 text-primary',
+                      )}
+                    >
+                      {project.name}
+                    </Link>
+                  </Button>
                 ))}
               </CollapsibleContent>
             </Collapsible>
@@ -158,8 +180,8 @@ function MarketingTree({ isCollapsed }: { isCollapsed: boolean }) {
       )}
 
       {projectId ? (
-        <div className="mt-2 flex flex-col gap-0.5 border-t border-hairline pt-2">
-          <p className="px-2 text-xs font-medium uppercase tracking-wide text-ink-subtle">
+        <div className="mt-2 flex flex-col gap-0.5 border-t border-border pt-2">
+          <p className="text-xs font-medium uppercase font-mono px-2 text-muted-foreground">
             {t('nav.sections.project')}
           </p>
           {MARKETING_PROJECT_NAV.map((item) => (
@@ -169,6 +191,7 @@ function MarketingTree({ isCollapsed }: { isCollapsed: boolean }) {
               isCollapsed={false}
               currentPath={pathname}
               basePath={projectBase}
+              onNavigate={onNavigate}
             />
           ))}
         </div>
@@ -181,54 +204,50 @@ function NavSection({
   section,
   isCollapsed,
   currentPath,
+  onNavigate,
 }: {
   section: NavSectionDef;
   isCollapsed: boolean;
   currentPath: string;
+  onNavigate?: () => void;
 }) {
   const { t } = useTranslation();
 
   return (
     <div className="flex flex-col gap-0.5">
       {!isCollapsed ? (
-        <p className={cn(appColors.sidebar.sectionLabel, 'px-2 py-1.5')}>{t(section.labelKey)}</p>
+        <p className={cn(layout.sidebar.sectionLabel, 'px-2 py-1.5')}>{t(section.labelKey)}</p>
       ) : null}
       {section.items.map((item) => (
-        <NavLinkItem key={item.id} item={item} isCollapsed={isCollapsed} currentPath={currentPath} />
+        <NavLinkItem
+          key={item.id}
+          item={item}
+          isCollapsed={isCollapsed}
+          currentPath={currentPath}
+          onNavigate={onNavigate}
+        />
       ))}
-      {section.id === 'marketing' ? <MarketingTree isCollapsed={isCollapsed} /> : null}
+      {section.id === 'marketing' ? (
+        <MarketingTree isCollapsed={isCollapsed} onNavigate={onNavigate} />
+      ) : null}
     </div>
   );
 }
 
-export function ShellSidebar({ isCollapsed }: ShellSidebarProps) {
-  const { t } = useTranslation();
+function DefaultSidebarNav({
+  isCollapsed,
+  onNavigate,
+}: {
+  isCollapsed: boolean;
+  onNavigate?: () => void;
+}) {
   const { pathname } = useLocation();
   const sections = useFilteredNavSections();
-  const c = appColors.sidebar;
+  const { isPlatformOperator } = useShellNavContext();
 
   return (
-    <aside
-      className={cn(
-        'sticky top-0 flex h-screen flex-col',
-        c.container,
-        isCollapsed ? 'w-[68px] px-2 py-4' : 'w-[228px] px-3 py-4',
-      )}
-    >
-      <Link
-        to="/dashboard"
-        className={cn(
-          'mb-4 flex items-center gap-2 rounded-md px-2 py-2 font-semibold text-ink hover:bg-surface-1',
-          isCollapsed && 'justify-center',
-        )}
-        title={t('nav.appName')}
-      >
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary text-sm text-primary-foreground">
-          A
-        </span>
-        {!isCollapsed ? <span className="truncate text-sm">{t('nav.appName')}</span> : null}
-      </Link>
-
+    <>
+      {!isPlatformOperator ? <ProductSwitcher isCollapsed={isCollapsed} /> : null}
       <nav className="flex flex-1 flex-col gap-3 overflow-y-auto">
         {sections.map((section) => (
           <NavSection
@@ -236,12 +255,187 @@ export function ShellSidebar({ isCollapsed }: ShellSidebarProps) {
             section={section}
             isCollapsed={isCollapsed}
             currentPath={pathname}
+            onNavigate={onNavigate}
           />
         ))}
       </nav>
+    </>
+  );
+}
+
+function ContextSidebarNav({
+  isCollapsed,
+  onNavigate,
+}: {
+  isCollapsed: boolean;
+  onNavigate?: () => void;
+}) {
+  const { t } = useTranslation();
+  const {
+    mode,
+    workspaceTenantId,
+    workspaceBase,
+    projectId,
+    companyId,
+    pathname,
+  } = useShellNavContext();
+  const { data: tenant } = useTenant(workspaceTenantId ?? '');
+  const {
+    companies,
+    getProjectName,
+    getCompanyName,
+    getProjectCompanyId,
+    expandCompany,
+  } = useSidebarNavContext();
+
+  useEffect(() => {
+    if (companyId) expandCompany(companyId);
+    if (projectId) {
+      const resolved = getProjectCompanyId(projectId);
+      if (resolved) expandCompany(resolved);
+    }
+  }, [companyId, projectId, expandCompany, getProjectCompanyId]);
+
+  if (mode === 'business-workspace' && workspaceBase && workspaceTenantId) {
+    return (
+      <>
+        <SidebarContextHeader
+          backTo="/admin/tenants"
+          backLabelKey="shell.adminHub.backToBusinesses"
+          title={tenant?.name ?? t('shell.adminHub.loadingBusiness')}
+          subtitle={t('shell.adminHub.businessWorkspace')}
+          isCollapsed={isCollapsed}
+          onNavigate={onNavigate}
+        />
+        <nav className="flex flex-1 flex-col gap-3 overflow-y-auto">
+          <BusinessWorkspaceNav
+            basePath={workspaceBase}
+            currentPath={pathname}
+            isCollapsed={isCollapsed}
+            onNavigate={onNavigate}
+          />
+        </nav>
+      </>
+    );
+  }
+
+  if (mode === 'marketing-project' && projectId) {
+    const resolvedCompanyId = companyId ?? getProjectCompanyId(projectId) ?? '';
+    const projectName = getProjectName(projectId) ?? t('shell.adminHub.loadingProject');
+    const companyLabel = resolvedCompanyId ? getCompanyName(resolvedCompanyId) : undefined;
+
+    return (
+      <>
+        <SidebarContextHeader
+          backTo="/admin/tenants"
+          backLabelKey="shell.adminHub.backToAll"
+          title={projectName}
+          subtitle={companyLabel}
+          isCollapsed={isCollapsed}
+          onNavigate={onNavigate}
+        />
+        <nav className="flex flex-1 flex-col gap-3 overflow-y-auto">
+          <MarketingCompanyNav
+            companyId={resolvedCompanyId}
+            projectId={projectId}
+            pathname={pathname}
+            isCollapsed={isCollapsed}
+            onNavigate={onNavigate}
+          />
+        </nav>
+      </>
+    );
+  }
+
+  if (mode === 'marketing-company' && companyId) {
+    const company = companies.find((c) => c.companyId === companyId);
+
+    return (
+      <>
+        <SidebarContextHeader
+          backTo="/admin/tenants"
+          backLabelKey="shell.adminHub.backToAll"
+          title={company ? companyDisplayName(company) : t('shell.adminHub.loadingCompany')}
+          subtitle={t('shell.adminHub.marketingCompany')}
+          isCollapsed={isCollapsed}
+          onNavigate={onNavigate}
+        />
+        <nav className="flex flex-1 flex-col gap-3 overflow-y-auto">
+          <MarketingCompanyNav
+            companyId={companyId}
+            pathname={pathname}
+            isCollapsed={isCollapsed}
+            onNavigate={onNavigate}
+          />
+        </nav>
+      </>
+    );
+  }
+
+  return null;
+}
+
+export function ShellSidebar({
+  isCollapsed,
+  forceExpanded = false,
+  onNavigate,
+  className,
+}: ShellSidebarProps) {
+  const { t } = useTranslation();
+  const { pathname } = useLocation();
+  const { mode, isPlatformOperator } = useShellNavContext();
+  const c = layout.sidebar;
+  const navCollapsed = forceExpanded ? false : isCollapsed;
+  const homePath = isPlatformOperator ? '/admin/tenants' : '/dashboard';
+  const useContextNav =
+    mode === 'business-workspace' ||
+    mode === 'marketing-project' ||
+    mode === 'marketing-company';
+
+  return (
+    <aside
+      className={cn(
+        'sticky top-0 flex h-screen flex-col',
+        c.container,
+        navCollapsed ? 'w-[68px] px-2 py-4' : 'w-[228px] px-3 py-4',
+        className,
+      )}
+    >
+      <Link
+        to={homePath}
+        onClick={onNavigate}
+        className={cn(
+          'mb-4 flex items-center gap-2 rounded-md px-2 py-2 font-semibold text-foreground hover:bg-muted',
+          navCollapsed && 'justify-center',
+        )}
+        title={navCollapsed ? t('nav.appName') : undefined}
+      >
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <LayersIcon className="size-5" aria-hidden />
+        </span>
+        {!navCollapsed ? <span className="truncate text-sm">{t('nav.appName')}</span> : null}
+      </Link>
+
+      {isPlatformOperator && !useContextNav ? (
+        <nav className="flex flex-1 flex-col gap-3 overflow-y-auto">
+          <AdminHubNav
+            isCollapsed={navCollapsed}
+            pathname={pathname}
+            onNavigate={onNavigate}
+          />
+        </nav>
+      ) : null}
+
+      {isPlatformOperator && useContextNav ? (
+        <ContextSidebarNav isCollapsed={navCollapsed} onNavigate={onNavigate} />
+      ) : null}
+
+      {!isPlatformOperator ? (
+        <DefaultSidebarNav isCollapsed={navCollapsed} onNavigate={onNavigate} />
+      ) : null}
 
       <footer className={c.footer}>
-        <p className={cn('px-2 text-xs text-ink-subtle', isCollapsed && 'sr-only')}>
+        <p className={cn('px-2 text-xs text-muted-foreground', navCollapsed && 'sr-only')}>
           {t('shell.footerCopyright', { year: new Date().getFullYear() })}
         </p>
       </footer>

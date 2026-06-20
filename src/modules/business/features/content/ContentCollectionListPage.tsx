@@ -83,7 +83,6 @@ export function ContentCollectionListPage() {
   return (
     <CrmPageShell>
       <PageHeader
-        title={t('pages.content')}
         description={t('content.subtitle')}
         breadcrumbs={
           isWorkspace

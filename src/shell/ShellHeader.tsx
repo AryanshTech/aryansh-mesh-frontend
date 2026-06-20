@@ -1,29 +1,39 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
-import { Languages, Moon, PanelLeftClose, PanelLeftOpen, Search, Sun } from 'lucide-react';
+import { useMemo } from 'react';
+import { PanelLeftClose, PanelLeftOpen, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { appColors } from '@/design-system/tokens/colors';
+import { layout } from '@/design-system/tokens/layout';
 import { cn } from '@/design-system/lib/utils';
 import { Button } from '@/design-system/components/ui/button';
 import { Input } from '@/design-system/components/ui/input';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/design-system/components/ui/dialog';
-import { useTheme } from '@/core/theme/ThemeProvider';
-import { getLocale, setLocale } from '@/core/i18n';
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandShortcut,
+} from '@/design-system/components/ui/command';
 import {
   useHeaderActionsList,
   useSetShellToolbarHost,
   useShellSearchSlot,
 } from '@/shell/HeaderActionsContext';
 import { useCommandNavLinks } from '@/shell/use-filtered-nav';
+import { UserMenu } from '@/shell/UserMenu';
+import { ShellIconButton } from '@/shared/components/layout/ShellIconButton';
+import { ShellUtilityActions } from '@/shared/components/layout/ShellUtilityActions';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/design-system/components/ui/tooltip';
 
 type ShellHeaderProps = {
   isCollapsed: boolean;
+  isMobileNav?: boolean;
+  mobileNavOpen?: boolean;
   pageTitle: string;
   pageSubtitle?: string;
   commandOpen: boolean;
@@ -34,6 +44,8 @@ type ShellHeaderProps = {
 
 export function ShellHeader({
   isCollapsed,
+  isMobileNav = false,
+  mobileNavOpen = false,
   pageTitle,
   pageSubtitle,
   commandOpen,
@@ -43,88 +55,51 @@ export function ShellHeader({
 }: ShellHeaderProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { resolved, setMode } = useTheme();
-  const [filterQuery, setFilterQuery] = useState('');
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const commandInputRef = useRef<HTMLInputElement>(null);
   const pageActions = useHeaderActionsList();
   const shellSearch = useShellSearchSlot();
   const setShellToolbarHost = useSetShellToolbarHost();
   const navLinks = useCommandNavLinks();
-  const sh = appColors.shellHeader;
-  const ThemeIcon = resolved === 'dark' ? Sun : Moon;
+  const sh = layout.shellHeader;
 
-  const filteredLinks = useMemo(() => {
-    const q = filterQuery.trim().toLowerCase();
-    if (!q) return navLinks;
-    return navLinks.filter((link) => {
-      const label = t(link.labelKey).toLowerCase();
-      const desc = t(link.descriptionKey, { defaultValue: '' }).toLowerCase();
-      return label.includes(q) || desc.includes(q);
-    });
-  }, [filterQuery, navLinks, t]);
+  const sidebarToggleLabel = isMobileNav
+    ? mobileNavOpen
+      ? t('shell.closeNavigation')
+      : t('shell.openNavigation')
+    : isCollapsed
+      ? t('shell.expandSidebar')
+      : t('shell.collapseSidebar');
 
-  useEffect(() => {
-    if (!commandOpen) {
-      setFilterQuery('');
-      setSelectedIndex(0);
-      return;
-    }
-    const id = window.requestAnimationFrame(() => {
-      commandInputRef.current?.focus();
-    });
-    return () => window.cancelAnimationFrame(id);
-  }, [commandOpen]);
+  const SidebarToggleIcon = isMobileNav
+    ? mobileNavOpen
+      ? PanelLeftClose
+      : PanelLeftOpen
+    : isCollapsed
+      ? PanelLeftOpen
+      : PanelLeftClose;
 
-  useEffect(() => {
-    setSelectedIndex((i) => Math.min(i, Math.max(0, filteredLinks.length - 1)));
-  }, [filterQuery, filteredLinks.length]);
-
-  const handleCommandInputKeyDown = (e: ReactKeyboardEvent<HTMLInputElement>) => {
-    if (filteredLinks.length === 0) return;
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setSelectedIndex((i) => Math.min(i + 1, filteredLinks.length - 1));
-      return;
-    }
-    if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setSelectedIndex((i) => Math.max(i - 1, 0));
-      return;
-    }
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const link = filteredLinks[selectedIndex];
-      if (link) {
-        navigate(link.to);
-        onCloseCommand();
-      }
-    }
-  };
-
-  const toggleLocale = () => {
-    setLocale(getLocale() === 'en' ? 'fr' : 'en');
-  };
-
-  const toggleTheme = () => {
-    setMode(resolved === 'dark' ? 'light' : 'dark');
-  };
+  const commandItems = useMemo(
+    () =>
+      navLinks.map((link) => ({
+        ...link,
+        label: t(link.labelKey),
+        description: t(link.descriptionKey, { defaultValue: link.to }),
+      })),
+    [navLinks, t],
+  );
 
   return (
     <>
-      <header className={sh.container}>
+      <header className="shell-header">
         <div className={sh.colLeft}>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-8 text-ink-subtle hover:bg-surface-2 hover:text-ink"
+          <ShellIconButton
             onClick={onToggleSidebar}
-            aria-label={isCollapsed ? t('shell.expandSidebar') : t('shell.collapseSidebar')}
+            aria-label={sidebarToggleLabel}
+            aria-expanded={isMobileNav ? mobileNavOpen : undefined}
           >
-            {isCollapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
-          </Button>
+            <SidebarToggleIcon />
+          </ShellIconButton>
           <div className="min-w-0">
-            <p className={sh.title}>{pageTitle}</p>
+            <h1 className={sh.title}>{pageTitle}</h1>
             {pageSubtitle ? <p className={sh.subtitle}>{pageSubtitle}</p> : null}
           </div>
         </div>
@@ -140,7 +115,7 @@ export function ShellHeader({
                   placeholder={shellSearch.placeholder}
                   aria-label={shellSearch.ariaLabel ?? shellSearch.placeholder}
                   disabled={shellSearch.disabled}
-                  className={sh.searchInput}
+                  className="pl-9"
                 />
               </div>
             </div>
@@ -148,15 +123,18 @@ export function ShellHeader({
             <div className={sh.searchCluster}>
               <div className={cn(sh.searchFieldWrap, 'w-full')}>
                 <Search className={sh.searchIcon} />
-                <button
+                <Button
                   type="button"
-                  className={sh.commandTrigger}
+                  variant="outline"
+                  className="h-10 w-full justify-start pl-9 pr-3 text-muted-foreground hover:text-foreground"
                   onClick={onOpenCommand}
                   aria-label={t('shell.commandPalette.open')}
                 >
-                  <span className="min-w-0 flex-1 truncate">{t('shell.commandPalette.placeholder')}</span>
-                  <kbd className={sh.commandTriggerShortcut}>⌘K</kbd>
-                </button>
+                  <span className="flex-1 truncate text-left text-sm">
+                    {t('shell.commandPalette.placeholder')}
+                  </span>
+                  <CommandShortcut className="hidden sm:inline-flex">⌘K</CommandShortcut>
+                </Button>
               </div>
               <div ref={setShellToolbarHost} className={sh.toolbarHost} />
             </div>
@@ -164,77 +142,65 @@ export function ShellHeader({
         </div>
 
         <div className={sh.colRight}>
+          {isMobileNav && !shellSearch ? (
+            <ShellIconButton
+              onClick={onOpenCommand}
+              aria-label={t('shell.commandPalette.open')}
+            >
+              <Search className="size-4" />
+            </ShellIconButton>
+          ) : null}
           {pageActions.map((action) => {
             const Icon = action.icon;
             return (
-              <button
-                key={action.id}
-                type="button"
-                className={cn(sh.iconButton, action.pressed && sh.iconButtonActive)}
-                onClick={action.onSelect}
-                aria-label={action.label}
-                aria-pressed={action.pressed ? true : undefined}
-              >
-                <Icon className="size-4" />
-              </button>
+              <Tooltip key={action.id}>
+                <TooltipTrigger asChild>
+                  <ShellIconButton
+                    onClick={action.onSelect}
+                    aria-label={action.label}
+                    aria-pressed={action.pressed ? true : undefined}
+                    className={cn(action.pressed && 'bg-primary/10 text-primary')}
+                  >
+                    <Icon className="size-4" />
+                  </ShellIconButton>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">{action.label}</TooltipContent>
+              </Tooltip>
             );
           })}
-          <button type="button" className={sh.iconButton} onClick={toggleLocale} aria-label={t('common.locale.toggle')}>
-            <Languages className="size-4" />
-          </button>
-          <button
-            type="button"
-            className={sh.iconButton}
-            onClick={toggleTheme}
-            aria-label={resolved === 'dark' ? t('shell.theme.light') : t('shell.theme.dark')}
-          >
-            <ThemeIcon className="size-4" />
-          </button>
+          <UserMenu />
+          <ShellUtilityActions />
         </div>
       </header>
 
-      <Dialog open={commandOpen} onOpenChange={(open) => !open && onCloseCommand()}>
-        <DialogContent className="gap-3 p-4 sm:max-w-lg">
-          <DialogHeader className="sr-only">
-            <DialogTitle>{t('shell.commandPalette.title')}</DialogTitle>
-            <DialogDescription>{t('shell.commandPalette.description')}</DialogDescription>
-          </DialogHeader>
-          <Input
-            ref={commandInputRef}
-            value={filterQuery}
-            onChange={(e) => setFilterQuery(e.target.value)}
-            onKeyDown={handleCommandInputKeyDown}
-            placeholder={t('shell.commandPalette.placeholder')}
-            data-command-palette-input="true"
-            className="h-11"
-          />
-          <div className="grid max-h-[min(50vh,24rem)] gap-1 overflow-y-auto">
-            {filteredLinks.length === 0 ? (
-              <p className="py-4 text-center text-sm text-ink-subtle">{t('shell.commandPalette.noMatches')}</p>
-            ) : (
-              filteredLinks.map((link, index) => (
-                <button
-                  key={link.to}
-                  type="button"
-                  className={cn(sh.commandPaletteRow, index === selectedIndex && sh.commandPaletteRowSelected)}
-                  onClick={() => {
-                    navigate(link.to);
-                    onCloseCommand();
-                  }}
-                  onMouseEnter={() => setSelectedIndex(index)}
-                >
-                  <div className="min-w-0 flex-1 text-left">
-                    <p className="text-sm font-semibold text-ink">{t(link.labelKey)}</p>
-                    <p className="text-xs text-ink-subtle">
-                      {t(link.descriptionKey, { defaultValue: link.to })}
-                    </p>
-                  </div>
-                </button>
-              ))
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <CommandDialog
+        open={commandOpen}
+        onOpenChange={(open) => !open && onCloseCommand()}
+        title={t('shell.commandPalette.title')}
+        description={t('shell.commandPalette.description')}
+      >
+        <CommandInput placeholder={t('shell.commandPalette.placeholder')} />
+        <CommandList>
+          <CommandEmpty>{t('shell.commandPalette.noMatches')}</CommandEmpty>
+          <CommandGroup>
+            {commandItems.map((link) => (
+              <CommandItem
+                key={link.to}
+                value={`${link.label} ${link.description} ${link.to}`}
+                onSelect={() => {
+                  navigate(link.to);
+                  onCloseCommand();
+                }}
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-foreground">{link.label}</p>
+                  <p className="text-xs text-muted-foreground">{link.description}</p>
+                </div>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
     </>
   );
 }

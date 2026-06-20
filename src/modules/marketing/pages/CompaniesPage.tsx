@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Building2Icon, FolderKanbanIcon, PlusIcon, UsersIcon } from 'lucide-react';
 import { companiesApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
@@ -22,6 +22,7 @@ import {
 } from '@/design-system/components/ui/dialog';
 import {
   Empty,
+  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
@@ -46,7 +47,6 @@ function countNewThisMonth(companies: CompanyResponse[]): number {
 
 export function CompaniesPage() {
   const { getToken, canWrite } = useAuth();
-  const navigate = useNavigate();
   const { projectsByCompany, expandCompany } = useSidebarNavContext();
 
   const companiesQuery = useQuery({
@@ -103,14 +103,13 @@ export function CompaniesPage() {
   return (
     <CrmPageShell>
       <PageHeader
-        title={t('companies.title')}
         description={t('companies.subtitle')}
         action={createButton}
       />
       {loading ? (
         <div className="grid gap-4 md:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-28 w-full rounded-xl" />
+            <Skeleton key={i} className="h-28 w-full rounded-lg" />
           ))}
         </div>
       ) : (
@@ -137,21 +136,23 @@ export function CompaniesPage() {
       )}
 
       {loading ? (
-        <Skeleton className="h-64 w-full rounded-xl" />
+        <Skeleton className="h-64 w-full rounded-lg" />
       ) : companies.length === 0 ? (
-        <Empty className="rounded-xl border border-dashed">
+        <Empty className="rounded-lg border border-dashed py-12">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <Building2Icon />
             </EmptyMedia>
-            <EmptyTitle>{t('companies.title')}</EmptyTitle>
+            <EmptyTitle>{t('companies.emptyTitle')}</EmptyTitle>
             <EmptyDescription>{t('companies.empty')}</EmptyDescription>
           </EmptyHeader>
-          {canWrite && (
-            <Button onClick={() => setModalOpen(true)}>
-              {t('companies.create')}
-            </Button>
-          )}
+          {canWrite ? (
+            <EmptyContent>
+              <Button onClick={() => setModalOpen(true)}>
+                {t('companies.create')}
+              </Button>
+            </EmptyContent>
+          ) : null}
         </Empty>
       ) : (
         <DataTableCard
@@ -168,15 +169,23 @@ export function CompaniesPage() {
             </TableHeader>
             <TableBody>
               {companies.map((company) => (
-                <TableRow
-                  key={company.companyId}
-                  className="cursor-pointer"
-                  onClick={() => navigate(`/marketing/companies/${company.companyId}`)}
-                >
+                <TableRow key={company.companyId}>
                   <TableCell className="font-mono text-sm">
-                    {company.companyCode}
+                    <Link
+                      to={`/marketing/companies/${company.companyId}`}
+                      className="font-medium text-foreground hover:text-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-sm"
+                    >
+                      {company.companyCode}
+                    </Link>
                   </TableCell>
-                  <TableCell className="font-medium">{company.name}</TableCell>
+                  <TableCell>
+                    <Link
+                      to={`/marketing/companies/${company.companyId}`}
+                      className="font-medium text-foreground hover:text-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-sm"
+                    >
+                      {company.name}
+                    </Link>
+                  </TableCell>
                   <TableCell className="font-tabular text-muted-foreground">
                     {formatDate(company.createdAt)}
                   </TableCell>

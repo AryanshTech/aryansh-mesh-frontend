@@ -1,4 +1,4 @@
-import { platformColors } from '@/design-system/tokens/colors';
+import { platformColors } from '@/design-system/tokens/platformColors';
 import { formatDateTime, t } from '@/core/i18n';
 import type { SocialPlatform, StyleReferenceResponse } from '@/modules/marketing/types/api';
 import { Badge } from '@/design-system/components/ui/badge';

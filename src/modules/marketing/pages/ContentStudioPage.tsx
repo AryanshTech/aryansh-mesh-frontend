@@ -77,9 +77,9 @@ export function ContentStudioPage() {
 
   return (
     <CrmPageShell>
-      <PageHeader title={t('content.title')} description={t('content.subtitle')} />
+      <PageHeader description={t('content.subtitle')} />
       {loading ? (
-        <Skeleton className="h-64 w-full rounded-xl" />
+        <Skeleton className="h-64 w-full rounded-lg" />
       ) : (
         <DataTableCard
           title={t('content.queueTitle')}

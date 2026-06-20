@@ -1,15 +1,21 @@
 import type { LucideIcon } from 'lucide-react';
 import {
   Blocks,
+  Brain,
   Building2,
   CalendarClock,
+  Clapperboard,
+  ClipboardList,
   DollarSign,
+  FileText,
   LayoutDashboard,
   MapPin,
   Megaphone,
   MessageSquareQuote,
+  MessagesSquare,
   Package,
   Rocket,
+  ScanSearch,
   Settings,
   UserSquare2,
   Users,
@@ -63,15 +69,15 @@ export const MARKETING_NAV: NavItemDef[] = [
 
 export const MARKETING_PROJECT_NAV: NavItemDef[] = [
   { id: 'project-dashboard', path: '', labelKey: 'nav.projectDashboard', icon: LayoutDashboard },
-  { id: 'studio', path: 'studio', labelKey: 'nav.studio', icon: Blocks },
-  { id: 'onboarding', path: 'onboarding', labelKey: 'nav.onboarding', icon: Settings },
-  { id: 'spy', path: 'spy', labelKey: 'nav.spy', icon: Megaphone },
-  { id: 'brand-memory', path: 'brand-memory', labelKey: 'nav.brandMemory', icon: MessageSquareQuote },
-  { id: 'marketing-content', path: 'content', labelKey: 'nav.marketingContent', icon: Blocks },
+  { id: 'studio', path: 'studio', labelKey: 'nav.studio', icon: Clapperboard },
+  { id: 'onboarding', path: 'onboarding', labelKey: 'nav.onboarding', icon: ClipboardList },
+  { id: 'spy', path: 'spy', labelKey: 'nav.spy', icon: ScanSearch },
+  { id: 'brand-memory', path: 'brand-memory', labelKey: 'nav.brandMemory', icon: Brain },
+  { id: 'marketing-content', path: 'content', labelKey: 'nav.marketingContent', icon: FileText },
   { id: 'creative', path: 'creative', labelKey: 'nav.creative', icon: Package },
   { id: 'social', path: 'social', labelKey: 'nav.social', icon: CalendarClock },
   { id: 'crm', path: 'crm', labelKey: 'nav.crm', icon: Users },
-  { id: 'workspace', path: 'workspace', labelKey: 'nav.workspace', icon: MessageSquareQuote },
+  { id: 'workspace', path: 'workspace', labelKey: 'nav.workspace', icon: MessagesSquare },
 ];
 
 export const ADMIN_NAV: NavItemDef[] = [
@@ -92,13 +98,41 @@ export const NAV_SECTIONS: NavSectionDef[] = [
   { id: 'settings', labelKey: 'nav.sections.settings', items: SETTINGS_NAV },
 ];
 
+function toWorkspaceRelativeItems(items: NavItemDef[]): NavItemDef[] {
+  return items.map((item) => ({
+    ...item,
+    path: item.path.replace(/^\//, ''),
+    matchPrefix: item.matchPrefix?.replace(/^\//, ''),
+  }));
+}
+
+/** Business module nav for admin tenant workspace routes (`/admin/tenants/:id/workspace/*`). */
+export const BUSINESS_WORKSPACE_SECTIONS: NavSectionDef[] = [
+  { id: 'core', labelKey: 'nav.sections.core', items: toWorkspaceRelativeItems(CORE_NAV) },
+  {
+    id: 'operations',
+    labelKey: 'nav.sections.operations',
+    items: toWorkspaceRelativeItems(OPERATIONS_NAV),
+  },
+  {
+    id: 'settings',
+    labelKey: 'nav.sections.settings',
+    items: toWorkspaceRelativeItems(SETTINGS_NAV),
+  },
+];
+
 export function isNavItemActive(currentPath: string, item: NavItemDef, basePath = ''): boolean {
   const fullPath = basePath
     ? item.path
       ? `${basePath}/${item.path.replace(/^\//, '')}`
       : basePath
     : item.path;
-  const prefix = item.matchPrefix ?? fullPath;
+  const rawPrefix = item.matchPrefix ?? fullPath;
+  const prefix = basePath
+    ? rawPrefix.startsWith('/')
+      ? rawPrefix
+      : `${basePath}/${rawPrefix.replace(/^\//, '')}`
+    : rawPrefix;
   if (item.path === '' && basePath) {
     return currentPath === basePath || currentPath === `${basePath}/`;
   }

@@ -8,7 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/des
 import { Input } from '@/design-system/components/ui/input';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/design-system/components/ui/tabs';
-import { appColors } from '@/design-system/tokens/colors';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { PageHeader } from '@/shared/components/crm/PageHeader';
 import {
@@ -19,12 +18,13 @@ import {
 import { ConnectorGuideCard } from '@/modules/business/features/publish/ConnectorGuideCard';
 import { useTenant } from '@/modules/business/features/admin/use-tenants';
 import { useAuth } from '@/core/auth/use-auth';
+import { resolveApiV1BaseUrl, resolveGatewayOrigin } from '@/core/api/config';
 import { usePermissions } from '@/core/permissions/use-permissions';
 import { useTenantScope } from '@/modules/business/hooks/use-tenant-scope';
 import { ApiError } from '@/modules/business/types/api';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api/v1';
-const EMBED_ORIGIN = API_BASE.replace(/\/api\/v1\/?$/, '');
+const API_V1_BASE = resolveApiV1BaseUrl();
+const EMBED_ORIGIN = resolveGatewayOrigin() || (typeof window !== 'undefined' ? window.location.origin : '');
 const COMPANY_SITE_URL =
   import.meta.env.VITE_COMPANY_SITE_URL?.replace(/\/$/, '') ?? 'https://aryansh.tech';
 
@@ -76,7 +76,7 @@ export function PublishPage() {
   const tenantName =
     (isWorkspace ? workspaceTenant?.name : session?.tenantName) ?? tenantSlug ?? '';
   const embedScript = tenantSlug
-    ? `<script src="${EMBED_ORIGIN}/embed.js" data-slug="${tenantSlug}" data-api="${API_BASE}"></script>`
+    ? `<script src="${EMBED_ORIGIN}/embed.js" data-slug="${tenantSlug}" data-api="${API_V1_BASE}"></script>`
     : '';
 
   async function copyEmbedScript() {
@@ -88,7 +88,6 @@ export function PublishPage() {
   return (
     <CrmPageShell>
       <PageHeader
-        title={t('pages.publish')}
         description={t('publish.subtitle')}
         breadcrumbs={
           isWorkspace
@@ -111,7 +110,7 @@ export function PublishPage() {
       />
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card className={appColors.publish.hubCard}>
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Globe className="size-4 text-primary" />
@@ -120,15 +119,15 @@ export function PublishPage() {
             <CardDescription>{t('publish.hub.publicSiteDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
-            <p className="type-body-sm text-ink-subtle">{t('publish.hub.publicSiteHint')}</p>
+            <p className="text-sm text-muted-foreground">{t('publish.hub.publicSiteHint')}</p>
             {tenantSlug ? (
               <div className="flex flex-wrap items-center gap-2">
-                <Badge className={appColors.publish.statusBadge}>
+                <Badge variant="secondary">
                   {t('publish.hub.slugLabel', { slug: tenantSlug })}
                 </Badge>
                 <Button variant="outline" size="sm" asChild>
                   <a
-                    href={`${API_BASE}/public/tenants/${tenantSlug}/snapshot`}
+                    href={`${API_V1_BASE}/public/tenants/${tenantSlug}/snapshot`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -138,12 +137,12 @@ export function PublishPage() {
                 </Button>
               </div>
             ) : (
-              <p className="type-body-sm text-ink-subtle">{t('publish.hub.noSlug')}</p>
+              <p className="text-sm text-muted-foreground">{t('publish.hub.noSlug')}</p>
             )}
           </CardContent>
         </Card>
 
-        <Card className={appColors.publish.hubCard}>
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ExternalLink className="size-4 text-primary" />
@@ -152,7 +151,7 @@ export function PublishPage() {
             <CardDescription>{t('publish.hub.landingDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
-            <p className="type-body-sm text-ink-subtle">{t('publish.hub.landingHint')}</p>
+            <p className="text-sm text-muted-foreground">{t('publish.hub.landingHint')}</p>
             <div className="flex flex-wrap gap-2">
               <Button variant="outline" size="sm" asChild>
                 <a href={COMPANY_SITE_URL} target="_blank" rel="noopener noreferrer">
@@ -169,7 +168,7 @@ export function PublishPage() {
         <ConnectorGuideCard
           tenantName={tenantName}
           tenantSlug={tenantSlug}
-          apiBase={API_BASE}
+          apiBase={API_V1_BASE}
           embedOrigin={EMBED_ORIGIN}
         />
       ) : null}
@@ -229,7 +228,7 @@ export function PublishPage() {
           {tenantSlug && (
             <p className="text-xs text-muted-foreground">
               {t('publish.embed.apiUrl', {
-                url: `${API_BASE}/public/tenants/${tenantSlug}/snapshot`,
+                url: `${API_V1_BASE}/public/tenants/${tenantSlug}/snapshot`,
               })}
             </p>
           )}

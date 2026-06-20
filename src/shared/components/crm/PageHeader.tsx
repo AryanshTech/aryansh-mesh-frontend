@@ -18,10 +18,13 @@ export interface BreadcrumbItemConfig {
 }
 
 interface PageHeaderProps {
-  title: string;
+  /** Kept for breadcrumbs/context; hidden when hideTitle is true (shell owns h1). */
+  title?: string;
   description?: string;
   breadcrumbs?: BreadcrumbItemConfig[];
   action?: ReactNode;
+  /** Default true — page title renders in ShellHeader only. */
+  hideTitle?: boolean;
 }
 
 export function PageHeader({
@@ -29,9 +32,10 @@ export function PageHeader({
   description,
   breadcrumbs,
   action,
+  hideTitle = true,
 }: PageHeaderProps) {
   return (
-    <div className="flex w-full min-w-0 max-w-full flex-col gap-4">
+    <div className="flex w-full max-w-full flex-col gap-4">
       {breadcrumbs && breadcrumbs.length > 0 && (
         <Breadcrumb>
           <BreadcrumbList className="min-w-0 flex-wrap">
@@ -52,15 +56,19 @@ export function PageHeader({
           </BreadcrumbList>
         </Breadcrumb>
       )}
-      <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0 flex flex-col gap-1">
-          <h1 className={cn('truncate', typographyClasses.pageTitle)}>{title}</h1>
-          {description && (
-            <p className={typographyClasses.pageSubtitle}>{description}</p>
-          )}
+      {(title && !hideTitle) || description || action ? (
+        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex w-full flex-1 flex-col gap-1 sm:min-w-0">
+            {title && !hideTitle ? (
+              <h2 className={cn('truncate', typographyClasses.pageTitle)}>{title}</h2>
+            ) : null}
+            {description ? (
+              <p className={cn('max-w-prose', typographyClasses.pageSubtitle)}>{description}</p>
+            ) : null}
+          </div>
+          {action ? <div className="shrink-0">{action}</div> : null}
         </div>
-        {action && <div className="shrink-0">{action}</div>}
-      </div>
+      ) : null}
     </div>
   );
 }

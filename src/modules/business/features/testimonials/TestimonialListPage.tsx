@@ -83,7 +83,6 @@ export function TestimonialListPage() {
   return (
     <CrmPageShell>
       <PageHeader
-        title={t('pages.testimonials')}
         description={t('testimonials.subtitle')}
         breadcrumbs={
           isWorkspace

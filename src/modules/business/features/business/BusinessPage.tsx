@@ -24,6 +24,7 @@ import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { useBusinessProfile, useUpdateBusiness } from '@/modules/business/features/business/use-business';
 import { usePermissions } from '@/core/permissions/use-permissions';
 import { useTenantScope } from '@/modules/business/hooks/use-tenant-scope';
+import { useWorkspaceBreadcrumbs } from '@/modules/business/hooks/use-workspace-breadcrumbs';
 import { ApiError } from '@/modules/business/types/api';
 
 const schema = z.object({
@@ -49,7 +50,8 @@ type BusinessForm = z.infer<typeof schema>;
 
 export function BusinessPage() {
   const { t } = useTranslation();
-  const { isWorkspace, tenantId } = useTenantScope();
+  const { tenantId } = useTenantScope();
+  const breadcrumbs = useWorkspaceBreadcrumbs(t('pages.business'));
   const { canEdit } = usePermissions();
   const { data, isLoading, isError } = useBusinessProfile();
   const updateBusiness = useUpdateBusiness();
@@ -133,18 +135,10 @@ export function BusinessPage() {
   }
 
   return (
-    <CrmPageShell className="max-w-4xl">
+    <CrmPageShell>
       <PageHeader
-        title={t('pages.business')}
         description={t('business.subtitle')}
-        breadcrumbs={
-          isWorkspace
-            ? [
-                { label: t('admin.tenants.title'), href: '/admin/tenants' },
-                { label: t('pages.business') },
-              ]
-            : undefined
-        }
+        breadcrumbs={breadcrumbs}
         action={
           canEdit ? (
             <Button
@@ -420,14 +414,6 @@ export function BusinessPage() {
               />
             </div>
           </FormSection>
-
-          {canEdit && (
-            <div className="flex justify-end pb-2">
-              <Button type="submit" disabled={updateBusiness.isPending}>
-                {updateBusiness.isPending ? t('common.loading') : t('common.save')}
-              </Button>
-            </div>
-          )}
         </form>
       </Form>
     </CrmPageShell>

@@ -26,7 +26,7 @@ export function DataTableCard({
         {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
       <CardContent className="p-0">
-        <div className="rounded-b-xl border-t">{children}</div>
+        <div className="rounded-b-lg border-t border-border">{children}</div>
       </CardContent>
     </Card>
   );

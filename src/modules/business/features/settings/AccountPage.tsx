@@ -39,7 +39,7 @@ export function AccountPage() {
 
   return (
     <CrmPageShell>
-      <PageHeader title={t('pages.account')} />
+      <PageHeader description={t('account.profileDescription')} />
       <Tabs defaultValue="profile">
         <TabsList>
           <TabsTrigger value="profile">{t('account.profile')}</TabsTrigger>

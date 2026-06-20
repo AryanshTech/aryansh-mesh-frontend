@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import { GripVertical, MoreHorizontal } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   DndContext,
   DragOverlay,
@@ -18,6 +20,16 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/design-system/lib/utils';
+import { Badge } from '@/design-system/components/ui/badge';
+import { Button } from '@/design-system/components/ui/button';
+import { Card } from '@/design-system/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@/design-system/components/ui/dropdown-menu';
 
 export interface KanbanColumn {
   id: string;
@@ -40,11 +52,18 @@ interface KanbanBoardProps {
 
 function KanbanCard({
   item,
+  columns,
   isDragging,
+  onMove,
+  disabled,
 }: {
   item: KanbanItem;
+  columns: KanbanColumn[];
   isDragging?: boolean;
+  onMove: (itemId: string, toColumnId: string) => void;
+  disabled?: boolean;
 }) {
+  const { t } = useTranslation();
   const {
     attributes,
     listeners,
@@ -59,49 +78,96 @@ function KanbanCard({
     transition,
   };
 
+  const moveTargets = columns.filter((column) => column.id !== item.columnId);
+
   return (
-    <div
+    <Card
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
       className={cn(
-        'cursor-grab rounded-lg border border-border bg-card px-3 py-2 shadow-sm active:cursor-grabbing',
-        (isDragging || isSortableDragging) && 'opacity-50'
+        'px-2 py-2 shadow-whisper',
+        (isDragging || isSortableDragging) && 'opacity-50',
       )}
     >
-      <p className="text-sm font-medium text-foreground">{item.title}</p>
-      {item.subtitle && (
-        <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
-          {item.subtitle}
-        </p>
-      )}
-    </div>
+      <div className="flex items-start gap-2">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className={cn(
+            'mt-0.5 size-7 shrink-0 cursor-grab touch-none text-muted-foreground active:cursor-grabbing',
+            disabled && 'pointer-events-none opacity-40',
+          )}
+          aria-label={t('kanban.dragHandle')}
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="size-4" />
+        </Button>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium text-foreground">{item.title}</p>
+          {item.subtitle ? (
+            <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{item.subtitle}</p>
+          ) : null}
+        </div>
+        {moveTargets.length > 0 ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="size-7 shrink-0 text-muted-foreground"
+                disabled={disabled}
+                aria-label={t('kanban.moveMenu')}
+              >
+                <MoreHorizontal className="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuLabel>{t('kanban.moveMenu')}</DropdownMenuLabel>
+              {moveTargets.map((column) => (
+                <DropdownMenuItem
+                  key={column.id}
+                  onClick={() => onMove(item.id, column.id)}
+                >
+                  {t('kanban.moveTo', { column: column.title })}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : null}
+      </div>
+    </Card>
   );
 }
 
 function KanbanColumnPanel({
   column,
   items,
+  columns,
+  onMove,
+  disabled,
 }: {
   column: KanbanColumn;
   items: KanbanItem[];
+  columns: KanbanColumn[];
+  onMove: (itemId: string, toColumnId: string) => void;
+  disabled?: boolean;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
 
   return (
-    <div className="flex min-w-[220px] flex-1 flex-col">
+    <div className="flex min-w-[260px] flex-1 flex-col">
       <div className="mb-2 flex items-center justify-between px-1">
         <h3 className="text-sm font-medium text-foreground">{column.title}</h3>
-        <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
-          {items.length}
-        </span>
+        <Badge variant="secondary">{items.length}</Badge>
       </div>
-      <div
+      <Card
         ref={setNodeRef}
         className={cn(
-          'flex min-h-[120px] flex-1 flex-col gap-2 rounded-xl border border-border bg-secondary/30 p-2 transition-colors',
-          isOver && 'border-primary/40 bg-primary/5'
+          'flex min-h-[120px] flex-1 flex-col gap-2 border-dashed bg-muted/50 p-2 shadow-none transition-colors',
+          isOver && 'border-primary/40 bg-primary/5',
         )}
       >
         <SortableContext
@@ -109,10 +175,16 @@ function KanbanColumnPanel({
           strategy={verticalListSortingStrategy}
         >
           {items.map((item) => (
-            <KanbanCard key={item.id} item={item} />
+            <KanbanCard
+              key={item.id}
+              item={item}
+              columns={columns}
+              onMove={onMove}
+              disabled={disabled}
+            />
           ))}
         </SortableContext>
-      </div>
+      </Card>
     </div>
   );
 }
@@ -127,7 +199,7 @@ export function KanbanBoard({
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(KeyboardSensor)
+    useSensor(KeyboardSensor),
   );
 
   const itemsByColumn = useMemo(() => {
@@ -144,9 +216,7 @@ export function KanbanBoard({
     return map;
   }, [columns, items]);
 
-  const activeItem = activeId
-    ? items.find((item) => item.id === activeId)
-    : undefined;
+  const activeItem = activeId ? items.find((item) => item.id === activeId) : undefined;
 
   const handleDragStart = (event: DragStartEvent) => {
     if (disabled) return;
@@ -181,17 +251,28 @@ export function KanbanBoard({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex gap-4 overflow-x-auto pb-2">
+      <div className="flex min-w-0 gap-4 overflow-x-auto pb-2">
         {columns.map((column) => (
           <KanbanColumnPanel
             key={column.id}
             column={column}
             items={itemsByColumn.get(column.id) ?? []}
+            columns={columns}
+            onMove={onMove}
+            disabled={disabled}
           />
         ))}
       </div>
       <DragOverlay>
-        {activeItem ? <KanbanCard item={activeItem} isDragging /> : null}
+        {activeItem ? (
+          <KanbanCard
+            item={activeItem}
+            columns={columns}
+            isDragging
+            onMove={onMove}
+            disabled={disabled}
+          />
+        ) : null}
       </DragOverlay>
     </DndContext>
   );

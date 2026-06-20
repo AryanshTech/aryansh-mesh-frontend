@@ -72,15 +72,15 @@ export function SocialCalendarPage() {
 
   return (
     <CrmPageShell>
-      <PageHeader title={t('social.title')} description={t('social.subtitle')} />
+      <PageHeader description={t('social.subtitle')} />
       {loading ? (
-        <div className="grid gap-4 md:grid-cols-5">
+        <div className="grid gap-4 md:grid-cols-[repeat(5,minmax(0,1fr))]">
           {WEEKDAYS.map((day) => (
-            <Skeleton key={day} className="h-48 rounded-xl" />
+            <Skeleton key={day} className="h-48 rounded-lg" />
           ))}
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-5">
+        <div className="grid gap-4 md:grid-cols-[repeat(5,minmax(0,1fr))]">
           {WEEKDAYS.map((day, index) => {
             const date = weekDates[index];
             const dateKey = toDateKey(date);
@@ -101,20 +101,19 @@ export function SocialCalendarPage() {
                     <p className="text-xs text-muted-foreground">{t('social.emptyDay')}</p>
                   ) : (
                     dayPosts.map((post) => (
-                      <div
-                        key={post.id}
-                        className="rounded-lg border bg-secondary/50 p-2 text-xs"
-                      >
-                        <div className="mb-1 flex items-center justify-between">
-                          <Badge variant="outline" className="text-[10px]">
-                            {t(`socialPlatforms.${post.platform}`)}
-                          </Badge>
-                          <Badge variant="secondary" className="text-[10px]">
-                            {t(`socialStatus.${post.status}`)}
-                          </Badge>
-                        </div>
-                        <p className="line-clamp-3">{post.content}</p>
-                      </div>
+                      <Card key={post.id} className="shadow-none">
+                        <CardContent className="space-y-1 p-2 text-xs">
+                          <div className="mb-1 flex items-center justify-between gap-1">
+                            <Badge variant="outline" className="text-[10px]">
+                              {t(`socialPlatforms.${post.platform}`)}
+                            </Badge>
+                            <Badge variant="secondary" className="text-[10px]">
+                              {t(`socialStatus.${post.status}`)}
+                            </Badge>
+                          </div>
+                          <p className="line-clamp-3">{post.content}</p>
+                        </CardContent>
+                      </Card>
                     ))
                   )}
                 </CardContent>

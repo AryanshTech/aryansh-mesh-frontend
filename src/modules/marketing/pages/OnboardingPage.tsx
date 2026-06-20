@@ -59,7 +59,7 @@ export function OnboardingPage() {
         description={t('onboarding.subtitle')}
       />
       {loading ? (
-        <Skeleton className="h-48 w-full rounded-xl" />
+        <Skeleton className="h-48 w-full rounded-lg" />
       ) : (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">

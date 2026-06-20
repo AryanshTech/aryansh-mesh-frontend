@@ -83,9 +83,17 @@
       "noMembership": "No access found for this account. You need an invitation from an administrator."
     }
   },
+  "kanban": {
+    "moveTo": "Move to {{column}}",
+    "moveMenu": "Move to column",
+    "dragHandle": "Drag card"
+  },
   "shell": {
     "expandSidebar": "Expand sidebar",
     "collapseSidebar": "Collapse sidebar",
+    "openNavigation": "Open navigation",
+    "closeNavigation": "Close navigation",
+    "skipToContent": "Skip to main content",
     "footerCopyright": "© {{year}} Aryansh Tech",
     "theme": {
       "light": "Switch to light mode",
@@ -98,9 +106,32 @@
       "open": "Open command palette",
       "noMatches": "No matching pages"
     },
+    "productSwitcher": {
+      "label": "Product",
+      "business": "Business",
+      "marketing": "Marketing"
+    },
+    "adminHub": {
+      "businesses": "Businesses",
+      "marketing": "Marketing",
+      "noBusinesses": "No businesses yet. Create one to get started.",
+      "noCompanies": "No marketing companies yet.",
+      "noProjects": "No projects for {{company}} yet.",
+      "backToBusinesses": "All businesses",
+      "backToAll": "All workspaces",
+      "businessWorkspace": "Business workspace",
+      "marketingCompany": "Marketing company",
+      "loadingBusiness": "Loading business…",
+      "loadingCompany": "Loading company…",
+      "loadingProject": "Loading project…"
+    },
     "nav": {
       "collapse": "Collapse",
       "logout": "Sign out"
+    },
+    "userMenu": {
+      "label": "User menu",
+      "account": "Account settings"
     }
   },
   "nav": {
@@ -125,7 +156,7 @@
     "bookingsDescription": "Booking requests",
     "publish": "Site & publish",
     "publishDescription": "Public site and API publishing",
-    "marketingOverview": "Marketing overview",
+    "marketingOverview": "Agency dashboard",
     "marketingOverviewDescription": "Agency portfolio dashboard",
     "companies": "Companies",
     "companiesDescription": "Client companies",
@@ -703,7 +734,9 @@
       "spotlightTitle": "Your GTM command center",
       "spotlightDescription": "Manage companies, run AI workflows, and approve content from one unified workspace.",
       "viewCompanies": "View all companies",
-      "recentCompanies": "Recent companies"
+      "recentCompanies": "Recent companies",
+      "emptyTitle": "No companies yet",
+      "emptyDescription": "Create your first client company to start running GTM workflows."
     },
     "companies": {
       "title": "Companies",
@@ -712,6 +745,7 @@
       "companyCode": "Company code",
       "companyName": "Company name",
       "empty": "No companies yet. Create your first company to get started.",
+      "emptyTitle": "No companies yet",
       "creating": "Creating…",
       "tableCode": "Code",
       "tableName": "Name",
@@ -731,6 +765,7 @@
       "create": "New project",
       "projectName": "Project name",
       "empty": "No projects yet. Create a project to start your GTM flow.",
+      "emptyTitle": "No projects yet",
       "open": "Open dashboard",
       "tableName": "Name",
       "tableOnboarding": "Onboarding",
@@ -986,6 +1021,7 @@
     "studio": {
       "title": "Marketing studio",
       "subtitle": "Activity feed, ideas, content pipeline, styles, and strategy map",
+      "urlPlaceholder": "https://",
       "pipelineTitle": "GTM agent pipeline",
       "tabs": {
         "feed": "Feed",

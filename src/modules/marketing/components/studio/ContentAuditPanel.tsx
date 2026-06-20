@@ -8,8 +8,16 @@ import type {
 } from '@/modules/marketing/types/api';
 import { STUDIO_PLATFORMS } from '@/modules/marketing/components/studio/StyleReferenceCard';
 import { Button } from '@/design-system/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/design-system/components/ui/card';
 import { Field, FieldGroup, FieldLabel } from '@/design-system/components/ui/field';
 import { Input } from '@/design-system/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/design-system/components/ui/select';
 import {
   Table,
   TableBody,
@@ -48,50 +56,54 @@ export function ContentAuditPanel({
   const [platform, setPlatform] = useState<SocialPlatform>('LINKEDIN');
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-xl border border-border bg-card p-4">
-        <h3 className="font-display text-lg font-semibold">
-          {t('studio.audits.runTitle')}
-        </h3>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t('studio.audits.runDescription')}
-        </p>
-        <FieldGroup className="mt-4">
-          <Field>
-            <FieldLabel>{t('studio.styles.sourceUrl')}</FieldLabel>
-            <Input
-              value={sourceUrl}
-              onChange={(e) => setSourceUrl(e.target.value)}
-              placeholder="https://example.com/blog"
-              disabled={disabled}
-            />
-          </Field>
-          <Field>
-            <FieldLabel>{t('studio.styles.platform')}</FieldLabel>
-            <select
-              className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
-              value={platform}
-              onChange={(e) => setPlatform(e.target.value as SocialPlatform)}
-              disabled={disabled}
+    <div className="space-y-lg">
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('studio.audits.runTitle')}</CardTitle>
+          <CardDescription>{t('studio.audits.runDescription')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <FieldGroup>
+            <Field>
+              <FieldLabel>{t('studio.styles.sourceUrl')}</FieldLabel>
+              <Input
+                value={sourceUrl}
+                onChange={(e) => setSourceUrl(e.target.value)}
+                placeholder="https://example.com/blog"
+                disabled={disabled}
+              />
+            </Field>
+            <Field>
+              <FieldLabel>{t('studio.styles.platform')}</FieldLabel>
+              <Select
+                value={platform}
+                onValueChange={(value) => setPlatform(value as SocialPlatform)}
+                disabled={disabled}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {STUDIO_PLATFORMS.map((item) => (
+                    <SelectItem key={item} value={item}>
+                      {t(`studio.platforms.${item}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Button
+              disabled={disabled || running || !sourceUrl.trim()}
+              onClick={() =>
+                onTrigger({ sourceUrl: sourceUrl.trim(), platform, maxPages: 20 })
+              }
             >
-              {STUDIO_PLATFORMS.map((item) => (
-                <option key={item} value={item}>
-                  {t(`studio.platforms.${item}`)}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Button
-            disabled={disabled || running || !sourceUrl.trim()}
-            onClick={() =>
-              onTrigger({ sourceUrl: sourceUrl.trim(), platform, maxPages: 20 })
-            }
-          >
-            <PlayIcon data-icon="inline-start" />
-            {running ? t('studio.audits.running') : t('studio.audits.run')}
-          </Button>
-        </FieldGroup>
-      </div>
+              <PlayIcon data-icon="inline-start" />
+              {running ? t('studio.audits.running') : t('studio.audits.run')}
+            </Button>
+          </FieldGroup>
+        </CardContent>
+      </Card>
 
       {audits.length > 0 && (
         <div className="flex flex-wrap gap-2">
@@ -109,7 +121,7 @@ export function ContentAuditPanel({
       )}
 
       {selectedAuditId && (
-        <div className="space-y-3">
+        <div className="space-y-md">
           <div className="flex justify-end">
             <Button
               size="sm"
@@ -120,7 +132,7 @@ export function ContentAuditPanel({
               {t('studio.audits.export')}
             </Button>
           </div>
-          <div className="overflow-x-auto rounded-xl border border-border">
+          <Card className="overflow-hidden p-0">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -145,7 +157,7 @@ export function ContentAuditPanel({
                 ))}
               </TableBody>
             </Table>
-          </div>
+          </Card>
         </div>
       )}
     </div>

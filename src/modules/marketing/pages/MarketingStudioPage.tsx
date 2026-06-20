@@ -29,7 +29,7 @@ import {
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { invalidateProjectStudio, queryKeys } from '@/modules/marketing/hooks/query-client';
-import { platformColors } from '@/design-system/tokens/colors';
+import { ToggleGroup, ToggleGroupItem } from '@/design-system/components/ui/toggle-group';
 import { t } from '@/core/i18n';
 import type {
   ContentStatus,
@@ -40,6 +40,7 @@ import type {
   StyleCaptureResponse,
 } from '@/modules/marketing/types/api';
 import { Button } from '@/design-system/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/design-system/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -53,6 +54,7 @@ import { Skeleton } from '@/design-system/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/design-system/components/ui/tabs';
 import { Textarea } from '@/design-system/components/ui/textarea';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
+import { resolveApiV1BaseUrl } from '@/core/api/config';
 import { cn } from '@/design-system/lib/utils';
 
 const STUDIO_TABS = [
@@ -492,9 +494,8 @@ export function MarketingStudioPage() {
   const handleExportAudit = async (auditId: string) => {
     const token = await getToken();
     if (!token) return;
-    const base = import.meta.env.VITE_API_BASE_URL ?? '';
     const res = await fetch(
-      `${base}/api/v1/projects/${projectId}/content-audits/${auditId}/export.xlsx`,
+      `${resolveApiV1BaseUrl()}/projects/${projectId}/content-audits/${auditId}/export.xlsx`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     if (!res.ok) return;
@@ -596,14 +597,18 @@ export function MarketingStudioPage() {
 
   return (
     <CrmPageShell className="min-w-0">
-      <PageHeader title={t('studio.title')} description={t('studio.subtitle')} />
+      <PageHeader description={t('studio.subtitle')} />
       {jobsQuery.data && (
-        <div className="rounded-xl border border-border bg-card p-4">
-          <h3 className="mb-3 text-sm font-medium text-muted-foreground">
-            {t('studio.pipelineTitle')}
-          </h3>
-          <AgentPipelineViz jobs={jobsQuery.data} />
-        </div>
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {t('studio.pipelineTitle')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AgentPipelineViz jobs={jobsQuery.data} />
+          </CardContent>
+        </Card>
       )}
 
       <Tabs value={activeTab} onValueChange={(v) => setTab(v as StudioTab)} className="min-w-0 w-full">
@@ -616,7 +621,7 @@ export function MarketingStudioPage() {
         </TabsList>
 
         {isLoading ? (
-          <Skeleton className="mt-4 h-64 w-full rounded-xl" />
+          <Skeleton className="mt-4 h-64 w-full rounded-lg" />
         ) : (
           <>
             <TabsContent value="feed">
@@ -677,30 +682,22 @@ export function MarketingStudioPage() {
 
             <TabsContent value="styles">
               <div className="space-y-6">
-                <div className="flex flex-wrap gap-2">
-                  {STUDIO_PLATFORMS.map((platform) => {
-                    const color = platformColors[platform];
-                    return (
-                      <button
-                        key={platform}
-                        type="button"
-                        onClick={() => setSelectedPlatform(platform)}
-                        className={cn(
-                          'rounded-full border px-3 py-1.5 text-sm transition-colors',
-                          selectedPlatform === platform
-                            ? 'border-primary bg-primary/10'
-                            : 'border-border hover:bg-secondary'
-                        )}
-                        style={
-                          selectedPlatform === platform && color
-                            ? { borderColor: color, color }
-                            : undefined
-                        }
-                      >
+                <div className="flex flex-wrap items-center gap-2">
+                  <ToggleGroup
+                    type="single"
+                    value={selectedPlatform}
+                    onValueChange={(value) => {
+                      if (value) setSelectedPlatform(value as SocialPlatform);
+                    }}
+                    variant="pill-category"
+                    className="flex flex-wrap justify-start gap-2"
+                  >
+                    {STUDIO_PLATFORMS.map((platform) => (
+                      <ToggleGroupItem key={platform} value={platform} className="text-sm">
                         {t(`studio.platforms.${platform}`)}
-                      </button>
-                    );
-                  })}
+                      </ToggleGroupItem>
+                    ))}
+                  </ToggleGroup>
                   <Button
                     size="sm"
                     variant="outline"
@@ -796,7 +793,8 @@ export function MarketingStudioPage() {
                   {savingMindmap ? t('common.loading') : t('studio.mindmap.save')}
                 </Button>
               </div>
-              <div className="h-[min(500px,50vh)] min-w-0 w-full overflow-hidden rounded-xl border border-border bg-secondary/20">
+              <Card className="h-[min(500px,50vh)] min-w-0 w-full overflow-hidden p-0">
+                <CardContent className="h-full p-0">
                 <ReactFlow
                   nodes={nodes}
                   edges={edges}
@@ -812,7 +810,8 @@ export function MarketingStudioPage() {
                   <Controls />
                   <MiniMap />
                 </ReactFlow>
-              </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </>
         )}
@@ -870,7 +869,7 @@ export function MarketingStudioPage() {
               <Input
                 value={refUrl}
                 onChange={(e) => setRefUrl(e.target.value)}
-                placeholder="https://"
+                placeholder={t('marketing.studio.urlPlaceholder')}
               />
             </Field>
             <Field>

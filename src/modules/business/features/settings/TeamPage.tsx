@@ -130,7 +130,6 @@ export function TeamPage() {
   return (
     <CrmPageShell>
       <PageHeader
-        title={t('pages.team')}
         description={t('team.subtitle')}
         breadcrumbs={
           isWorkspace

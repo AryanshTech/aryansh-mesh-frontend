@@ -22,6 +22,7 @@ import {
 } from '@/design-system/components/ui/dialog';
 import {
   Empty,
+  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyTitle,
@@ -100,12 +101,15 @@ export function CompanyProjectsPage() {
   return (
     <CrmPageShell>
       <PageHeader
-        title={t('projects.title')}
         description={t('projects.subtitle', { company: company?.name ?? '' })}
+        breadcrumbs={[
+          { label: t('breadcrumb.companies'), href: '/marketing/companies' },
+          { label: company?.name ?? t('projects.title') },
+        ]}
         action={createButton}
       />
       {loading ? (
-        <Skeleton className="h-28 w-full max-w-sm rounded-xl" />
+        <Skeleton className="h-28 w-full max-w-sm rounded-lg" />
       ) : (
         <div className="grid gap-4 md:max-w-sm">
           <StatCard
@@ -118,18 +122,20 @@ export function CompanyProjectsPage() {
       )}
 
       {loading ? (
-        <Skeleton className="h-64 w-full rounded-xl" />
+        <Skeleton className="h-64 w-full rounded-lg" />
       ) : projects.length === 0 ? (
-        <Empty className="rounded-xl border border-dashed">
+        <Empty className="rounded-lg border border-dashed py-12">
           <EmptyHeader>
-            <EmptyTitle>{t('projects.title')}</EmptyTitle>
+            <EmptyTitle>{t('projects.emptyTitle')}</EmptyTitle>
             <EmptyDescription>{t('projects.empty')}</EmptyDescription>
           </EmptyHeader>
-          {canWrite && (
-            <Button onClick={() => setModalOpen(true)}>
-              {t('projects.create')}
-            </Button>
-          )}
+          {canWrite ? (
+            <EmptyContent>
+              <Button onClick={() => setModalOpen(true)}>
+                {t('projects.create')}
+              </Button>
+            </EmptyContent>
+          ) : null}
         </Empty>
       ) : (
         <DataTableCard

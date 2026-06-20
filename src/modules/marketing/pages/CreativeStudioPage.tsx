@@ -11,7 +11,7 @@ export function CreativeStudioPage() {
 
   return (
     <CrmPageShell>
-      <PageHeader title={t('creative.title')} description={t('creative.subtitle')} />
+      <PageHeader description={t('creative.subtitle')} />
       <Alert>
         <PaletteIcon />
         <AlertTitle>{t('creative.comingSoonTitle')}</AlertTitle>

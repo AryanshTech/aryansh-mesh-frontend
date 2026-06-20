@@ -1,4 +1,5 @@
 import { api } from '@/core/api/client';
+import { resolveApiV1BaseUrl, resolveGatewayOrigin } from '@/core/api/config';
 import { ApiError } from '@/core/api/types';
 
 export async function apiFetch<T>(
@@ -43,8 +44,11 @@ export async function authApiFetch<T>(
 }
 
 export function getApiBaseUrl(): string {
-  const raw = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ?? 'http://localhost:8090';
-  return raw.endsWith('/api/v1') ? raw.slice(0, -'/api/v1'.length) : raw;
+  return resolveGatewayOrigin();
+}
+
+export function getApiV1BaseUrl(): string {
+  return resolveApiV1BaseUrl();
 }
 
 export { ApiError };

@@ -79,10 +79,7 @@ export function OnboardingPage() {
 
   return (
     <CrmPageShell>
-      <PageHeader
-        title={t('pages.onboarding')}
-        description={t('onboarding.subtitle')}
-      />
+      <PageHeader description={t('onboarding.subtitle')} />
 
       <Card>
         <CardHeader>

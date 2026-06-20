@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { appColors } from '@/design-system/tokens/colors';
+import { layout } from '@/design-system/tokens/layout';
 import { cn } from '@/design-system/lib/utils';
 
 interface CrmPageShellProps {
@@ -9,13 +9,7 @@ interface CrmPageShellProps {
 
 export function CrmPageShell({ children, className }: CrmPageShellProps) {
   return (
-    <div
-      className={cn(
-        appColors.dashboard.page,
-        'flex w-full flex-col gap-6 animate-fade-in-up',
-        className,
-      )}
-    >
+    <div className={cn(layout.dashboard.page, 'min-w-0 w-full', className)}>
       {children}
     </div>
   );

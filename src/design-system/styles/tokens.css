@@ -1,71 +1,107 @@
 /**
- * Linear-inspired design tokens (see docs/aryansh-mesh/DESIGN.md).
+ * Geist-inspired design tokens (see docs/aryansh-mesh/DESIGN.md).
  * RGB channel triplets use --rgb-* (referenced by @theme in globals.css).
  */
 
 /* ─── Light theme ───────────────────────────────────────────── */
 :root,
 html.light {
-  --rgb-primary: 94 106 210;
-  --rgb-primary-hover: 130 143 255;
-  --rgb-primary-focus: 94 105 209;
+  /* Brand & accent */
+  --rgb-primary: 0 112 243;
+  --rgb-primary-hover: 7 97 209;
+  --rgb-primary-focus: 0 112 243;
   --rgb-on-primary: 255 255 255;
+  --rgb-link: 0 112 243;
+  --rgb-link-deep: 7 97 209;
+  --rgb-link-soft: 211 229 255;
 
-  --rgb-canvas: 255 255 255;
-  --rgb-surface-1: 245 246 246;
-  --rgb-surface-2: 246 247 247;
-  --rgb-surface-3: 240 241 242;
-  --rgb-surface-4: 235 236 238;
+  /* Surfaces */
+  --rgb-canvas: 250 250 250;
+  --rgb-canvas-elevated: 255 255 255;
+  --rgb-hairline-soft: 242 242 242;
 
-  --rgb-hairline: 229 231 235;
-  --rgb-hairline-strong: 209 213 219;
-  --rgb-hairline-tertiary: 189 194 201;
+  /* Text ladder */
+  --rgb-ink: 23 23 23;
+  --rgb-body: 77 77 77;
+  --rgb-mute: 115 115 115;
+  --rgb-faint: 161 161 161;
 
-  --rgb-ink: 0 0 0;
-  --rgb-ink-muted: 55 65 81;
-  --rgb-ink-subtle: 107 114 128;
-  --rgb-ink-tertiary: 156 163 175;
+  /* Legacy aliases (ink-muted → body, etc.) */
+  --rgb-ink-muted: var(--rgb-body);
+  --rgb-ink-subtle: var(--rgb-mute);
+  --rgb-ink-tertiary: var(--rgb-faint);
 
-  --rgb-brand-secure: 122 127 173;
-  --rgb-semantic-success: 39 166 68;
-  --rgb-overlay: 15 23 42;
+  /* Legacy surface aliases */
+  --rgb-surface-1: var(--rgb-canvas-elevated);
+  --rgb-surface-2: var(--rgb-hairline-soft);
+  --rgb-surface-3: var(--rgb-hairline-soft);
+  --rgb-surface-4: var(--rgb-hairline-soft);
+
+  /* Borders */
+  --rgb-hairline: 235 235 235;
+  --rgb-hairline-strong: 220 220 220;
+  --rgb-hairline-tertiary: 200 200 200;
+
+  /* Accent family (gradient stops only) */
+  --rgb-violet: 121 40 202;
+  --rgb-cyan: 80 227 194;
+  --rgb-pink: 255 0 128;
+  --rgb-magenta: 235 54 127;
+
+  /* Gradient stops */
+  --rgb-gradient-develop-start: 0 124 240;
+  --rgb-gradient-develop-end: 0 223 216;
+  --rgb-gradient-preview-start: 121 40 202;
+  --rgb-gradient-preview-end: 255 0 128;
+  --rgb-gradient-ship-start: 255 77 77;
+  --rgb-gradient-ship-end: 249 203 40;
+
+  --rgb-overlay: 23 23 23;
 
   /* shadcn semantic channels */
   --background: var(--rgb-canvas);
   --foreground: var(--rgb-ink);
-  --card: var(--rgb-surface-1);
+  --card: var(--rgb-canvas-elevated);
   --card-foreground: var(--rgb-ink);
-  --popover: var(--rgb-surface-1);
+  --popover: var(--rgb-canvas-elevated);
   --popover-foreground: var(--rgb-ink);
   --primary: var(--rgb-primary);
   --primary-foreground: var(--rgb-on-primary);
-  --secondary: var(--rgb-surface-2);
+  --secondary: var(--rgb-hairline-soft);
   --secondary-foreground: var(--rgb-ink);
-  --muted: var(--rgb-surface-2);
-  --muted-foreground: var(--rgb-ink-subtle);
-  --accent: var(--rgb-surface-3);
+  --muted: var(--rgb-hairline-soft);
+  --muted-foreground: var(--rgb-mute);
+  --accent: var(--rgb-hairline-soft);
   --accent-foreground: var(--rgb-ink);
-  --destructive: 220 38 38;
+  --destructive: 238 0 0;
   --destructive-foreground: 255 255 255;
   --border: var(--rgb-hairline);
-  --input: var(--rgb-hairline-strong);
+  --input: var(--rgb-hairline);
   --ring: var(--rgb-primary-focus);
-  --hover: var(--rgb-surface-2);
+  --hover: var(--rgb-hairline-soft);
 
-  --success: 39 166 68;
-  --success-foreground: 20 83 45;
-  --warning: 217 119 6;
+  --success: var(--rgb-primary);
+  --success-foreground: var(--rgb-on-primary);
+  --warning: 245 166 35;
   --warning-foreground: 146 64 14;
-  --error: 220 38 38;
-  --info: 94 106 210;
+  --error: 238 0 0;
+  --info: var(--rgb-primary);
 
-  --radius: 0.5rem;
+  /* Radius scale */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 16px;
+  --radius-pill-category: 64px;
+  --radius-pill: 100px;
+  --radius: var(--radius-sm);
 
   --sidebar: var(--rgb-canvas);
   --sidebar-foreground: var(--rgb-ink);
   --sidebar-primary: var(--rgb-primary);
   --sidebar-primary-foreground: var(--rgb-on-primary);
-  --sidebar-accent: var(--rgb-surface-1);
+  --sidebar-accent: var(--rgb-hairline-soft);
   --sidebar-accent-foreground: var(--rgb-ink);
   --sidebar-border: var(--rgb-hairline);
   --sidebar-ring: var(--rgb-primary-focus);
@@ -76,63 +112,83 @@ html.light {
 /* ─── Dark theme ────────────────────────────────────────────── */
 html.dark,
 .dark {
-  --rgb-primary: 94 106 210;
-  --rgb-primary-hover: 130 143 255;
-  --rgb-primary-focus: 94 105 209;
+  --rgb-primary: 0 112 243;
+  --rgb-primary-hover: 50 145 255;
+  --rgb-primary-focus: 0 112 243;
   --rgb-on-primary: 255 255 255;
+  --rgb-link: 0 112 243;
+  --rgb-link-deep: 50 145 255;
+  --rgb-link-soft: 0 112 243;
 
-  --rgb-canvas: 1 1 2;
-  --rgb-surface-1: 15 16 17;
-  --rgb-surface-2: 20 21 22;
-  --rgb-surface-3: 24 25 26;
-  --rgb-surface-4: 25 26 27;
+  --rgb-canvas: 10 10 10;
+  --rgb-canvas-elevated: 23 23 23;
+  --rgb-hairline-soft: 30 30 30;
 
-  --rgb-hairline: 35 37 42;
-  --rgb-hairline-strong: 52 52 58;
-  --rgb-hairline-tertiary: 62 62 68;
+  --rgb-ink: 250 250 250;
+  --rgb-body: 161 161 161;
+  --rgb-mute: 112 112 112;
+  --rgb-faint: 90 90 90;
 
-  --rgb-ink: 247 248 248;
-  --rgb-ink-muted: 208 214 224;
-  --rgb-ink-subtle: 138 143 152;
-  --rgb-ink-tertiary: 98 102 109;
+  --rgb-ink-muted: var(--rgb-body);
+  --rgb-ink-subtle: var(--rgb-mute);
+  --rgb-ink-tertiary: var(--rgb-faint);
 
-  --rgb-brand-secure: 122 127 173;
-  --rgb-semantic-success: 39 166 68;
+  --rgb-surface-1: var(--rgb-canvas-elevated);
+  --rgb-surface-2: var(--rgb-hairline-soft);
+  --rgb-surface-3: var(--rgb-hairline-soft);
+  --rgb-surface-4: var(--rgb-hairline-soft);
+
+  --rgb-hairline: 46 46 46;
+  --rgb-hairline-strong: 60 60 60;
+  --rgb-hairline-tertiary: 75 75 75;
+
+  --rgb-violet: 121 40 202;
+  --rgb-cyan: 80 227 194;
+  --rgb-pink: 255 0 128;
+  --rgb-magenta: 235 54 127;
+
+  --rgb-gradient-develop-start: 0 124 240;
+  --rgb-gradient-develop-end: 0 223 216;
+  --rgb-gradient-preview-start: 121 40 202;
+  --rgb-gradient-preview-end: 255 0 128;
+  --rgb-gradient-ship-start: 255 77 77;
+  --rgb-gradient-ship-end: 249 203 40;
+
   --rgb-overlay: 0 0 0;
 
   --background: var(--rgb-canvas);
   --foreground: var(--rgb-ink);
-  --card: var(--rgb-surface-1);
+  --card: var(--rgb-canvas-elevated);
   --card-foreground: var(--rgb-ink);
-  --popover: var(--rgb-surface-2);
+  --popover: var(--rgb-canvas-elevated);
   --popover-foreground: var(--rgb-ink);
   --primary: var(--rgb-primary);
   --primary-foreground: var(--rgb-on-primary);
-  --secondary: var(--rgb-surface-2);
+  --secondary: var(--rgb-hairline-soft);
   --secondary-foreground: var(--rgb-ink);
-  --muted: var(--rgb-surface-2);
-  --muted-foreground: var(--rgb-ink-subtle);
-  --accent: var(--rgb-surface-3);
+  --muted: var(--rgb-hairline-soft);
+  --muted-foreground: var(--rgb-mute);
+  --accent: var(--rgb-hairline-soft);
   --accent-foreground: var(--rgb-ink);
   --destructive: 248 113 113;
   --destructive-foreground: 255 255 255;
   --border: var(--rgb-hairline);
-  --input: var(--rgb-hairline-strong);
+  --input: var(--rgb-hairline);
   --ring: var(--rgb-primary-focus);
-  --hover: var(--rgb-surface-2);
+  --hover: var(--rgb-hairline-soft);
 
-  --success: 39 166 68;
-  --success-foreground: 187 247 208;
+  --success: var(--rgb-primary);
+  --success-foreground: var(--rgb-on-primary);
   --warning: 251 191 36;
   --warning-foreground: 254 243 199;
   --error: 248 113 113;
-  --info: 130 143 255;
+  --info: 50 145 255;
 
   --sidebar: var(--rgb-canvas);
   --sidebar-foreground: var(--rgb-ink);
   --sidebar-primary: var(--rgb-primary);
   --sidebar-primary-foreground: var(--rgb-on-primary);
-  --sidebar-accent: var(--rgb-surface-1);
+  --sidebar-accent: var(--rgb-hairline-soft);
   --sidebar-accent-foreground: var(--rgb-ink);
   --sidebar-border: var(--rgb-hairline);
   --sidebar-ring: var(--rgb-primary-focus);

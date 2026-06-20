@@ -54,7 +54,6 @@ export function BookingListPage() {
   return (
     <CrmPageShell>
       <PageHeader
-        title={t('pages.bookings')}
         description={t('bookings.subtitle')}
         breadcrumbs={
           isWorkspace

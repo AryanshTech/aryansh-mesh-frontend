@@ -60,7 +60,6 @@ export function ProductListPage() {
   return (
     <CrmPageShell>
       <PageHeader
-        title={t('pages.products')}
         description={t('products.subtitle')}
         breadcrumbs={
           isWorkspace

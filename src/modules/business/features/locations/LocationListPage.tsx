@@ -81,7 +81,6 @@ export function LocationListPage() {
   return (
     <CrmPageShell>
       <PageHeader
-        title={t('pages.locations')}
         description={t('locations.subtitle')}
         breadcrumbs={
           isWorkspace

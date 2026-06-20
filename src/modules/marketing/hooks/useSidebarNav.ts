@@ -1,12 +1,15 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { companiesApi, projectsApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
+import { usePermissions } from '@/core/permissions/use-permissions';
 import { queryKeys } from '@/modules/marketing/hooks/query-client';
 import type { ProjectResponse } from '@/modules/marketing/types/api';
 
 export function useSidebarNav() {
   const { getToken } = useAuth();
+  const { isPlatformAdmin, isSuperAdmin } = usePermissions();
+  const isPlatformOperator = isPlatformAdmin || isSuperAdmin;
   const [expandedCompanies, setExpandedCompanies] = useState<Set<string>>(new Set());
 
   const companiesQuery = useQuery({
@@ -46,6 +49,11 @@ export function useSidebarNav() {
   }, [expandedList, projectQueries]);
 
   const companies = companiesQuery.data ?? [];
+
+  useEffect(() => {
+    if (!isPlatformOperator || companies.length === 0) return;
+    setExpandedCompanies(new Set(companies.map((company) => company.companyId)));
+  }, [companies, isPlatformOperator]);
 
   const toggleCompany = useCallback((companyId: string) => {
     setExpandedCompanies((prev) => {

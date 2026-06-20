@@ -107,12 +107,12 @@ export function CrmPipelinePage() {
 
   return (
     <CrmPageShell>
-      <PageHeader title={t('crm.title')} description={t('crm.subtitle')} />
+      <PageHeader description={t('crm.subtitle')} />
       {loading ? (
-        <Skeleton className="h-64 w-full rounded-xl" />
+        <Skeleton className="h-64 w-full rounded-lg" />
       ) : (
         <Tabs defaultValue="contacts">
-          <TabsList>
+          <TabsList className="flex-wrap">
             <TabsTrigger value="contacts">{t('crm.contactsTab')}</TabsTrigger>
             <TabsTrigger value="deals">{t('crm.dealsTab')}</TabsTrigger>
           </TabsList>

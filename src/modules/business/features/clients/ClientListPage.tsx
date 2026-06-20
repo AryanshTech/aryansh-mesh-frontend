@@ -79,7 +79,6 @@ export function ClientListPage() {
   return (
     <CrmPageShell>
       <PageHeader
-        title={t('pages.clients')}
         description={t('clients.subtitle')}
         breadcrumbs={
           isWorkspace

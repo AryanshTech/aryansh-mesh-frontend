@@ -1,60 +1,49 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Outlet, useLocation, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { HeaderActionsProvider } from '@/shell/HeaderActionsContext';
 import { ShellSidebar, readSidebarCollapsed, writeSidebarCollapsed } from '@/shell/ShellSidebar';
 import { ShellHeader } from '@/shell/ShellHeader';
+import { usePageMeta } from '@/shell/use-page-meta';
 import { SidebarNavProvider } from '@/modules/marketing/contexts/sidebar-nav-context';
-import { appColors } from '@/design-system/tokens/colors';
-import { cn } from '@/design-system/lib/utils';
+import { layout } from '@/design-system/tokens/layout';
+import { TooltipProvider } from '@/design-system/components/ui/tooltip';
+import { Sheet, SheetContent } from '@/design-system/components/ui/sheet';
 
-function usePageMeta(): { title: string; subtitle?: string } {
-  const { t } = useTranslation();
-  const { pathname } = useLocation();
-  const { projectId } = useParams();
+const MOBILE_NAV_QUERY = '(max-width: 767px)';
 
-  return useMemo(() => {
-    const routes: Record<string, { title: string; subtitle?: string }> = {
-      '/dashboard': { title: t('business.dashboard.title') },
-      '/profile': { title: t('business.business.title') },
-      '/products': { title: t('business.products.title') },
-      '/costs': { title: t('business.costs.title') },
-      '/clients': { title: t('business.clients.title') },
-      '/locations': { title: t('business.locations.title') },
-      '/testimonials': { title: t('business.testimonials.title') },
-      '/content': { title: t('business.content.title') },
-      '/bookings': { title: t('business.bookings.title') },
-      '/publish': { title: t('business.publish.title') },
-      '/settings/team': { title: t('business.team.title') },
-      '/settings/account': { title: t('business.account.title') },
-      '/onboarding': { title: t('business.onboarding.title') },
-      '/admin/tenants': { title: t('business.admin.tenants.title') },
-      '/marketing': { title: t('marketing.agency.title') },
-      '/marketing/companies': { title: t('marketing.companies.title') },
-    };
+function useIsMobileNav(): boolean {
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia(MOBILE_NAV_QUERY).matches : false,
+  );
 
-    for (const [path, meta] of Object.entries(routes)) {
-      if (pathname === path || pathname.startsWith(`${path}/`)) {
-        return meta;
-      }
-    }
+  useEffect(() => {
+    const media = window.matchMedia(MOBILE_NAV_QUERY);
+    const onChange = () => setIsMobile(media.matches);
+    onChange();
+    media.addEventListener('change', onChange);
+    return () => media.removeEventListener('change', onChange);
+  }, []);
 
-    if (projectId && pathname.includes('/marketing/projects/')) {
-      return { title: t('marketing.projectDashboard.title') };
-    }
-
-    return { title: t('nav.appName') };
-  }, [pathname, projectId, t]);
+  return isMobile;
 }
 
 export function AppShell() {
+  const { t } = useTranslation();
+  const { pathname } = useLocation();
+  const isMobile = useIsMobileNav();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(readSidebarCollapsed);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
   const pageMeta = usePageMeta();
 
   useEffect(() => {
     writeSidebarCollapsed(sidebarCollapsed);
   }, [sidebarCollapsed]);
+
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -76,27 +65,58 @@ export function AppShell() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
+  const handleToggleSidebar = () => {
+    if (isMobile) {
+      setMobileNavOpen((open) => !open);
+      return;
+    }
+    setSidebarCollapsed((collapsed) => !collapsed);
+  };
+
   return (
-    <HeaderActionsProvider>
-      <SidebarNavProvider>
-        <div className={cn('flex min-h-screen', appColors.layout.background)}>
-          <ShellSidebar isCollapsed={sidebarCollapsed} />
-          <main className="flex min-h-screen min-w-0 flex-1 flex-col">
-            <ShellHeader
+    <TooltipProvider delayDuration={300}>
+      <HeaderActionsProvider>
+        <SidebarNavProvider>
+          <div className="flex min-h-screen min-w-0">
+            <a href="#main-content" className={layout.shellHeader.skipLink}>
+              {t('shell.skipToContent')}
+            </a>
+
+            <ShellSidebar
               isCollapsed={sidebarCollapsed}
-              pageTitle={pageMeta.title}
-              pageSubtitle={pageMeta.subtitle}
-              commandOpen={commandOpen}
-              onToggleSidebar={() => setSidebarCollapsed((c) => !c)}
-              onOpenCommand={() => setCommandOpen(true)}
-              onCloseCommand={() => setCommandOpen(false)}
+              className="hidden md:flex"
             />
-            <div id="main-content" className="page-shell flex-1 overflow-y-auto">
-              <Outlet />
-            </div>
-          </main>
-        </div>
-      </SidebarNavProvider>
-    </HeaderActionsProvider>
+
+            <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
+              <SheetContent side="left" className="w-[min(100vw,228px)] border-border p-0 sm:max-w-[228px]">
+                <ShellSidebar
+                  isCollapsed={false}
+                  forceExpanded
+                  onNavigate={() => setMobileNavOpen(false)}
+                  className="flex h-full w-full border-0"
+                />
+              </SheetContent>
+            </Sheet>
+
+            <main className="shell-mesh flex min-h-screen min-w-0 flex-1 flex-col">
+              <ShellHeader
+                isCollapsed={sidebarCollapsed}
+                isMobileNav={isMobile}
+                mobileNavOpen={mobileNavOpen}
+                pageTitle={pageMeta.title}
+                pageSubtitle={pageMeta.subtitle}
+                commandOpen={commandOpen}
+                onToggleSidebar={handleToggleSidebar}
+                onOpenCommand={() => setCommandOpen(true)}
+                onCloseCommand={() => setCommandOpen(false)}
+              />
+              <div id="main-content" className="page-shell flex-1 overflow-y-auto">
+                <Outlet />
+              </div>
+            </main>
+          </div>
+        </SidebarNavProvider>
+      </HeaderActionsProvider>
+    </TooltipProvider>
   );
 }

@@ -14,16 +14,10 @@ import { getPostLoginPath } from '@/modules/business/navigation';
 import { api } from '@/core/api/client';
 import { ApiError } from '@/modules/business/types/api';
 import type { InvitePreviewResponse } from '@/modules/business/types/auth';
+import { AuthShell } from '@/shell/AuthShell';
+import { AuthFormCard } from '@/shared/components/layout/AuthFormCard';
 import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
 import { Button } from '@/design-system/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/design-system/components/ui/card';
 import {
   Form,
   FormControl,
@@ -133,131 +127,127 @@ export function SignUpPage() {
     inviteQuery.error instanceof ApiError && inviteQuery.error.status === 503;
   const invitePending = inviteToken.length > 0 && inviteQuery.isLoading;
 
+  const loginHref = inviteToken
+    ? `/login?inviteToken=${encodeURIComponent(inviteToken)}`
+    : '/login';
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-muted/40 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>{t('auth.signUpTitle')}</CardTitle>
-          <CardDescription>{t('auth.signUpSubtitle')}</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          {inviteIndexBuilding && (
-            <Alert>
-              <AlertDescription>{t('invite.indexBuilding')}</AlertDescription>
-            </Alert>
-          )}
-          {inviteInvalid && (
-            <Alert variant="destructive">
-              <AlertTitle>{t('invite.missingTokenTitle')}</AlertTitle>
-              <AlertDescription>{t('invite.missingToken')}</AlertDescription>
-            </Alert>
-          )}
-          {inviteQuery.data && (
-            <Alert>
-              <AlertDescription>
-                {t('invite.signUpForTenant', { tenant: inviteQuery.data.tenantName })}
-              </AlertDescription>
-            </Alert>
-          )}
-          {!inviteInvalid && (
-            <Alert>
-              <AlertDescription>{t('auth.signUpInviteRequired')}</AlertDescription>
-            </Alert>
-          )}
-          {invitePending ? (
-            <div className="flex flex-col gap-4">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ) : (
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="flex flex-col gap-4"
-              >
-                <FormField
-                  control={form.control}
-                  name="inviteToken"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('auth.inviteToken')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} readOnly={Boolean(inviteToken)} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('auth.email')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          autoComplete="email"
-                          readOnly={Boolean(inviteQuery.data?.email)}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('auth.password')}</FormLabel>
-                      <FormControl>
-                        <Input type="password" autoComplete="new-password" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('auth.confirmPassword')}</FormLabel>
-                      <FormControl>
-                        <Input type="password" autoComplete="new-password" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={form.formState.isSubmitting || inviteInvalid}
-                >
-                  {form.formState.isSubmitting ? t('common.loading') : t('auth.createAccount')}
-                </Button>
-              </form>
-            </Form>
-          )}
-        </CardContent>
-        <CardFooter className="flex flex-col gap-2 border-t pt-6">
-          <Button variant="link" asChild className="w-full">
-            <Link
-              to={
-                inviteToken
-                  ? `/login?inviteToken=${encodeURIComponent(inviteToken)}`
-                  : '/login'
-              }
-            >
-              {t('auth.alreadyHaveAccount')}
-            </Link>
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
+    <AuthShell>
+      <div className="w-full max-w-[420px]">
+        <AuthFormCard
+          title={t('auth.signUpTitle')}
+          description={t('auth.signUpSubtitle')}
+          footer={
+            <Button variant="link" size="sm" asChild className="w-full">
+              <Link to={loginHref}>{t('auth.alreadyHaveAccount')}</Link>
+            </Button>
+          }
+        >
+          <div className="flex flex-col gap-4">
+            {inviteIndexBuilding ? (
+              <Alert>
+                <AlertDescription>{t('invite.indexBuilding')}</AlertDescription>
+              </Alert>
+            ) : null}
+            {inviteInvalid ? (
+              <Alert variant="subtle-destructive">
+                <AlertTitle>{t('invite.missingTokenTitle')}</AlertTitle>
+                <AlertDescription>{t('invite.missingToken')}</AlertDescription>
+              </Alert>
+            ) : null}
+            {inviteQuery.data ? (
+              <Alert>
+                <AlertDescription>
+                  {t('invite.signUpForTenant', { tenant: inviteQuery.data.tenantName })}
+                </AlertDescription>
+              </Alert>
+            ) : null}
+            {!inviteInvalid ? (
+              <Alert>
+                <AlertDescription>{t('auth.signUpInviteRequired')}</AlertDescription>
+              </Alert>
+            ) : null}
+            {invitePending ? (
+              <div className="flex flex-col gap-4">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+            ) : (
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+                  <FormField
+                    control={form.control}
+                    name="inviteToken"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('auth.inviteToken')}</FormLabel>
+                        <FormControl>
+                          <Input {...field} readOnly={Boolean(inviteToken)} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('auth.email')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            autoComplete="email"
+                            readOnly={Boolean(inviteQuery.data?.email)}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('auth.password')}</FormLabel>
+                        <FormControl>
+                          <Input type="password" autoComplete="new-password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('auth.confirmPassword')}</FormLabel>
+                        <FormControl>
+                          <Input type="password" autoComplete="new-password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="submit"
+                    variant="pill"
+                    size="pill"
+                    className="w-full"
+                    disabled={form.formState.isSubmitting || inviteInvalid}
+                  >
+                    {form.formState.isSubmitting ? t('common.loading') : t('auth.createAccount')}
+                  </Button>
+                </form>
+              </Form>
+            )}
+          </div>
+        </AuthFormCard>
+      </div>
+    </AuthShell>
   );
 }

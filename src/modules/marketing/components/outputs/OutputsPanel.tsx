@@ -1,9 +1,8 @@
-import { useState, type CSSProperties } from 'react';
+import { useState } from 'react';
 import { CopyIcon, Trash2Icon } from 'lucide-react';
 import type { OutputResponse, OutputType } from '@/modules/marketing/types/api';
 import { formatDate, t } from '@/core/i18n';
-import { colors } from '@/design-system/tokens/colors';
-import { Badge } from '@/design-system/components/ui/badge';
+import { Badge, type BadgeProps } from '@/design-system/components/ui/badge';
 import { Button } from '@/design-system/components/ui/button';
 import { Checkbox } from '@/design-system/components/ui/checkbox';
 import { ScrollArea } from '@/design-system/components/ui/scroll-area';
@@ -39,14 +38,14 @@ function outputTypeLabel(type: OutputType): string {
   return t(`outputTypes.${type}`);
 }
 
-function typeBadgeStyle(type: OutputType): CSSProperties {
+function outputTypeBadgeVariant(type: OutputType): NonNullable<BadgeProps['variant']> {
   switch (type) {
     case 'GI':
-      return { backgroundColor: colors.pastelGi, color: colors.pastelGiText };
+      return 'outputGi';
     case 'SP':
-      return { backgroundColor: colors.pastelSp, color: colors.pastelSpText };
+      return 'outputSp';
     case 'LP':
-      return { backgroundColor: colors.pastelLp, color: colors.pastelLpText };
+      return 'outputLp';
     default: {
       const _exhaustive: never = type;
       return _exhaustive;
@@ -85,17 +84,17 @@ function OutputList({
                 checked={selectedIds.has(output.outputId)}
                 onCheckedChange={() => onToggleSelect(output.outputId)}
               />
-              <button
+              <Button
                 type="button"
-                className="truncate font-mono text-sm text-primary hover:underline"
+                variant="link"
+                className="h-auto truncate p-0 text-sm font-mono text-primary"
                 onClick={() => onInsertLabel(output.label)}
               >
                 {output.label}
-              </button>
+              </Button>
               <Badge
-                variant="outline"
-                className="border-0 text-xs uppercase tracking-wider"
-                style={typeBadgeStyle(output.type)}
+                variant={outputTypeBadgeVariant(output.type)}
+                className="text-xs uppercase tracking-wider"
               >
                 {outputTypeLabel(output.type)}
               </Badge>

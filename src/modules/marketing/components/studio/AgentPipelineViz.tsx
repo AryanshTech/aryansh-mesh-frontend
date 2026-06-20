@@ -1,6 +1,7 @@
 import { t } from '@/core/i18n';
 import type { AgentJobResponse, AgentJobStatus, WorkflowId } from '@/modules/marketing/types/api';
 import { Badge } from '@/design-system/components/ui/badge';
+import { Card, CardContent } from '@/design-system/components/ui/card';
 import { cn } from '@/design-system/lib/utils';
 
 const PIPELINE_STEPS = [
@@ -57,23 +58,25 @@ export function AgentPipelineViz({ jobs }: AgentPipelineVizProps) {
 
         return (
           <div key={step.key} className="flex items-center gap-2">
-            <div
+            <Card
               className={cn(
-                'flex flex-col gap-1 rounded-lg border border-border bg-card px-3 py-2',
+                'px-3 py-2 shadow-none',
                 status === 'COMPLETED' && 'border-primary/30 bg-primary/5',
                 status === 'RUNNING' && 'border-ring/40',
-                status === 'FAILED' && 'border-destructive/40'
+                status === 'FAILED' && 'border-destructive/40',
               )}
             >
-              <span className="text-sm font-medium">
-                {t(`studio.pipeline.steps.${step.key}`)}
-              </span>
-              <Badge variant={statusVariant(status)}>
-                {status
-                  ? t(`jobStatus.${status}`)
-                  : t('studio.pipeline.notStarted')}
-              </Badge>
-            </div>
+              <CardContent className="flex flex-col gap-1 p-0">
+                <span className="text-sm font-medium">
+                  {t(`studio.pipeline.steps.${step.key}`)}
+                </span>
+                <Badge variant={statusVariant(status)}>
+                  {status
+                    ? t(`jobStatus.${status}`)
+                    : t('studio.pipeline.notStarted')}
+                </Badge>
+              </CardContent>
+            </Card>
             {index < PIPELINE_STEPS.length - 1 && (
               <span className="text-muted-foreground">→</span>
             )}

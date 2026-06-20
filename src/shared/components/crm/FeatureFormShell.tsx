@@ -12,7 +12,7 @@ export function FeatureFormShell({ children, footer, className }: FeatureFormShe
   return (
     <div className={cn('flex w-full min-w-0 flex-col gap-4', className)}>
       <Card className="w-full min-w-0">
-        <CardContent className="pt-6">{children}</CardContent>
+        <CardContent>{children}</CardContent>
       </Card>
       {footer ? (
         <div className="flex flex-wrap items-center justify-end gap-2">{footer}</div>

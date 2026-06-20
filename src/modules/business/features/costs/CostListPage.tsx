@@ -79,7 +79,6 @@ export function CostListPage() {
   return (
     <CrmPageShell>
       <PageHeader
-        title={t('pages.costs')}
         description={t('costs.subtitle')}
         breadcrumbs={
           isWorkspace

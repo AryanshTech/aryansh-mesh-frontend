@@ -1,4 +1,5 @@
 import { ApiError, type ApiErrorBody } from '@/core/api/types';
+import { resolveApiV1BaseUrl } from '@/core/api/config';
 
 type TokenGetter = (forceRefresh?: boolean) => Promise<string | null>;
 type UnauthorizedHandler = () => void;
@@ -14,22 +15,13 @@ export function configureApiClient(options: {
   onUnauthorized = options.onUnauthorized;
 }
 
-function resolveBaseUrl(): string {
-  const raw = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ?? 'http://localhost:8090';
-  if (raw.endsWith('/api/v1')) {
-    return raw;
-  }
-  if (raw.startsWith('http')) {
-    return `${raw}/api/v1`;
-  }
-  return raw;
-}
-
-const baseUrl = resolveBaseUrl();
+const baseUrl = resolveApiV1BaseUrl();
 
 export function getApiBaseUrl(): string {
   return baseUrl;
 }
+
+export { resolveGatewayOrigin, resolveApiV1BaseUrl } from '@/core/api/config';
 
 async function parseError(response: Response): Promise<ApiError> {
   try {

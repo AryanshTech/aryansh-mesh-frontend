@@ -106,7 +106,7 @@ export function SpyPage() {
         }
       />
       {loading ? (
-        <Skeleton className="h-64 w-full rounded-xl" />
+        <Skeleton className="h-64 w-full rounded-lg" />
       ) : (
         <DataTableCard
           title={t('spy.tableTitle')}
