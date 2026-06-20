@@ -50,22 +50,16 @@
   --color-sidebar-border: rgb(var(--rgb-hairline) / <alpha-value>);
   --color-sidebar-ring: rgb(var(--rgb-primary-focus) / <alpha-value>);
 
-  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
-
-  --spacing-xxs: 4px;
-  --spacing-xs: 8px;
-  --spacing-sm: 12px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --spacing-2xl: 40px;
-  --spacing-3xl: 64px;
-  --spacing-4xl: 96px;
-  --spacing-section: 128px;
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
   --animate-fade-in-up: fadeInUp 0.45s ease-out both;
   --animate-fade-in: fadeIn 0.3s ease-out both;
+  --animate-content-in: contentIn 0.35s cubic-bezier(0.23, 1, 0.32, 1) both;
+
+  --duration-fast: 160ms;
+  --duration-normal: 300ms;
+  --duration-slow: 450ms;
 }
 
 @keyframes fadeInUp {
@@ -85,6 +79,17 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes contentIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -177,6 +182,15 @@
       rgb(var(--rgb-canvas));
   }
 
+  html.dark .shell-mesh {
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 40%, rgb(var(--rgb-gradient-develop-start) / 0.14), transparent 50%),
+      radial-gradient(ellipse 60% 50% at 80% 20%, rgb(var(--rgb-gradient-preview-start) / 0.1), transparent 45%),
+      radial-gradient(ellipse 50% 40% at 60% 80%, rgb(var(--rgb-gradient-ship-start) / 0.08), transparent 40%),
+      radial-gradient(ellipse 40% 30% at 10% 90%, rgb(var(--rgb-cyan) / 0.08), transparent 35%),
+      rgb(var(--rgb-canvas));
+  }
+
   .auth-panel {
     border-right: 1px solid rgb(var(--rgb-hairline));
     background:
@@ -187,6 +201,15 @@
       rgb(var(--rgb-canvas));
   }
 
+  html.dark .auth-panel {
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 40%, rgb(var(--rgb-gradient-develop-start) / 0.22), transparent 50%),
+      radial-gradient(ellipse 60% 50% at 80% 20%, rgb(var(--rgb-gradient-preview-start) / 0.16), transparent 45%),
+      radial-gradient(ellipse 50% 40% at 60% 80%, rgb(var(--rgb-gradient-ship-start) / 0.14), transparent 40%),
+      radial-gradient(ellipse 40% 30% at 10% 90%, rgb(var(--rgb-cyan) / 0.12), transparent 35%),
+      rgb(var(--rgb-canvas));
+  }
+
   .auth-form-surface {
     @apply bg-background;
   }
@@ -194,6 +217,19 @@
   .auth-feature-dot {
     background: rgb(var(--rgb-primary));
     box-shadow: 0 0 12px rgb(var(--rgb-primary) / 0.45);
+  }
+
+  .animate-content-in {
+    animation: var(--animate-content-in);
+  }
+
+  .stagger-item {
+    animation: var(--animate-content-in);
+    animation-delay: var(--stagger-delay, 0ms);
+  }
+
+  .focus-glow:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 }
 

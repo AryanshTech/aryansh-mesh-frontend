@@ -26,6 +26,7 @@ import { ConfirmDialog } from '@/shared/components/crm/ConfirmDialog';
 import { FeatureListShell } from '@/shared/components/crm/FeatureListShell';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { ShellPageActions } from '@/shared/components/layout/ShellPageActions';
 import { useClients, useDeleteClient } from '@/modules/business/features/clients/use-clients';
 import { usePermissions } from '@/core/permissions/use-permissions';
 import { useTenantScope } from '@/modules/business/hooks/use-tenant-scope';
@@ -90,12 +91,14 @@ export function ClientListPage() {
         }
         action={
           canEdit ? (
-            <Button asChild>
-              <Link to={path('/clients/new')}>
-                <Plus className="size-4" />
-                {t('empty.clientsCta')}
-              </Link>
-            </Button>
+            <ShellPageActions>
+              <Button asChild>
+                <Link to={path('/clients/new')}>
+                  <Plus className="size-4" />
+                  {t('empty.clientsCta')}
+                </Link>
+              </Button>
+            </ShellPageActions>
           ) : undefined
         }
       />
@@ -143,6 +146,7 @@ export function ClientListPage() {
                         <Button
                           variant="ghost"
                           size="icon"
+                          aria-label={t('clients.deleteTitle')}
                           onClick={() => setDeleteId(client.id)}
                         >
                           <Trash2 className="size-4" />

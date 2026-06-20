@@ -96,8 +96,10 @@
     "skipToContent": "Skip to main content",
     "footerCopyright": "© {{year}} Aryansh Tech",
     "theme": {
-      "light": "Switch to light mode",
-      "dark": "Switch to dark mode"
+      "menu": "Choose theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
     },
     "commandPalette": {
       "title": "Command palette",
@@ -156,6 +158,8 @@
     "bookingsDescription": "Booking requests",
     "publish": "Site & publish",
     "publishDescription": "Public site and API publishing",
+    "connect": "Connect website",
+    "connectDescription": "API gateway setup for client websites",
     "marketingOverview": "Agency dashboard",
     "marketingOverviewDescription": "Agency portfolio dashboard",
     "companies": "Companies",
@@ -210,6 +214,7 @@
       "content": "Custom content",
       "bookings": "Bookings",
       "publish": "Publish",
+      "connect": "Connect website",
       "settings": "Settings",
       "team": "Team",
       "account": "Account",
@@ -269,6 +274,7 @@
       "content": "Custom content",
       "bookings": "Bookings",
       "publish": "Publish",
+      "connect": "Connect website",
       "team": "Team Settings",
       "account": "Account Settings",
       "tenants": "Tenants",
@@ -282,6 +288,7 @@
         "createDescription": "Register a new client business on the platform.",
         "created": "Tenant created successfully.",
         "notFound": "Tenant not found.",
+        "loadError": "Could not load tenants.",
         "empty": {
           "title": "No tenants yet",
           "description": "Create your first client business to get started.",
@@ -589,6 +596,17 @@
         "lastPublished": "Last published",
         "never": "Never published"
       },
+      "snapshot": {
+        "title": "Published snapshot",
+        "description": "Summary of the latest published content on your public site.",
+        "business": "Business profile",
+        "products": "Products",
+        "locations": "Locations",
+        "testimonials": "Testimonials",
+        "contentBlocks": "Content blocks",
+        "configured": "Configured",
+        "notPublished": "Not in snapshot yet"
+      },
       "embed": {
         "title": "Website connection",
         "description": "Add this script to your client website to load live data.",
@@ -600,7 +618,7 @@
       "hub": {
         "publicSiteTitle": "Public API & embed",
         "publicSiteDescription": "Live data your landing pages and websites consume.",
-        "publicSiteHint": "Publish from this page, then connect your site via the embed script or public snapshot API.",
+        "publicSiteHint": "Publish from this page, then connect your site from the Connect tab.",
         "slugLabel": "Tenant slug: {{slug}}",
         "viewApiSnapshot": "View snapshot API",
         "noSlug": "Complete onboarding to receive a public tenant slug.",
@@ -608,6 +626,12 @@
         "landingDescription": "Company marketing site and custom landing pages.",
         "landingHint": "Manage the Aryansh company site or build client landing pages in the landing-page project.",
         "openCompanySite": "Open company site"
+      },
+      "connectLink": {
+        "title": "Connect client website",
+        "description": "Setup guide, CORS, env vars, and developer markdown for this tenant.",
+        "hint": "Open the Connect tab for step-by-step instructions to link any client site to Aryansh Tech.",
+        "action": "Open Connect tab"
       },
       "connectorGuide": {
         "title": "Website developer guide",
@@ -684,6 +708,14 @@
           }
         }
       }
+    },
+    "connect": {
+      "subtitle": "Connect this client's website to Aryansh Tech through the public API gateway.",
+      "overviewTitle": "Website connection",
+      "overviewDescription": "Use the tabs below to register CORS domains, copy env vars, and share the full developer guide with your client's web team.",
+      "openPublish": "Open Publish",
+      "noSlugTitle": "Tenant slug required",
+      "noSlugDescription": "Complete onboarding for this business before connecting a website."
     },
     "bookings": {
       "subtitle": "Reservations submitted from your website.",
@@ -902,7 +934,10 @@
       "tableUrl": "URL",
       "tableLastProfiled": "Last profiled",
       "empty": "No competitors yet. Add one and run spy.",
-      "never": "Never"
+      "never": "Never",
+      "runSuccess": "Spy workflow started.",
+      "createSuccess": "Competitor added.",
+      "loadError": "Could not load competitors."
     },
     "brandMemory": {
       "title": "Brand memory",
@@ -912,7 +947,9 @@
       "version": "v{version}",
       "placeholder": "# Brand memory\n\nICP, tone, differentiation…",
       "saveVersion": "Save new version",
-      "saving": "Saving…"
+      "saveSuccess": "Brand memory saved.",
+      "saving": "Saving…",
+      "loadError": "Could not load brand memory."
     },
     "content": {
       "title": "Content studio",
@@ -927,7 +964,11 @@
       "approve": "Approve",
       "reject": "Reject",
       "rejectPrompt": "Why are you rejecting this content?",
-      "rejectDefault": "Revision needed"
+      "rejectDefault": "Revision needed",
+      "rejectDialogTitle": "Reject content",
+      "rejectConfirm": "Reject",
+      "approveSuccess": "Content approved.",
+      "rejectSuccess": "Content rejected."
     },
     "contentTypes": {
       "BLOG": "Blog post",
@@ -958,6 +999,9 @@
       "title": "Social calendar",
       "subtitle": "Mon–Fri content queue for the current week",
       "emptyDay": "No posts scheduled",
+      "emptyWeekTitle": "No posts this week",
+      "emptyWeekDescription": "Schedule social content to see it on the calendar.",
+      "loadError": "Could not load social posts.",
       "days": {
         "monday": "Monday",
         "tuesday": "Tuesday",
@@ -990,7 +1034,11 @@
       "dealsTitle": "Deals",
       "dealsDescription": "Pipeline for company {companyId}.",
       "contactsEmpty": "No contacts yet.",
+      "contactsEmptyTitle": "No contacts",
       "dealsEmpty": "No deals yet.",
+      "dealsEmptyTitle": "No deals",
+      "loadError": "Could not load CRM data.",
+      "moveSuccess": "Deal stage updated.",
       "tableName": "Name",
       "tableEmail": "Email",
       "tableRole": "Role",
@@ -1044,7 +1092,11 @@
       "saving": "Saving…",
       "chat": "Chat workspace",
       "noOutputs": "No saved outputs",
-      "mainThread": "Main thread"
+      "mainThread": "Main thread",
+      "deleteConfirm": "This output will be permanently removed.",
+      "deleteSuccess": "Output deleted.",
+      "deleteError": "Could not delete output.",
+      "streaming": "Assistant is responding"
     },
     "chat": {
       "quickGi": "@gi",

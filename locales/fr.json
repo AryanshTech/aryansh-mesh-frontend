@@ -96,8 +96,10 @@
     "skipToContent": "Aller au contenu principal",
     "footerCopyright": "© {{year}} Aryansh Tech",
     "theme": {
-      "light": "Mode clair",
-      "dark": "Mode sombre"
+      "menu": "Choisir le thème",
+      "light": "Clair",
+      "dark": "Sombre",
+      "system": "Système"
     },
     "commandPalette": {
       "title": "Palette de commandes",
@@ -156,6 +158,8 @@
     "bookingsDescription": "Demandes de réservation",
     "publish": "Site et publication",
     "publishDescription": "Site public et API",
+    "connect": "Connecter le site",
+    "connectDescription": "Configuration passerelle API pour sites clients",
     "marketingOverview": "Tableau de bord agence",
     "marketingOverviewDescription": "Tableau de bord agence",
     "companies": "Entreprises",
@@ -210,6 +214,7 @@
       "content": "Contenu personnalisé",
       "bookings": "Réservations",
       "publish": "Publier",
+      "connect": "Connecter le site",
       "settings": "Paramètres",
       "team": "Équipe",
       "account": "Compte",
@@ -269,6 +274,7 @@
       "content": "Contenu personnalisé",
       "bookings": "Réservations",
       "publish": "Publier",
+      "connect": "Connecter le site",
       "team": "Paramètres d'équipe",
       "account": "Paramètres du compte",
       "tenants": "Locataires",
@@ -282,6 +288,7 @@
         "createDescription": "Enregistrez une nouvelle entreprise cliente sur la plateforme.",
         "created": "Locataire créé avec succès.",
         "notFound": "Locataire introuvable.",
+        "loadError": "Impossible de charger les locataires.",
         "empty": {
           "title": "Aucun locataire",
           "description": "Créez votre première entreprise cliente pour commencer.",
@@ -589,6 +596,17 @@
         "lastPublished": "Dernière publication",
         "never": "Jamais publié"
       },
+      "snapshot": {
+        "title": "Snapshot publié",
+        "description": "Résumé du dernier contenu publié sur votre site public.",
+        "business": "Profil d'entreprise",
+        "products": "Produits",
+        "locations": "Emplacements",
+        "testimonials": "Témoignages",
+        "contentBlocks": "Blocs de contenu",
+        "configured": "Configuré",
+        "notPublished": "Pas encore dans le snapshot"
+      },
       "embed": {
         "title": "Connexion au site web",
         "description": "Ajoutez ce script au site du client pour charger les données en direct.",
@@ -600,7 +618,7 @@
       "hub": {
         "publicSiteTitle": "API publique et intégration",
         "publicSiteDescription": "Données en direct pour vos pages et sites.",
-        "publicSiteHint": "Publiez depuis cette page, puis connectez votre site via le script ou l'API snapshot.",
+        "publicSiteHint": "Publiez depuis cette page, puis connectez le site via l'onglet Connecter.",
         "slugLabel": "Slug tenant : {{slug}}",
         "viewApiSnapshot": "Voir l'API snapshot",
         "noSlug": "Terminez l'intégration pour obtenir un slug public.",
@@ -608,6 +626,12 @@
         "landingDescription": "Site marketing et pages client.",
         "landingHint": "Gérez le site Aryansh ou créez des pages dans le projet landing-page.",
         "openCompanySite": "Ouvrir le site entreprise"
+      },
+      "connectLink": {
+        "title": "Connecter le site client",
+        "description": "Guide de configuration, CORS, variables d'environnement et markdown développeur pour ce tenant.",
+        "hint": "Ouvrez l'onglet Connecter pour les instructions pas à pas afin de lier tout site client à Aryansh Tech.",
+        "action": "Ouvrir l'onglet Connecter"
       },
       "connectorGuide": {
         "title": "Guide développeur site web",
@@ -684,6 +708,14 @@
           }
         }
       }
+    },
+    "connect": {
+      "subtitle": "Connectez le site web de ce client à Aryansh Tech via la passerelle API publique.",
+      "overviewTitle": "Connexion site web",
+      "overviewDescription": "Utilisez les onglets ci-dessous pour enregistrer les domaines CORS, copier les variables d'environnement et partager le guide développeur complet avec l'équipe web du client.",
+      "openPublish": "Ouvrir Publier",
+      "noSlugTitle": "Slug tenant requis",
+      "noSlugDescription": "Terminez l'intégration de cette entreprise avant de connecter un site web."
     },
     "bookings": {
       "subtitle": "Réservations envoyées depuis votre site web.",
@@ -902,7 +934,10 @@
       "tableUrl": "URL",
       "tableLastProfiled": "Dernier profil",
       "empty": "Aucun concurrent. Ajoutez-en un et lancez la veille.",
-      "never": "Jamais"
+      "never": "Jamais",
+      "runSuccess": "Workflow de veille lancé.",
+      "createSuccess": "Concurrent ajouté.",
+      "loadError": "Impossible de charger les concurrents."
     },
     "brandMemory": {
       "title": "Mémoire de marque",
@@ -912,7 +947,9 @@
       "version": "v{version}",
       "placeholder": "# Mémoire de marque\n\nICP, ton, différenciation…",
       "saveVersion": "Enregistrer une nouvelle version",
-      "saving": "Enregistrement…"
+      "saveSuccess": "Mémoire de marque enregistrée.",
+      "saving": "Enregistrement…",
+      "loadError": "Impossible de charger la mémoire de marque."
     },
     "content": {
       "title": "Studio contenu",
@@ -927,7 +964,11 @@
       "approve": "Approuver",
       "reject": "Rejeter",
       "rejectPrompt": "Pourquoi rejetez-vous ce contenu ?",
-      "rejectDefault": "Révision nécessaire"
+      "rejectDefault": "Révision nécessaire",
+      "rejectDialogTitle": "Rejeter le contenu",
+      "rejectConfirm": "Rejeter",
+      "approveSuccess": "Contenu approuvé.",
+      "rejectSuccess": "Contenu rejeté."
     },
     "contentTypes": {
       "BLOG": "Article de blog",
@@ -958,6 +999,9 @@
       "title": "Calendrier social",
       "subtitle": "File de contenu lun–ven pour la semaine en cours",
       "emptyDay": "Aucun post planifié",
+      "emptyWeekTitle": "Aucun post cette semaine",
+      "emptyWeekDescription": "Planifiez du contenu social pour le voir dans le calendrier.",
+      "loadError": "Impossible de charger les publications sociales.",
       "days": {
         "monday": "Lundi",
         "tuesday": "Mardi",
@@ -990,7 +1034,11 @@
       "dealsTitle": "Affaires",
       "dealsDescription": "Pipeline pour l'entreprise {companyId}.",
       "contactsEmpty": "Aucun contact.",
+      "contactsEmptyTitle": "Aucun contact",
       "dealsEmpty": "Aucune affaire.",
+      "dealsEmptyTitle": "Aucune affaire",
+      "loadError": "Impossible de charger les données CRM.",
+      "moveSuccess": "Étape de l'affaire mise à jour.",
       "tableName": "Nom",
       "tableEmail": "Courriel",
       "tableRole": "Rôle",
@@ -1044,7 +1092,11 @@
       "saving": "Enregistrement…",
       "chat": "Espace chat",
       "noOutputs": "Aucune sortie enregistrée",
-      "mainThread": "Fil principal"
+      "mainThread": "Fil principal",
+      "deleteConfirm": "Cette sortie sera supprimée définitivement.",
+      "deleteSuccess": "Sortie supprimée.",
+      "deleteError": "Impossible de supprimer la sortie.",
+      "streaming": "L'assistant répond"
     },
     "chat": {
       "quickGi": "@gi",

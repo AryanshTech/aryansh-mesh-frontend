@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { PanelLeftClose, PanelLeftOpen, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { layout } from '@/design-system/tokens/layout';
 import { cn } from '@/design-system/lib/utils';
 import { Button } from '@/design-system/components/ui/button';
@@ -20,7 +20,9 @@ import {
   useSetShellToolbarHost,
   useShellSearchSlot,
 } from '@/shell/HeaderActionsContext';
-import { useCommandNavLinks } from '@/shell/use-filtered-nav';
+import { useFilteredNavSections } from '@/shell/use-filtered-nav';
+import { buildProjectNavPath, MARKETING_PROJECT_NAV } from '@/shell/navigation';
+import { usePermissions } from '@/core/permissions/use-permissions';
 import { UserMenu } from '@/shell/UserMenu';
 import { ShellIconButton } from '@/shared/components/layout/ShellIconButton';
 import { ShellUtilityActions } from '@/shared/components/layout/ShellUtilityActions';
@@ -55,10 +57,12 @@ export function ShellHeader({
 }: ShellHeaderProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { projectId } = useParams();
+  const { canAccessMarketing } = usePermissions();
   const pageActions = useHeaderActionsList();
   const shellSearch = useShellSearchSlot();
   const setShellToolbarHost = useSetShellToolbarHost();
-  const navLinks = useCommandNavLinks();
+  const navSections = useFilteredNavSections();
   const sh = layout.shellHeader;
 
   const sidebarToggleLabel = isMobileNav
@@ -77,15 +81,31 @@ export function ShellHeader({
       ? PanelLeftOpen
       : PanelLeftClose;
 
-  const commandItems = useMemo(
-    () =>
-      navLinks.map((link) => ({
-        ...link,
-        label: t(link.labelKey),
-        description: t(link.descriptionKey, { defaultValue: link.to }),
+  const commandSections = useMemo(() => {
+    const sections = navSections.map((section) => ({
+      id: section.id,
+      heading: t(section.labelKey),
+      items: section.items.map((item) => ({
+        to: item.path,
+        label: t(item.labelKey),
+        description: t(`${item.labelKey}Description`, { defaultValue: item.path }),
       })),
-    [navLinks, t],
-  );
+    }));
+
+    if (projectId && canAccessMarketing) {
+      sections.push({
+        id: 'project',
+        heading: t('nav.sections.project'),
+        items: MARKETING_PROJECT_NAV.map((item) => ({
+          to: buildProjectNavPath(projectId, item.path),
+          label: t(item.labelKey),
+          description: t(`${item.labelKey}Description`, { defaultValue: item.path }),
+        })),
+      });
+    }
+
+    return sections;
+  }, [navSections, projectId, canAccessMarketing, t]);
 
   return (
     <>
@@ -182,23 +202,25 @@ export function ShellHeader({
         <CommandInput placeholder={t('shell.commandPalette.placeholder')} />
         <CommandList>
           <CommandEmpty>{t('shell.commandPalette.noMatches')}</CommandEmpty>
-          <CommandGroup>
-            {commandItems.map((link) => (
-              <CommandItem
-                key={link.to}
-                value={`${link.label} ${link.description} ${link.to}`}
-                onSelect={() => {
-                  navigate(link.to);
-                  onCloseCommand();
-                }}
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-foreground">{link.label}</p>
-                  <p className="text-xs text-muted-foreground">{link.description}</p>
-                </div>
-              </CommandItem>
-            ))}
-          </CommandGroup>
+          {commandSections.map((section) => (
+            <CommandGroup key={section.id} heading={section.heading}>
+              {section.items.map((link) => (
+                <CommandItem
+                  key={link.to}
+                  value={`${link.label} ${link.description} ${link.to}`}
+                  onSelect={() => {
+                    navigate(link.to);
+                    onCloseCommand();
+                  }}
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-foreground">{link.label}</p>
+                    <p className="text-xs text-muted-foreground">{link.description}</p>
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          ))}
         </CommandList>
       </CommandDialog>
     </>

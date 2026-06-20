@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router-dom';
-import { MARKETING_PROJECT_NAV } from '@/shell/navigation';
+import { MARKETING_PROJECT_NAV, PAGE_META_ROUTES } from '@/shell/navigation';
 
 type PageMeta = { title: string; subtitle?: string };
 
@@ -41,6 +41,9 @@ function resolveAdminWorkspaceMeta(pathname: string, t: (key: string) => string)
   if (rest.startsWith('publish')) {
     return { title: t('pages.publish'), subtitle: t('publish.subtitle') };
   }
+  if (rest.startsWith('connect')) {
+    return { title: t('pages.connect'), subtitle: t('connect.subtitle') };
+  }
   if (rest.startsWith('settings/team')) {
     return { title: t('pages.team'), subtitle: t('team.subtitle') };
   }
@@ -65,33 +68,12 @@ export function usePageMeta(): PageMeta {
       return workspaceMeta;
     }
 
-    const routes: Record<string, PageMeta> = {
-      '/dashboard': { title: t('pages.dashboard') },
-      '/profile': { title: t('pages.business'), subtitle: t('business.subtitle') },
-      '/products': { title: t('pages.products'), subtitle: t('products.subtitle') },
-      '/costs': { title: t('pages.costs'), subtitle: t('costs.subtitle') },
-      '/clients': { title: t('pages.clients'), subtitle: t('clients.subtitle') },
-      '/locations': { title: t('pages.locations'), subtitle: t('locations.subtitle') },
-      '/testimonials': { title: t('pages.testimonials'), subtitle: t('testimonials.subtitle') },
-      '/content': { title: t('pages.content'), subtitle: t('content.subtitle') },
-      '/bookings': { title: t('pages.bookings'), subtitle: t('bookings.subtitle') },
-      '/publish': { title: t('pages.publish'), subtitle: t('publish.subtitle') },
-      '/settings/team': { title: t('pages.team'), subtitle: t('team.subtitle') },
-      '/settings/account': { title: t('pages.account'), subtitle: t('account.subtitle') },
-      '/onboarding': { title: t('pages.onboarding'), subtitle: t('onboarding.subtitle') },
-      '/admin/tenants': { title: t('admin.tenants.title') },
-      '/marketing': { title: t('marketing.agency.title') },
-      '/marketing/companies': { title: t('marketing.companies.title') },
-      '/marketing/admin/users': { title: t('nav.marketingUsers') },
-    };
-
-    const routeEntries = Object.entries(routes).sort(
-      ([pathA], [pathB]) => pathB.length - pathA.length,
-    );
-
-    for (const [path, meta] of routeEntries) {
-      if (pathname === path || pathname.startsWith(`${path}/`)) {
-        return meta;
+    for (const route of PAGE_META_ROUTES) {
+      if (pathname === route.prefix || pathname.startsWith(`${route.prefix}/`)) {
+        return {
+          title: t(route.titleKey),
+          subtitle: route.subtitleKey ? t(route.subtitleKey) : undefined,
+        };
       }
     }
 

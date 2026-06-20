@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { EyeIcon, PlusIcon } from 'lucide-react';
+import { toast } from 'sonner';
 import { agentJobsApi, competitorsApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
 import { DataTableCard } from '@/modules/marketing/components/dashboard/data-table-card';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { PageAsyncShell } from '@/shared/components/crm/PageAsyncShell';
 import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { formatDate, t } from '@/core/i18n';
 import type { CompetitorResponse } from '@/modules/marketing/types/api';
@@ -16,6 +18,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/design-system/components/ui/dialog';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/design-system/components/ui/empty';
 import { Field, FieldGroup, FieldLabel } from '@/design-system/components/ui/field';
 import { Input } from '@/design-system/components/ui/input';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
@@ -33,6 +43,7 @@ export function SpyPage() {
   const { getToken, canWrite } = useAuth();
   const [competitors, setCompetitors] = useState<CompetitorResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [name, setName] = useState('');
@@ -41,12 +52,15 @@ export function SpyPage() {
 
   const load = async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await apiFetchWithRetry(
         (token) => competitorsApi.list(token, projectId),
         getToken
       );
       setCompetitors(res);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('errors.network'));
     } finally {
       setLoading(false);
     }
@@ -64,6 +78,9 @@ export function SpyPage() {
           agentJobsApi.trigger(token, projectId, { workflowId: 'RUN_SPY' }),
         getToken
       );
+      toast.success(t('spy.runSuccess'));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t('errors.network'));
     } finally {
       setRunning(false);
     }
@@ -79,7 +96,10 @@ export function SpyPage() {
       setModalOpen(false);
       setName('');
       setUrl('');
+      toast.success(t('spy.createSuccess'));
       await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t('errors.network'));
     } finally {
       setCreating(false);
     }
@@ -105,30 +125,46 @@ export function SpyPage() {
           ) : undefined
         }
       />
-      {loading ? (
-        <Skeleton className="h-64 w-full rounded-lg" />
-      ) : (
-        <DataTableCard
-          title={t('spy.tableTitle')}
-          description={t('spy.tableDescription')}
-        >
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t('spy.tableName')}</TableHead>
-                <TableHead>{t('spy.tableUrl')}</TableHead>
-                <TableHead>{t('spy.tableLastProfiled')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {competitors.length === 0 ? (
+      <PageAsyncShell
+        loading={loading}
+        error={error}
+        errorDescription={error ?? undefined}
+        onRetry={() => void load()}
+        skeleton={<Skeleton className="h-64 w-full rounded-lg" />}
+      >
+        {competitors.length === 0 ? (
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <EyeIcon />
+              </EmptyMedia>
+              <EmptyTitle>{t('spy.empty')}</EmptyTitle>
+              <EmptyDescription>{t('spy.tableDescription')}</EmptyDescription>
+            </EmptyHeader>
+            {canWrite ? (
+              <EmptyContent>
+                <Button size="sm" onClick={() => setModalOpen(true)}>
+                  <PlusIcon data-icon="inline-start" />
+                  {t('spy.addCompetitor')}
+                </Button>
+              </EmptyContent>
+            ) : null}
+          </Empty>
+        ) : (
+          <DataTableCard
+            title={t('spy.tableTitle')}
+            description={t('spy.tableDescription')}
+          >
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center text-muted-foreground">
-                    {t('spy.empty')}
-                  </TableCell>
+                  <TableHead>{t('spy.tableName')}</TableHead>
+                  <TableHead>{t('spy.tableUrl')}</TableHead>
+                  <TableHead>{t('spy.tableLastProfiled')}</TableHead>
                 </TableRow>
-              ) : (
-                competitors.map((c) => (
+              </TableHeader>
+              <TableBody>
+                {competitors.map((c) => (
                   <TableRow key={c.id}>
                     <TableCell className="font-medium">{c.name}</TableCell>
                     <TableCell>
@@ -137,7 +173,7 @@ export function SpyPage() {
                           href={c.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[var(--accent-blue)] hover:underline"
+                          className="text-primary hover:text-primary/90 hover:underline"
                         >
                           {c.url}
                         </a>
@@ -149,12 +185,12 @@ export function SpyPage() {
                       {c.lastProfiledAt ? formatDate(c.lastProfiledAt) : t('spy.never')}
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </DataTableCard>
-      )}
+                ))}
+              </TableBody>
+            </Table>
+          </DataTableCard>
+        )}
+      </PageAsyncShell>
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent>

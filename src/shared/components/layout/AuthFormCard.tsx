@@ -7,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/design-system/components/ui/card';
+import { layout } from '@/design-system/tokens/layout';
 import { cn } from '@/design-system/lib/utils';
 
 type AuthFormCardProps = {
@@ -25,14 +26,14 @@ export function AuthFormCard({
   className,
 }: AuthFormCardProps) {
   return (
-    <Card variant="elevated" className={cn('w-full rounded-lg border-border shadow-whisper', className)}>
+    <Card variant="elevated" className={cn('w-full min-w-0 rounded-lg border-border shadow-whisper', className)}>
       <CardHeader className="space-y-1 pb-4">
-        <CardTitle className="text-3xl font-semibold text-foreground">{title}</CardTitle>
+        <CardTitle className={layout.auth.title}>{title}</CardTitle>
         {description ? (
-          <CardDescription className="text-muted-foreground">{description}</CardDescription>
+          <CardDescription className={layout.auth.subtitle}>{description}</CardDescription>
         ) : null}
       </CardHeader>
-      <CardContent>{children}</CardContent>
+      <CardContent className="w-full min-w-0">{children}</CardContent>
       {footer ? <CardFooter className="flex-col gap-2 border-t border-border pt-6">{footer}</CardFooter> : null}
     </Card>
   );

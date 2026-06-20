@@ -5,6 +5,7 @@ import {
   CalendarClock,
   DollarSign,
   LayoutDashboard,
+  Link2,
   MapPin,
   MessageSquareQuote,
   Package,
@@ -26,6 +27,7 @@ const modules = [
   { suffix: '/content', key: 'business.nav.content', icon: Blocks },
   { suffix: '/bookings', key: 'business.nav.bookings', icon: CalendarClock },
   { suffix: '/publish', key: 'business.nav.publish', icon: Rocket },
+  { suffix: '/connect', key: 'business.nav.connect', icon: Link2 },
 ] as const;
 
 interface AdminTenantQuickNavProps {

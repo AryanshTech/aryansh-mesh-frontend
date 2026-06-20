@@ -8,6 +8,7 @@ import { useAuth } from '@/core/auth/use-auth';
 import { getAuthErrorKey } from '@/core/auth/auth-errors';
 import { getPostLoginPath } from '@/modules/business/navigation';
 import { ApiError } from '@/modules/business/types/api';
+import { layout } from '@/design-system/tokens/layout';
 import { AuthShell } from '@/shell/AuthShell';
 import { AuthFormCard } from '@/shared/components/layout/AuthFormCard';
 import { Alert, AlertDescription } from '@/design-system/components/ui/alert';
@@ -83,7 +84,7 @@ export function LoginPage() {
 
   return (
     <AuthShell>
-      <div className="w-full max-w-[420px]">
+      <div className={layout.auth.formCardWrap}>
         <AuthFormCard
           title={t('auth.welcomeTitle')}
           description={t('auth.welcomeSubtitle')}
@@ -102,7 +103,7 @@ export function LoginPage() {
           }
         >
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full min-w-0 flex-col gap-4">
               {formError ? (
                 <Alert variant="subtle-destructive">
                   <AlertDescription className="text-destructive">{formError}</AlertDescription>
@@ -113,8 +114,8 @@ export function LoginPage() {
                 control={form.control}
                 name="email"
                 render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel className="text-sm font-medium text-foreground">{t('auth.email')}</FormLabel>
+                  <FormItem>
+                    <FormLabel>{t('auth.email')}</FormLabel>
                     <FormControl>
                       <Input
                         type="email"
@@ -132,10 +133,10 @@ export function LoginPage() {
                 control={form.control}
                 name="password"
                 render={({ field }) => (
-                  <FormItem className="space-y-2">
+                  <FormItem>
                     <div className="flex items-center justify-between gap-2">
-                      <FormLabel className="text-sm font-medium text-foreground">{t('auth.password')}</FormLabel>
-                      <Button variant="link" size="sm" asChild className="h-auto p-0 text-xs">
+                      <FormLabel>{t('auth.password')}</FormLabel>
+                      <Button variant="link" size="sm" asChild className="h-auto shrink-0 p-0 text-xs">
                         <Link to="/forgot-password">{t('auth.forgotPassword')}</Link>
                       </Button>
                     </div>
@@ -147,7 +148,13 @@ export function LoginPage() {
                 )}
               />
 
-              <Button type="submit" variant="pill" size="pill" className="mt-1 w-full" disabled={submitting}>
+              <Button
+                type="submit"
+                variant="pill"
+                size="pill"
+                className="w-full shrink-0"
+                disabled={submitting}
+              >
                 {submitting ? (
                   <>
                     <Spinner />

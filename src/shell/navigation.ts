@@ -17,6 +17,7 @@ import {
   Rocket,
   ScanSearch,
   Settings,
+  Link2,
   UserSquare2,
   Users,
 } from 'lucide-react';
@@ -60,6 +61,7 @@ export const OPERATIONS_NAV: NavItemDef[] = [
   { id: 'clients', path: '/clients', labelKey: 'nav.clients', icon: Users, matchPrefix: '/clients' },
   { id: 'bookings', path: '/bookings', labelKey: 'nav.bookings', icon: CalendarClock },
   { id: 'publish', path: '/publish', labelKey: 'nav.publish', icon: Rocket },
+  { id: 'connect', path: '/connect', labelKey: 'nav.connect', icon: Link2 },
 ];
 
 export const MARKETING_NAV: NavItemDef[] = [
@@ -143,3 +145,63 @@ export function buildProjectNavPath(projectId: string, segment: string): string 
   const base = `/marketing/projects/${projectId}`;
   return segment ? `${base}/${segment}` : base;
 }
+
+export type PageMetaRouteDef = {
+  prefix: string;
+  titleKey: string;
+  subtitleKey?: string;
+};
+
+const PAGE_META_SUBTITLES: Partial<Record<string, string>> = {
+  '/profile': 'business.subtitle',
+  '/products': 'products.subtitle',
+  '/costs': 'costs.subtitle',
+  '/clients': 'clients.subtitle',
+  '/locations': 'locations.subtitle',
+  '/testimonials': 'testimonials.subtitle',
+  '/content': 'content.subtitle',
+  '/bookings': 'bookings.subtitle',
+  '/publish': 'publish.subtitle',
+  '/connect': 'connect.subtitle',
+  '/settings/team': 'team.subtitle',
+  '/settings/account': 'account.subtitle',
+  '/onboarding': 'onboarding.subtitle',
+};
+
+const PAGE_META_TITLE_KEYS: Partial<Record<string, string>> = {
+  '/dashboard': 'pages.dashboard',
+  '/profile': 'pages.business',
+  '/products': 'pages.products',
+  '/costs': 'pages.costs',
+  '/clients': 'pages.clients',
+  '/locations': 'pages.locations',
+  '/testimonials': 'pages.testimonials',
+  '/content': 'pages.content',
+  '/bookings': 'pages.bookings',
+  '/publish': 'pages.publish',
+  '/connect': 'pages.connect',
+  '/settings/team': 'pages.team',
+  '/settings/account': 'pages.account',
+  '/onboarding': 'pages.onboarding',
+};
+
+function navItemsToPageMeta(items: NavItemDef[]): PageMetaRouteDef[] {
+  return items
+    .filter((item) => item.path.startsWith('/'))
+    .map((item) => ({
+      prefix: item.matchPrefix ?? item.path,
+      titleKey: PAGE_META_TITLE_KEYS[item.path] ?? item.labelKey,
+      subtitleKey: PAGE_META_SUBTITLES[item.path],
+    }));
+}
+
+/** Longest-prefix match table for shell page titles (static routes). */
+export const PAGE_META_ROUTES: PageMetaRouteDef[] = [
+  ...navItemsToPageMeta(CORE_NAV),
+  ...navItemsToPageMeta(OPERATIONS_NAV),
+  ...navItemsToPageMeta(MARKETING_NAV),
+  ...navItemsToPageMeta(ADMIN_NAV),
+  ...navItemsToPageMeta(SETTINGS_NAV),
+  { prefix: '/admin/tenants', titleKey: 'admin.tenants.title' },
+  { prefix: '/marketing/admin/users', titleKey: 'nav.marketingUsers' },
+].sort((a, b) => b.prefix.length - a.prefix.length);

@@ -7,26 +7,10 @@ import { ShellHeader } from '@/shell/ShellHeader';
 import { usePageMeta } from '@/shell/use-page-meta';
 import { SidebarNavProvider } from '@/modules/marketing/contexts/sidebar-nav-context';
 import { layout } from '@/design-system/tokens/layout';
+import { PageTransition } from '@/shared/components/layout/PageTransition';
+import { useIsMobileNav } from '@/shared/hooks/use-is-mobile-nav';
 import { TooltipProvider } from '@/design-system/components/ui/tooltip';
 import { Sheet, SheetContent } from '@/design-system/components/ui/sheet';
-
-const MOBILE_NAV_QUERY = '(max-width: 767px)';
-
-function useIsMobileNav(): boolean {
-  const [isMobile, setIsMobile] = useState(() =>
-    typeof window !== 'undefined' ? window.matchMedia(MOBILE_NAV_QUERY).matches : false,
-  );
-
-  useEffect(() => {
-    const media = window.matchMedia(MOBILE_NAV_QUERY);
-    const onChange = () => setIsMobile(media.matches);
-    onChange();
-    media.addEventListener('change', onChange);
-    return () => media.removeEventListener('change', onChange);
-  }, []);
-
-  return isMobile;
-}
 
 export function AppShell() {
   const { t } = useTranslation();
@@ -110,8 +94,10 @@ export function AppShell() {
                 onOpenCommand={() => setCommandOpen(true)}
                 onCloseCommand={() => setCommandOpen(false)}
               />
-              <div id="main-content" className="page-shell flex-1 overflow-y-auto">
-                <Outlet />
+              <div id="main-content" className="page-shell flex min-h-0 flex-1 flex-col overflow-y-auto">
+                <PageTransition routeKey={pathname}>
+                  <Outlet />
+                </PageTransition>
               </div>
             </main>
           </div>

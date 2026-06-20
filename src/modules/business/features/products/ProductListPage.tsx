@@ -23,6 +23,7 @@ import {
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { FeatureListShell } from '@/shared/components/crm/FeatureListShell';
 import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { ShellPageActions } from '@/shared/components/layout/ShellPageActions';
 import { StatusBadge } from '@/shared/components/crm/StatusBadge';
 import { useProducts } from '@/modules/business/features/products/use-products';
 import { usePermissions } from '@/core/permissions/use-permissions';
@@ -71,12 +72,14 @@ export function ProductListPage() {
         }
         action={
           canEdit ? (
-            <Button asChild>
-              <Link to={path('/products/new')}>
-                <Plus className="size-4" />
-                {t('empty.productsCta')}
-              </Link>
-            </Button>
+            <ShellPageActions>
+              <Button asChild>
+                <Link to={path('/products/new')}>
+                  <Plus className="size-4" />
+                  {t('empty.productsCta')}
+                </Link>
+              </Button>
+            </ShellPageActions>
           ) : undefined
         }
       />
@@ -110,8 +113,12 @@ export function ProductListPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {items.map((product) => (
-                <TableRow key={product.id}>
+              {items.map((product, index) => (
+                <TableRow
+                  key={product.id}
+                  className="stagger-item"
+                  style={{ ['--stagger-delay' as string]: `${index * 40}ms` }}
+                >
                   <TableCell className="font-medium">{product.name}</TableCell>
                   <TableCell>
                     {product.price} {product.currency}

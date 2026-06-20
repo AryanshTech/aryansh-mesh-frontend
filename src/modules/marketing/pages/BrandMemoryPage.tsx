@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { brandMemoriesApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { PageAsyncShell } from '@/shared/components/crm/PageAsyncShell';
 import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { t } from '@/core/i18n';
 import type { BrandMemoryResponse } from '@/modules/marketing/types/api';
@@ -18,10 +20,12 @@ export function BrandMemoryPage() {
   const [current, setCurrent] = useState<BrandMemoryResponse | null>(null);
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await apiFetchWithRetry(
         (token) => brandMemoriesApi.getCurrent(token, projectId),
@@ -29,14 +33,16 @@ export function BrandMemoryPage() {
       );
       setCurrent(res);
       setContent(res?.contentMarkdown ?? '');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('errors.network'));
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectId, getToken]);
 
   useEffect(() => {
     void load();
-  }, [projectId, getToken]);
+  }, [load]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -47,10 +53,15 @@ export function BrandMemoryPage() {
         getToken
       );
       setCurrent(created);
+      toast.success(t('brandMemory.saveSuccess'));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t('errors.network'));
     } finally {
       setSaving(false);
     }
   };
+
+  const skeleton = <Skeleton className="h-96 w-full rounded-lg" />;
 
   return (
     <CrmPageShell>
@@ -64,9 +75,13 @@ export function BrandMemoryPage() {
           </Badge>
         }
       />
-      {loading ? (
-        <Skeleton className="h-96 w-full rounded-lg" />
-      ) : (
+      <PageAsyncShell
+        loading={loading}
+        error={error}
+        errorDescription={error ?? undefined}
+        onRetry={() => void load()}
+        skeleton={skeleton}
+      >
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>{t('brandMemory.editorTitle')}</CardTitle>
@@ -92,7 +107,7 @@ export function BrandMemoryPage() {
             )}
           </CardContent>
         </Card>
-      )}
+      </PageAsyncShell>
     </CrmPageShell>
   );
 }

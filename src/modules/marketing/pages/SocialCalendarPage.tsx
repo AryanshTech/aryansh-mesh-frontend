@@ -1,13 +1,22 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { CalendarIcon } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { socialPostsApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { PageAsyncShell } from '@/shared/components/crm/PageAsyncShell';
 import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { t } from '@/core/i18n';
 import type { SocialPostResponse } from '@/modules/marketing/types/api';
 import { Badge } from '@/design-system/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/design-system/components/ui/card';
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/design-system/components/ui/empty';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
 
 const WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as const;
@@ -36,6 +45,7 @@ export function SocialCalendarPage() {
   const { getToken } = useAuth();
   const [posts, setPosts] = useState<SocialPostResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const weekStart = useMemo(() => getMonday(new Date()), []);
 
@@ -54,74 +64,103 @@ export function SocialCalendarPage() {
     return map;
   }, [posts]);
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      try {
-        const res = await apiFetchWithRetry(
-          (token) => socialPostsApi.list(token, projectId),
-          getToken
-        );
-        setPosts(res);
-      } finally {
-        setLoading(false);
-      }
-    };
-    void load();
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await apiFetchWithRetry(
+        (token) => socialPostsApi.list(token, projectId),
+        getToken
+      );
+      setPosts(res);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('errors.network'));
+    } finally {
+      setLoading(false);
+    }
   }, [projectId, getToken]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const hasAnyPosts = posts.length > 0;
+  const skeleton = (
+    <div className="grid gap-4 md:grid-cols-[repeat(5,minmax(0,1fr))]">
+      {WEEKDAYS.map((day) => (
+        <Skeleton key={day} className="h-48 rounded-lg" />
+      ))}
+    </div>
+  );
 
   return (
     <CrmPageShell>
       <PageHeader description={t('social.subtitle')} />
-      {loading ? (
-        <div className="grid gap-4 md:grid-cols-[repeat(5,minmax(0,1fr))]">
-          {WEEKDAYS.map((day) => (
-            <Skeleton key={day} className="h-48 rounded-lg" />
-          ))}
-        </div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-[repeat(5,minmax(0,1fr))]">
-          {WEEKDAYS.map((day, index) => {
-            const date = weekDates[index];
-            const dateKey = toDateKey(date);
-            const dayPosts = postsByDate[dateKey] ?? [];
+      <PageAsyncShell
+        loading={loading}
+        error={error}
+        errorDescription={error ?? undefined}
+        onRetry={() => void load()}
+        skeleton={skeleton}
+      >
+        {!hasAnyPosts ? (
+          <Empty className="rounded-lg border border-dashed py-12">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <CalendarIcon />
+              </EmptyMedia>
+              <EmptyTitle>{t('social.emptyWeekTitle')}</EmptyTitle>
+              <EmptyDescription>{t('social.emptyWeekDescription')}</EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-[repeat(5,minmax(0,1fr))]">
+            {WEEKDAYS.map((day, index) => {
+              const date = weekDates[index];
+              const dateKey = toDateKey(date);
+              const dayPosts = postsByDate[dateKey] ?? [];
 
-            return (
-              <Card key={day}>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {t(`social.days.${day}`)}
-                  </CardTitle>
-                  <p className="text-xs text-muted-foreground">
-                    {date.toLocaleDateString()}
-                  </p>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {dayPosts.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">{t('social.emptyDay')}</p>
-                  ) : (
-                    dayPosts.map((post) => (
-                      <Card key={post.id} className="shadow-none">
-                        <CardContent className="space-y-1 p-2 text-xs">
-                          <div className="mb-1 flex items-center justify-between gap-1">
-                            <Badge variant="outline" className="text-[10px]">
-                              {t(`socialPlatforms.${post.platform}`)}
-                            </Badge>
-                            <Badge variant="secondary" className="text-[10px]">
-                              {t(`socialStatus.${post.status}`)}
-                            </Badge>
-                          </div>
-                          <p className="line-clamp-3">{post.content}</p>
-                        </CardContent>
-                      </Card>
-                    ))
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
+              return (
+                <Card
+                  key={day}
+                  className="stagger-item"
+                  style={{ ['--stagger-delay' as string]: `${index * 50}ms` }}
+                >
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      {t(`social.days.${day}`)}
+                    </CardTitle>
+                    <p className="text-xs text-muted-foreground">
+                      {date.toLocaleDateString()}
+                    </p>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {dayPosts.length === 0 ? (
+                      <p className="text-xs text-muted-foreground">{t('social.emptyDay')}</p>
+                    ) : (
+                      dayPosts.map((post) => (
+                        <Card key={post.id} className="shadow-none">
+                          <CardContent className="space-y-1 p-2 text-xs">
+                            <div className="mb-1 flex items-center justify-between gap-1">
+                              <Badge variant="outline" className="text-[10px]">
+                                {t(`socialPlatforms.${post.platform}`)}
+                              </Badge>
+                              <Badge variant="secondary" className="text-[10px]">
+                                {t(`socialStatus.${post.status}`)}
+                              </Badge>
+                            </div>
+                            <p className="line-clamp-3">{post.content}</p>
+                          </CardContent>
+                        </Card>
+                      ))
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </PageAsyncShell>
     </CrmPageShell>
   );
 }

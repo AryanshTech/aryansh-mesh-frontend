@@ -1,60 +1,38 @@
-import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ExternalLink, Globe } from 'lucide-react';
+import { ExternalLink, Globe, Link2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
 import { Badge } from '@/design-system/components/ui/badge';
 import { Button } from '@/design-system/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/design-system/components/ui/card';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/design-system/components/ui/tabs';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { ShellPageActions } from '@/shared/components/layout/ShellPageActions';
 import {
   usePublish,
   usePublishLatest,
   usePublishStatus,
 } from '@/modules/business/features/publish/use-publish';
-import { WebsiteIntegrationPanel } from '@/modules/business/features/publish/WebsiteIntegrationPanel';
-import { useBusinessProfile } from '@/modules/business/features/business/use-business';
+import { useWebsiteIntegrationContext } from '@/modules/business/hooks/use-website-integration';
 import { useWorkspaceBreadcrumbs } from '@/modules/business/hooks/use-workspace-breadcrumbs';
-import { useTenant } from '@/modules/business/features/admin/use-tenants';
-import { useAuth } from '@/core/auth/use-auth';
-import { resolveApiV1BaseUrl, resolveGatewayOrigin } from '@/core/api/config';
 import { usePermissions } from '@/core/permissions/use-permissions';
-import { useTenantScope } from '@/modules/business/hooks/use-tenant-scope';
+import { resolveApiV1BaseUrl } from '@/core/api/config';
 import { ApiError } from '@/modules/business/types/api';
 
 const API_V1_BASE = resolveApiV1BaseUrl();
-const EMBED_ORIGIN = resolveGatewayOrigin() || (typeof window !== 'undefined' ? window.location.origin : '');
 const COMPANY_SITE_URL =
   import.meta.env.VITE_COMPANY_SITE_URL?.replace(/\/$/, '') ?? 'https://aryansh.tech';
 
 export function PublishPage() {
   const { t } = useTranslation();
-  const { session } = useAuth();
-  const { isWorkspace, tenantId, path } = useTenantScope();
   const breadcrumbs = useWorkspaceBreadcrumbs(t('pages.publish'));
-  const { data: workspaceTenant } = useTenant(isWorkspace ? tenantId : '');
-  const { data: businessProfile } = useBusinessProfile();
+  const { tenantSlug, connectPath } = useWebsiteIntegrationContext();
   const { canPublish } = usePermissions();
   const { data: status, isLoading, isError } = usePublishStatus();
   const { data: latest } = usePublishLatest();
   const publish = usePublish();
-  const allowedOrigins = useMemo(() => {
-    const origins = [...(businessProfile?.allowedWebsiteOrigins ?? [])];
-    if (businessProfile?.websiteUrl) {
-      try {
-        const websiteOrigin = new URL(businessProfile.websiteUrl).origin;
-        if (!origins.includes(websiteOrigin)) {
-          origins.unshift(websiteOrigin);
-        }
-      } catch {
-        // ignore invalid website URL
-      }
-    }
-    return origins;
-  }, [businessProfile]);
 
   async function handlePublish() {
     try {
@@ -90,9 +68,6 @@ export function PublishPage() {
   }
 
   const draftCounts = status?.draftCounts ?? {};
-  const tenantSlug = isWorkspace ? workspaceTenant?.slug : session?.tenantSlug;
-  const tenantName =
-    (isWorkspace ? workspaceTenant?.name : session?.tenantName) ?? tenantSlug ?? '';
 
   return (
     <CrmPageShell>
@@ -101,12 +76,14 @@ export function PublishPage() {
         breadcrumbs={breadcrumbs}
         action={
           canPublish ? (
-            <Button
-              onClick={() => void handlePublish()}
-              disabled={publish.isPending || !status?.hasUnpublishedChanges}
-            >
-              {publish.isPending ? t('common.loading') : t('publish.action')}
-            </Button>
+            <ShellPageActions>
+              <Button
+                onClick={() => void handlePublish()}
+                disabled={publish.isPending || !status?.hasUnpublishedChanges}
+              >
+                {publish.isPending ? t('common.loading') : t('publish.action')}
+              </Button>
+            </ShellPageActions>
           ) : undefined
         }
       />
@@ -147,35 +124,24 @@ export function PublishPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <ExternalLink className="size-4 text-primary" />
-              {t('publish.hub.landingTitle')}
+              <Link2 className="size-4 text-primary" />
+              {t('publish.connectLink.title')}
             </CardTitle>
-            <CardDescription>{t('publish.hub.landingDescription')}</CardDescription>
+            <CardDescription>{t('publish.connectLink.description')}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
-            <p className="text-sm text-muted-foreground">{t('publish.hub.landingHint')}</p>
-            <div className="flex flex-wrap gap-2">
+            <p className="text-sm text-muted-foreground">{t('publish.connectLink.hint')}</p>
+            {tenantSlug ? (
               <Button variant="outline" size="sm" asChild>
-                <a href={COMPANY_SITE_URL} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="size-4" data-icon="inline-start" />
-                  {t('publish.hub.openCompanySite')}
-                </a>
+                <Link to={connectPath}>
+                  <Link2 className="size-4" data-icon="inline-start" />
+                  {t('publish.connectLink.action')}
+                </Link>
               </Button>
-            </div>
+            ) : null}
           </CardContent>
         </Card>
       </div>
-
-      {tenantSlug ? (
-        <WebsiteIntegrationPanel
-          tenantName={tenantName}
-          tenantSlug={tenantSlug}
-          apiBase={API_V1_BASE}
-          embedOrigin={EMBED_ORIGIN}
-          profilePath={path('/profile')}
-          allowedOrigins={allowedOrigins}
-        />
-      ) : null}
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
@@ -228,75 +194,57 @@ export function PublishPage() {
         </Card>
       )}
 
-      <Tabs defaultValue="business">
-        <TabsList>
-          <TabsTrigger value="business">{t('nav.profile')}</TabsTrigger>
-          <TabsTrigger value="products">{t('nav.products')}</TabsTrigger>
-          <TabsTrigger value="locations">{t('nav.locations')}</TabsTrigger>
-          <TabsTrigger value="testimonials">{t('nav.testimonials')}</TabsTrigger>
-          <TabsTrigger value="content">{t('nav.content')}</TabsTrigger>
-        </TabsList>
-        <TabsContent value="business">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('nav.profile')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <pre className="max-h-64 overflow-auto rounded-md bg-muted p-4 text-xs">
-                {JSON.stringify(latest?.business ?? {}, null, 2)}
-              </pre>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="products">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('nav.products')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <pre className="max-h-64 overflow-auto rounded-md bg-muted p-4 text-xs">
-                {JSON.stringify(latest?.products ?? [], null, 2)}
-              </pre>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="locations">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('nav.locations')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <pre className="max-h-64 overflow-auto rounded-md bg-muted p-4 text-xs">
-                {JSON.stringify(latest?.locations ?? [], null, 2)}
-              </pre>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="testimonials">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('nav.testimonials')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <pre className="max-h-64 overflow-auto rounded-md bg-muted p-4 text-xs">
-                {JSON.stringify(latest?.testimonials ?? [], null, 2)}
-              </pre>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="content">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('nav.content')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <pre className="max-h-64 overflow-auto rounded-md bg-muted p-4 text-xs">
-                {JSON.stringify(latest?.content ?? {}, null, 2)}
-              </pre>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('publish.snapshot.title')}</CardTitle>
+          <CardDescription>{t('publish.snapshot.description')}</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="rounded-lg border border-border bg-muted/30 p-4">
+            <p className="text-xs font-medium uppercase text-muted-foreground">
+              {t('publish.snapshot.business')}
+            </p>
+            <p className="mt-1 text-sm font-medium text-foreground">
+              {(latest?.business as { name?: string } | undefined)?.name ??
+                t('publish.snapshot.notPublished')}
+            </p>
+          </div>
+          <div className="rounded-lg border border-border bg-muted/30 p-4">
+            <p className="text-xs font-medium uppercase text-muted-foreground">
+              {t('publish.snapshot.products')}
+            </p>
+            <p className="mt-1 text-sm font-medium text-foreground font-tabular">
+              {Array.isArray(latest?.products) ? latest.products.length : 0}
+            </p>
+          </div>
+          <div className="rounded-lg border border-border bg-muted/30 p-4">
+            <p className="text-xs font-medium uppercase text-muted-foreground">
+              {t('publish.snapshot.locations')}
+            </p>
+            <p className="mt-1 text-sm font-medium text-foreground font-tabular">
+              {Array.isArray(latest?.locations) ? latest.locations.length : 0}
+            </p>
+          </div>
+          <div className="rounded-lg border border-border bg-muted/30 p-4">
+            <p className="text-xs font-medium uppercase text-muted-foreground">
+              {t('publish.snapshot.testimonials')}
+            </p>
+            <p className="mt-1 text-sm font-medium text-foreground font-tabular">
+              {Array.isArray(latest?.testimonials) ? latest.testimonials.length : 0}
+            </p>
+          </div>
+          <div className="rounded-lg border border-border bg-muted/30 p-4 sm:col-span-2 lg:col-span-1">
+            <p className="text-xs font-medium uppercase text-muted-foreground">
+              {t('publish.snapshot.contentBlocks')}
+            </p>
+            <p className="mt-1 text-sm font-medium text-foreground">
+              {latest?.content && typeof latest.content === 'object'
+                ? t('publish.snapshot.configured')
+                : t('publish.snapshot.notPublished')}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </CrmPageShell>
   );
 }

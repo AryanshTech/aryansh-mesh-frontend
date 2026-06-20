@@ -16,8 +16,9 @@ import { BriefEditor } from '@/modules/marketing/components/brief/BriefEditor';
 import { ChatComposer } from '@/modules/marketing/components/chat/ChatComposer';
 import { MessageList } from '@/modules/marketing/components/chat/MessageList';
 import { OutputsPanel } from '@/modules/marketing/components/outputs/OutputsPanel';
-import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
-import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { ConfirmDialog } from '@/shared/components/crm/ConfirmDialog';
+import { ShellPageActions } from '@/shared/components/layout/ShellPageActions';
+import { layout } from '@/design-system/tokens/layout';
 import { useSidebarNavContext } from '@/modules/marketing/contexts/sidebar-nav-context';
 import { t } from '@/core/i18n';
 import type {
@@ -29,6 +30,8 @@ import type {
 } from '@/modules/marketing/types/api';
 import { Alert, AlertDescription } from '@/design-system/components/ui/alert';
 import { Button } from '@/design-system/components/ui/button';
+import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { Spinner } from '@/design-system/components/ui/spinner';
 import {
   ResizableHandle,
@@ -53,6 +56,8 @@ export function ThreadWorkspacePage() {
   const [streaming, setStreaming] = useState(false);
   const [loading, setLoading] = useState(true);
   const [pendingInsert, setPendingInsert] = useState<string | null>(null);
+  const [deleteOutputId, setDeleteOutputId] = useState<string | null>(null);
+  const [deletingOutput, setDeletingOutput] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const loadOutputs = useCallback(
@@ -125,7 +130,7 @@ export function ThreadWorkspacePage() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
-  }, [messages]);
+  }, [messages, streaming]);
 
   useEffect(() => {
     const type = filter === 'ALL' ? undefined : filter;
@@ -204,14 +209,27 @@ export function ThreadWorkspacePage() {
     }
   };
 
-  const handleDeleteOutput = async (outputId: string) => {
-    if (!confirm(t('common.confirmDelete'))) return;
-    await apiFetchWithRetry(
-      (token) => outputsApi.delete(token, projectId, outputId),
-      getToken
-    );
-    await loadOutputs(filter === 'ALL' ? undefined : filter);
-    toast.success(t('workspace.delete'));
+  const handleDeleteOutput = async () => {
+    if (!canWrite || !deleteOutputId) return;
+    setDeletingOutput(true);
+    try {
+      await apiFetchWithRetry(
+        (token) => outputsApi.delete(token, projectId, deleteOutputId),
+        getToken
+      );
+      setOutputs((prev) => prev.filter((o) => o.id !== deleteOutputId));
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(deleteOutputId);
+        return next;
+      });
+      toast.success(t('workspace.deleteSuccess'));
+      setDeleteOutputId(null);
+    } catch {
+      toast.error(t('workspace.deleteError'));
+    } finally {
+      setDeletingOutput(false);
+    }
   };
 
   const handleExport = async (format: 'CSV' | 'XLSX') => {
@@ -240,14 +258,16 @@ export function ThreadWorkspacePage() {
   }
 
   return (
-    <CrmPageShell className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+    <CrmPageShell className={layout.dashboard.pageViewport}>
       <PageHeader
         action={
           canWrite ? (
-            <Button size="sm" variant="outline" onClick={() => setBriefOpen(true)}>
-              <FileTextIcon data-icon="inline-start" />
-              {t('workspace.editBrief')}
-            </Button>
+            <ShellPageActions>
+              <Button size="sm" variant="outline" onClick={() => setBriefOpen(true)}>
+                <FileTextIcon data-icon="inline-start" />
+                {t('workspace.editBrief')}
+              </Button>
+            </ShellPageActions>
           ) : undefined
         }
       />
@@ -262,8 +282,15 @@ export function ThreadWorkspacePage() {
                 <AlertDescription>{t('workspace.viewerReadOnly')}</AlertDescription>
               </Alert>
             )}
-            <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden">
-              <MessageList messages={messages} />
+            <div
+              className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden"
+              aria-live="polite"
+              aria-busy={streaming}
+            >
+              <MessageList messages={messages} streaming={streaming} />
+              {streaming ? (
+                <span className="sr-only">{t('workspace.streaming')}</span>
+              ) : null}
               <div ref={messagesEndRef} />
             </div>
             {threadId && (
@@ -295,12 +322,21 @@ export function ThreadWorkspacePage() {
               })
             }
             onInsertLabel={(label) => setPendingInsert(`@${label}`)}
-            onDelete={handleDeleteOutput}
+            onDelete={(id) => setDeleteOutputId(id)}
             onExport={handleExport}
             canWrite={canWrite}
           />
         </ResizablePanel>
       </ResizablePanelGroup>
+
+      <ConfirmDialog
+        open={Boolean(deleteOutputId)}
+        onOpenChange={(open) => !open && setDeleteOutputId(null)}
+        title={t('common.confirmDelete')}
+        description={t('workspace.deleteConfirm')}
+        onConfirm={() => void handleDeleteOutput()}
+        loading={deletingOutput}
+      />
 
       <BriefEditor
         projectId={projectId}

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   Building2Icon,
   FolderKanbanIcon,
@@ -40,7 +40,6 @@ function countNewThisMonth(companies: CompanyResponse[]): number {
 }
 
 export function AgencyOverviewPage() {
-  const navigate = useNavigate();
   const { projectsByCompany } = useSidebarNavContext();
   const { data, isLoading } = useAgencyCompanies();
   const companies = data?.items ?? [];
@@ -145,15 +144,23 @@ export function AgencyOverviewPage() {
                   </TableHeader>
                   <TableBody>
                     {companies.slice(0, 5).map((company) => (
-                      <TableRow
-                        key={company.companyId}
-                        className="cursor-pointer"
-                        onClick={() => navigate(`/marketing/companies/${company.companyId}`)}
-                      >
-                        <TableCell className="font-mono text-sm">
-                          {company.companyCode}
+                      <TableRow key={company.companyId}>
+                        <TableCell className="font-medium">
+                          <Link
+                            to={`/marketing/companies/${company.companyId}`}
+                            className="font-mono text-sm text-primary hover:underline"
+                          >
+                            {company.companyCode}
+                          </Link>
                         </TableCell>
-                        <TableCell className="font-medium">{company.name}</TableCell>
+                        <TableCell className="font-medium">
+                          <Link
+                            to={`/marketing/companies/${company.companyId}`}
+                            className="hover:underline"
+                          >
+                            {company.name}
+                          </Link>
+                        </TableCell>
                         <TableCell className="font-tabular text-muted-foreground">
                           {formatDate(company.createdAt)}
                         </TableCell>

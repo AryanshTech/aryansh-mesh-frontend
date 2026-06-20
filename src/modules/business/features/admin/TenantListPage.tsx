@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Plus, ExternalLink } from 'lucide-react';
 import { Button } from '@/design-system/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
 import { Badge } from '@/design-system/components/ui/badge';
 import { Card, CardContent } from '@/design-system/components/ui/card';
 import {
@@ -31,6 +32,7 @@ import {
 import { Skeleton } from '@/design-system/components/ui/skeleton';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { ShellPageActions } from '@/shared/components/layout/ShellPageActions';
 import { useTenants } from '@/modules/business/features/admin/use-tenants';
 import { formatDate } from '@/modules/business/navigation';
 import { getLocale } from '@/core/i18n';
@@ -49,10 +51,12 @@ export function TenantListPage() {
       <PageHeader
         description={t('admin.tenants.description')}
         action={
-          <Button onClick={() => navigate('/admin/tenants/new')}>
-            <Plus />
-            {t('admin.tenants.create')}
-          </Button>
+          <ShellPageActions>
+            <Button onClick={() => navigate('/admin/tenants/new')}>
+              <Plus />
+              {t('admin.tenants.create')}
+            </Button>
+          </ShellPageActions>
         }
       />
 
@@ -67,17 +71,17 @@ export function TenantListPage() {
           )}
 
           {isError && (
-            <Empty className="border-0">
-              <EmptyHeader>
-                <EmptyTitle>{t('errors.network')}</EmptyTitle>
-                <EmptyDescription>{t('common.retry')}</EmptyDescription>
-              </EmptyHeader>
-              <EmptyContent>
-                <Button variant="outline" onClick={() => void refetch()}>
-                  {t('common.retry')}
-                </Button>
-              </EmptyContent>
-            </Empty>
+            <div className="p-4">
+              <Alert variant="destructive">
+                <AlertTitle>{t('errors.network')}</AlertTitle>
+                <AlertDescription className="flex flex-col gap-3">
+                  <span>{t('admin.tenants.loadError')}</span>
+                  <Button variant="outline" size="sm" className="w-fit" onClick={() => void refetch()}>
+                    {t('common.retry')}
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            </div>
           )}
 
           {!isLoading && !isError && data && data.items.length === 0 && (
@@ -109,28 +113,26 @@ export function TenantListPage() {
                 <TableBody>
                   {data.items.map((tenant) => (
                     <TableRow key={tenant.id}>
-                      <TableCell
-                        className="cursor-pointer font-medium"
-                        onClick={() => navigate(`/admin/tenants/${tenant.id}`)}
-                      >
-                        {tenant.name}
+                      <TableCell className="font-medium">
+                        <Link
+                          to={`/admin/tenants/${tenant.id}`}
+                          className="text-foreground hover:text-primary"
+                        >
+                          {tenant.name}
+                        </Link>
                       </TableCell>
-                      <TableCell
-                        className="cursor-pointer"
-                        onClick={() => navigate(`/admin/tenants/${tenant.id}`)}
-                      >
-                        {tenant.slug}
+                      <TableCell>
+                        <Link
+                          to={`/admin/tenants/${tenant.id}`}
+                          className="text-muted-foreground hover:text-primary"
+                        >
+                          {tenant.slug}
+                        </Link>
                       </TableCell>
-                      <TableCell
-                        className="cursor-pointer"
-                        onClick={() => navigate(`/admin/tenants/${tenant.id}`)}
-                      >
+                      <TableCell>
                         <Badge variant="secondary">{tenant.status}</Badge>
                       </TableCell>
-                      <TableCell
-                        className="cursor-pointer font-tabular"
-                        onClick={() => navigate(`/admin/tenants/${tenant.id}`)}
-                      >
+                      <TableCell className="font-tabular text-muted-foreground">
                         {formatDate(tenant.createdAt, locale)}
                       </TableCell>
                       <TableCell className="text-right">

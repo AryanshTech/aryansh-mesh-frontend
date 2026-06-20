@@ -17,6 +17,7 @@ import { ContentCollectionListPage } from '@/modules/business/features/content/C
 import { ContentCollectionFormPage } from '@/modules/business/features/content/ContentCollectionFormPage';
 import { BookingListPage } from '@/modules/business/features/bookings/BookingListPage';
 import { PublishPage } from '@/modules/business/features/publish/PublishPage';
+import { WebsiteConnectPage } from '@/modules/business/features/connect/WebsiteConnectPage';
 import { TeamPage } from '@/modules/business/features/settings/TeamPage';
 import { AccountPage } from '@/modules/business/features/settings/AccountPage';
 import { TenantListPage } from '@/modules/business/features/admin/TenantListPage';
@@ -51,6 +52,7 @@ function workspaceRoutes() {
       <Route path="content/:id" element={<ContentCollectionFormPage />} />
       <Route path="bookings" element={<BookingListPage />} />
       <Route path="publish" element={<PublishPage />} />
+      <Route path="connect" element={<WebsiteConnectPage />} />
       <Route path="settings/team" element={<TeamPage />} />
       <Route path="settings/account" element={<AccountPage />} />
       <Route path="onboarding" element={<OnboardingPage />} />
@@ -86,6 +88,7 @@ export function businessRoutes() {
       <Route path="content/:id" element={<ContentCollectionFormPage />} />
       <Route path="bookings" element={<BookingListPage />} />
       <Route path="publish" element={<PublishPage />} />
+      <Route path="connect" element={<WebsiteConnectPage />} />
       <Route path="settings/team" element={<TeamPage />} />
       <Route path="settings/account" element={<AccountPage />} />
       <Route element={<AdminRoute />}>

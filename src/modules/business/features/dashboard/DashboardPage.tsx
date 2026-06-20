@@ -74,20 +74,25 @@ export function DashboardPage() {
       ) : null}
 
       <div className={`${layout.dashboard.section} grid gap-4 md:grid-cols-2 lg:grid-cols-4`}>
-        {stats.map(({ key, value, href }) => {
+        {stats.map(({ key, value, href }, index) => {
           const Icon = STAT_ICONS[key];
           return (
-            <StatCard
+            <div
               key={key}
-              title={t(`dashboard.stats.${key}`)}
-              value={value}
-              icon={Icon}
-              action={
-                <Button variant="link" size="sm" asChild className="h-auto p-0">
-                  <Link to={href}>{t('common.edit')}</Link>
-                </Button>
-              }
-            />
+              className="stagger-item"
+              style={{ ['--stagger-delay' as string]: `${index * 50}ms` }}
+            >
+              <StatCard
+                title={t(`dashboard.stats.${key}`)}
+                value={value}
+                icon={Icon}
+                action={
+                  <Button variant="link" size="sm" asChild className="h-auto p-0">
+                    <Link to={href}>{t('common.edit')}</Link>
+                  </Button>
+                }
+              />
+            </div>
           );
         })}
       </div>

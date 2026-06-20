@@ -14,7 +14,7 @@ const toggleVariants = cva(
           "border border-border bg-transparent text-muted-foreground hover:bg-muted",
         pill: "rounded-pill px-4 data-[state=on]:bg-card data-[state=on]:text-foreground",
         "pill-category":
-          "rounded-[64px] px-4 data-[state=on]:bg-card data-[state=on]:text-foreground",
+          "rounded-pill-category px-4 data-[state=on]:bg-card data-[state=on]:text-foreground",
       },
       size: {
         default: "h-9 px-3",

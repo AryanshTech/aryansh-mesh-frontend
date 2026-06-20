@@ -41,16 +41,24 @@ export const layout = {
   },
   dashboard: {
     page: 'flex w-full flex-col gap-6 animate-fade-in-up',
+    pageViewport: 'flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden',
     section: 'flex flex-col gap-4',
   },
   auth: {
-    panel: 'auth-panel',
-    hero: 'auth-panel',
-    form: 'auth-form-surface',
+    shell:
+      'flex min-h-svh w-full flex-col bg-background lg:h-svh lg:flex-row lg:overflow-hidden',
+    panel:
+      'auth-panel relative hidden shrink-0 flex-col justify-between overflow-x-hidden overflow-y-auto p-10 lg:flex lg:h-full lg:w-[min(100%,480px)] lg:max-w-[45%] lg:min-w-[320px] xl:p-14',
+    formColumn:
+      'auth-form-surface relative flex min-h-svh min-w-0 flex-1 flex-col bg-card lg:h-full lg:min-h-0 lg:overflow-y-auto lg:bg-muted/30',
+    formMain:
+      'flex w-full min-w-0 flex-1 items-center justify-center px-6 pb-12 pt-4 md:px-10 lg:pb-16',
+    formCardWrap: 'w-full min-w-0 max-w-[420px]',
     title: 'text-3xl font-semibold text-foreground',
     subtitle: 'text-sm text-muted-foreground',
+    /** @deprecated Use `auth.panel` */
+    hero: 'auth-panel',
+    /** @deprecated Use `auth.formColumn` */
+    form: 'auth-form-surface',
   },
 } as const;
-
-/** @deprecated Use `layout` from `@/design-system/tokens/layout` */
-export const appColors = layout;
