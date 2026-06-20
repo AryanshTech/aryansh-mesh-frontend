@@ -4,7 +4,8 @@ import { EyeIcon, PlusIcon } from 'lucide-react';
 import { agentJobsApi, competitorsApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
 import { DataTableCard } from '@/modules/marketing/components/dashboard/data-table-card';
-import { PageShell } from '@/modules/marketing/components/layout/page-shell';
+import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { formatDate, t } from '@/core/i18n';
 import type { CompetitorResponse } from '@/modules/marketing/types/api';
 import { Button } from '@/design-system/components/ui/button';
@@ -85,25 +86,25 @@ export function SpyPage() {
   };
 
   return (
-    <PageShell
-      scrollable
-      title={t('spy.title')}
-      description={t('spy.subtitle')}
-      headerActions={
-        canWrite ? (
-          <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => setModalOpen(true)}>
-              <PlusIcon data-icon="inline-start" />
-              {t('spy.addCompetitor')}
-            </Button>
-            <Button size="sm" disabled={running} onClick={() => void handleRunSpy()}>
-              <EyeIcon data-icon="inline-start" />
-              {running ? t('spy.running') : t('spy.runSpy')}
-            </Button>
-          </div>
-        ) : undefined
-      }
-    >
+    <CrmPageShell>
+      <PageHeader
+        title={t('spy.title')}
+        description={t('spy.subtitle')}
+        action={
+          canWrite ? (
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" onClick={() => setModalOpen(true)}>
+                <PlusIcon data-icon="inline-start" />
+                {t('spy.addCompetitor')}
+              </Button>
+              <Button size="sm" disabled={running} onClick={() => void handleRunSpy()}>
+                <EyeIcon data-icon="inline-start" />
+                {running ? t('spy.running') : t('spy.runSpy')}
+              </Button>
+            </div>
+          ) : undefined
+        }
+      />
       {loading ? (
         <Skeleton className="h-64 w-full rounded-xl" />
       ) : (
@@ -189,6 +190,6 @@ export function SpyPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </PageShell>
+    </CrmPageShell>
   );
 }

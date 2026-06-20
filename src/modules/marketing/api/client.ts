@@ -1,55 +1,37 @@
+import { api } from '@/core/api/client';
 import { ApiError } from '@/core/api/types';
-import type { ApiErrorBody } from '@/core/api/types';
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8090';
-
-function apiPrefix(): string {
-  const base = API_BASE.replace(/\/$/, '');
-  return base.endsWith('/api/v1') ? base : `${base}/api/v1`;
-}
-
-async function parseLegacyError(response: Response): Promise<ApiError> {
-  try {
-    const body = (await response.json()) as ApiErrorBody & {
-      error?: { code?: string; message?: string };
-      code?: string;
-      message?: string;
-    };
-    const code = body.error?.code ?? body.code ?? 'UNKNOWN';
-    const message = body.error?.message ?? body.message ?? response.statusText;
-    return new ApiError(response.status, { code, message });
-  } catch {
-    return new ApiError(response.status, {
-      code: 'UNKNOWN',
-      message: response.statusText || 'Request failed',
-    });
-  }
-}
 
 export async function apiFetch<T>(
   path: string,
-  token: string,
+  _token: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const headers = new Headers(options.headers);
+  const method = (options.method ?? 'GET').toUpperCase();
+  const body = options.body;
 
-  if (!(options.body instanceof FormData)) {
-    headers.set('Content-Type', 'application/json');
+  if (body instanceof FormData) {
+    return api.upload<T>(path, body);
   }
 
-  headers.set('Authorization', `Bearer ${token}`);
-
-  const res = await fetch(`${apiPrefix()}${path}`, {
-    ...options,
-    headers,
-  });
-
-  if (!res.ok) {
-    throw await parseLegacyError(res);
+  let parsedBody: unknown;
+  if (typeof body === 'string' && body.length > 0) {
+    parsedBody = JSON.parse(body) as unknown;
   }
 
-  if (res.status === 204) return undefined as T;
-  return res.json() as Promise<T>;
+  switch (method) {
+    case 'GET':
+      return api.get<T>(path);
+    case 'POST':
+      return api.post<T>(path, parsedBody);
+    case 'PUT':
+      return api.put<T>(path, parsedBody);
+    case 'PATCH':
+      return api.patch<T>(path, parsedBody);
+    case 'DELETE':
+      return api.delete<T>(path);
+    default:
+      throw new ApiError(400, { code: 'UNSUPPORTED_METHOD', message: method });
+  }
 }
 
 export async function authApiFetch<T>(
@@ -61,11 +43,8 @@ export async function authApiFetch<T>(
 }
 
 export function getApiBaseUrl(): string {
-  const base = API_BASE.replace(/\/$/, '');
-  if (base.endsWith('/api/v1')) {
-    return base.slice(0, -'/api/v1'.length);
-  }
-  return base;
+  const raw = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ?? 'http://localhost:8090';
+  return raw.endsWith('/api/v1') ? raw.slice(0, -'/api/v1'.length) : raw;
 }
 
 export { ApiError };

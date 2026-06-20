@@ -97,7 +97,7 @@ export function CostFormPage() {
         title={isNew ? t('costs.form.createTitle') : t('costs.form.title')}
         breadcrumbs={[
           ...(isWorkspace
-            ? [{ label: t('admin.tenants.title'), href: '/business/admin/tenants' }]
+            ? [{ label: t('admin.tenants.title'), href: '/admin/tenants' }]
             : []),
           { label: t('pages.costs'), href: path('/costs') },
           { label: isNew ? t('common.create') : cost?.label ?? '' },

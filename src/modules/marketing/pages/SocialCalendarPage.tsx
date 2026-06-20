@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { socialPostsApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
-import { PageShell } from '@/modules/marketing/components/layout/page-shell';
+import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { t } from '@/core/i18n';
 import type { SocialPostResponse } from '@/modules/marketing/types/api';
 import { Badge } from '@/design-system/components/ui/badge';
@@ -70,11 +71,8 @@ export function SocialCalendarPage() {
   }, [projectId, getToken]);
 
   return (
-    <PageShell
-      scrollable
-      title={t('social.title')}
-      description={t('social.subtitle')}
-    >
+    <CrmPageShell>
+      <PageHeader title={t('social.title')} description={t('social.subtitle')} />
       {loading ? (
         <div className="grid gap-4 md:grid-cols-5">
           {WEEKDAYS.map((day) => (
@@ -125,6 +123,6 @@ export function SocialCalendarPage() {
           })}
         </div>
       )}
-    </PageShell>
+    </CrmPageShell>
   );
 }

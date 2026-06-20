@@ -37,6 +37,7 @@ import { Separator } from '@/design-system/components/ui/separator';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { AdminTenantQuickNav } from '@/modules/business/features/admin/AdminTenantQuickNav';
 import { useInviteOwner } from '@/modules/business/features/admin/use-invite';
 import { useTenant } from '@/modules/business/features/admin/use-tenants';
 import { formatDate } from '@/modules/business/navigation';
@@ -126,17 +127,19 @@ export function TenantDetailPage() {
       <PageHeader
         title={tenant.name}
         breadcrumbs={[
-          { label: t('admin.tenants.title'), href: '/business/admin/tenants' },
+          { label: t('admin.tenants.title'), href: '/admin/tenants' },
           { label: tenant.name },
         ]}
         action={
           <Button asChild>
-            <Link to={`/business/admin/tenants/${tenant.id}/workspace/business`}>
+            <Link to={`/admin/tenants/${tenant.id}/workspace/dashboard`}>
               {t('admin.tenants.detail.manageTenant')}
             </Link>
           </Button>
         }
       />
+
+      <AdminTenantQuickNav tenantId={tenant.id} />
 
       <Card>
         <CardHeader>

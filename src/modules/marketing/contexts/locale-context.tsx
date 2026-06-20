@@ -1,41 +1,31 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useState,
-  type ReactNode,
-} from 'react';
-import {
-  getLocale,
-  setLocale as persistLocale,
-  t as translate,
-  type Locale,
-} from '@/core/i18n';
+import { createContext, useCallback, useContext, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+import { getLocale, setLocale as persistLocale, type Locale } from '@/core/i18n';
 
 type LocaleContextValue = {
   locale: Locale;
   setLocale: (locale: Locale) => void;
-  t: typeof translate;
+  t: (key: string, params?: Record<string, string | number>) => string;
 };
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(getLocale);
+  const { t, i18n } = useTranslation();
 
   const setLocale = useCallback((next: Locale) => {
     persistLocale(next);
-    setLocaleState(next);
   }, []);
 
-  const t = useCallback(
-    (key: string, params?: Record<string, string | number>) =>
-      translate(key, params),
-    [locale]
+  const marketingT = useCallback(
+    (key: string, params?: Record<string, string | number>) => t(key, params),
+    [t],
   );
 
   return (
-    <LocaleContext.Provider value={{ locale, setLocale, t }}>
+    <LocaleContext.Provider
+      value={{ locale: (i18n.language as Locale) ?? getLocale(), setLocale, t: marketingT }}
+    >
       {children}
     </LocaleContext.Provider>
   );

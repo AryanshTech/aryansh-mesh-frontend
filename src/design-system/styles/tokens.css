@@ -1,0 +1,141 @@
+/**
+ * Linear-inspired design tokens (see docs/aryansh-mesh/DESIGN.md).
+ * RGB channel triplets use --rgb-* (referenced by @theme in globals.css).
+ */
+
+/* ─── Light theme ───────────────────────────────────────────── */
+:root,
+html.light {
+  --rgb-primary: 94 106 210;
+  --rgb-primary-hover: 130 143 255;
+  --rgb-primary-focus: 94 105 209;
+  --rgb-on-primary: 255 255 255;
+
+  --rgb-canvas: 255 255 255;
+  --rgb-surface-1: 245 246 246;
+  --rgb-surface-2: 246 247 247;
+  --rgb-surface-3: 240 241 242;
+  --rgb-surface-4: 235 236 238;
+
+  --rgb-hairline: 229 231 235;
+  --rgb-hairline-strong: 209 213 219;
+  --rgb-hairline-tertiary: 189 194 201;
+
+  --rgb-ink: 0 0 0;
+  --rgb-ink-muted: 55 65 81;
+  --rgb-ink-subtle: 107 114 128;
+  --rgb-ink-tertiary: 156 163 175;
+
+  --rgb-brand-secure: 122 127 173;
+  --rgb-semantic-success: 39 166 68;
+  --rgb-overlay: 15 23 42;
+
+  /* shadcn semantic channels */
+  --background: var(--rgb-canvas);
+  --foreground: var(--rgb-ink);
+  --card: var(--rgb-surface-1);
+  --card-foreground: var(--rgb-ink);
+  --popover: var(--rgb-surface-1);
+  --popover-foreground: var(--rgb-ink);
+  --primary: var(--rgb-primary);
+  --primary-foreground: var(--rgb-on-primary);
+  --secondary: var(--rgb-surface-2);
+  --secondary-foreground: var(--rgb-ink);
+  --muted: var(--rgb-surface-2);
+  --muted-foreground: var(--rgb-ink-subtle);
+  --accent: var(--rgb-surface-3);
+  --accent-foreground: var(--rgb-ink);
+  --destructive: 220 38 38;
+  --destructive-foreground: 255 255 255;
+  --border: var(--rgb-hairline);
+  --input: var(--rgb-hairline-strong);
+  --ring: var(--rgb-primary-focus);
+  --hover: var(--rgb-surface-2);
+
+  --success: 39 166 68;
+  --success-foreground: 20 83 45;
+  --warning: 217 119 6;
+  --warning-foreground: 146 64 14;
+  --error: 220 38 38;
+  --info: 94 106 210;
+
+  --radius: 0.5rem;
+
+  --sidebar: var(--rgb-canvas);
+  --sidebar-foreground: var(--rgb-ink);
+  --sidebar-primary: var(--rgb-primary);
+  --sidebar-primary-foreground: var(--rgb-on-primary);
+  --sidebar-accent: var(--rgb-surface-1);
+  --sidebar-accent-foreground: var(--rgb-ink);
+  --sidebar-border: var(--rgb-hairline);
+  --sidebar-ring: var(--rgb-primary-focus);
+
+  --overlay-alpha: 0.58;
+}
+
+/* ─── Dark theme ────────────────────────────────────────────── */
+html.dark,
+.dark {
+  --rgb-primary: 94 106 210;
+  --rgb-primary-hover: 130 143 255;
+  --rgb-primary-focus: 94 105 209;
+  --rgb-on-primary: 255 255 255;
+
+  --rgb-canvas: 1 1 2;
+  --rgb-surface-1: 15 16 17;
+  --rgb-surface-2: 20 21 22;
+  --rgb-surface-3: 24 25 26;
+  --rgb-surface-4: 25 26 27;
+
+  --rgb-hairline: 35 37 42;
+  --rgb-hairline-strong: 52 52 58;
+  --rgb-hairline-tertiary: 62 62 68;
+
+  --rgb-ink: 247 248 248;
+  --rgb-ink-muted: 208 214 224;
+  --rgb-ink-subtle: 138 143 152;
+  --rgb-ink-tertiary: 98 102 109;
+
+  --rgb-brand-secure: 122 127 173;
+  --rgb-semantic-success: 39 166 68;
+  --rgb-overlay: 0 0 0;
+
+  --background: var(--rgb-canvas);
+  --foreground: var(--rgb-ink);
+  --card: var(--rgb-surface-1);
+  --card-foreground: var(--rgb-ink);
+  --popover: var(--rgb-surface-2);
+  --popover-foreground: var(--rgb-ink);
+  --primary: var(--rgb-primary);
+  --primary-foreground: var(--rgb-on-primary);
+  --secondary: var(--rgb-surface-2);
+  --secondary-foreground: var(--rgb-ink);
+  --muted: var(--rgb-surface-2);
+  --muted-foreground: var(--rgb-ink-subtle);
+  --accent: var(--rgb-surface-3);
+  --accent-foreground: var(--rgb-ink);
+  --destructive: 248 113 113;
+  --destructive-foreground: 255 255 255;
+  --border: var(--rgb-hairline);
+  --input: var(--rgb-hairline-strong);
+  --ring: var(--rgb-primary-focus);
+  --hover: var(--rgb-surface-2);
+
+  --success: 39 166 68;
+  --success-foreground: 187 247 208;
+  --warning: 251 191 36;
+  --warning-foreground: 254 243 199;
+  --error: 248 113 113;
+  --info: 130 143 255;
+
+  --sidebar: var(--rgb-canvas);
+  --sidebar-foreground: var(--rgb-ink);
+  --sidebar-primary: var(--rgb-primary);
+  --sidebar-primary-foreground: var(--rgb-on-primary);
+  --sidebar-accent: var(--rgb-surface-1);
+  --sidebar-accent-foreground: var(--rgb-ink);
+  --sidebar-border: var(--rgb-hairline);
+  --sidebar-ring: var(--rgb-primary-focus);
+
+  --overlay-alpha: 0.72;
+}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Plus } from 'lucide-react';
+import { Plus, ExternalLink } from 'lucide-react';
 import { Button } from '@/design-system/components/ui/button';
 import { Badge } from '@/design-system/components/ui/badge';
 import { Card, CardContent } from '@/design-system/components/ui/card';
@@ -50,7 +50,7 @@ export function TenantListPage() {
         title={t('admin.tenants.title')}
         description={t('admin.tenants.description')}
         action={
-          <Button onClick={() => navigate('/business/admin/tenants/new')}>
+          <Button onClick={() => navigate('/admin/tenants/new')}>
             <Plus />
             {t('admin.tenants.create')}
           </Button>
@@ -88,7 +88,7 @@ export function TenantListPage() {
                 <EmptyDescription>{t('admin.tenants.empty.description')}</EmptyDescription>
               </EmptyHeader>
               <EmptyContent>
-                <Button onClick={() => navigate('/business/admin/tenants/new')}>
+                <Button onClick={() => navigate('/admin/tenants/new')}>
                   {t('admin.tenants.empty.cta')}
                 </Button>
               </EmptyContent>
@@ -104,21 +104,49 @@ export function TenantListPage() {
                     <TableHead>{t('admin.tenants.table.slug')}</TableHead>
                     <TableHead>{t('admin.tenants.table.status')}</TableHead>
                     <TableHead>{t('admin.tenants.table.createdAt')}</TableHead>
+                    <TableHead className="w-[140px] text-right">{t('common.edit')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {data.items.map((tenant) => (
-                    <TableRow
-                      key={tenant.id}
-                      className="cursor-pointer"
-                      onClick={() => navigate(`/business/admin/tenants/${tenant.id}`)}
-                    >
-                      <TableCell className="font-medium">{tenant.name}</TableCell>
-                      <TableCell>{tenant.slug}</TableCell>
-                      <TableCell>
+                    <TableRow key={tenant.id}>
+                      <TableCell
+                        className="cursor-pointer font-medium"
+                        onClick={() => navigate(`/admin/tenants/${tenant.id}`)}
+                      >
+                        {tenant.name}
+                      </TableCell>
+                      <TableCell
+                        className="cursor-pointer"
+                        onClick={() => navigate(`/admin/tenants/${tenant.id}`)}
+                      >
+                        {tenant.slug}
+                      </TableCell>
+                      <TableCell
+                        className="cursor-pointer"
+                        onClick={() => navigate(`/admin/tenants/${tenant.id}`)}
+                      >
                         <Badge variant="secondary">{tenant.status}</Badge>
                       </TableCell>
-                      <TableCell>{formatDate(tenant.createdAt, locale)}</TableCell>
+                      <TableCell
+                        className="cursor-pointer font-tabular"
+                        onClick={() => navigate(`/admin/tenants/${tenant.id}`)}
+                      >
+                        {formatDate(tenant.createdAt, locale)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          size="sm"
+                          onClick={() =>
+                            navigate(
+                              `/admin/tenants/${tenant.id}/workspace/dashboard`,
+                            )
+                          }
+                        >
+                          <ExternalLink className="size-4" />
+                          {t('admin.tenants.detail.manageTenant')}
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

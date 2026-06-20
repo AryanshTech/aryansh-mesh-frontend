@@ -1,12 +1,11 @@
 import { Outlet } from 'react-router-dom';
-import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { TenantWorkspaceBanner } from '@/modules/business/features/admin/TenantWorkspaceBanner';
 
 export function TenantWorkspaceLayout() {
   return (
-    <CrmPageShell>
+    <div className="flex w-full min-w-0 flex-col gap-4">
       <TenantWorkspaceBanner />
       <Outlet />
-    </CrmPageShell>
+    </div>
   );
 }

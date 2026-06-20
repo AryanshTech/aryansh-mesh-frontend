@@ -17,7 +17,7 @@ export function StatCard({ title, value, description, icon: Icon }: StatCardProp
         <Icon className="size-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold tracking-tight">{value}</div>
+        <div className="text-2xl font-light tracking-tight font-tabular">{value}</div>
         {description && (
           <p className={`mt-1 ${typographyClasses.caption}`}>{description}</p>
         )}

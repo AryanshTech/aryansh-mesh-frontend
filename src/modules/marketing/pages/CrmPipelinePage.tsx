@@ -4,7 +4,8 @@ import { contactsApi, dealsApi, projectsApi } from '@/modules/marketing/api/endp
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
 import { KanbanBoard } from '@/modules/marketing/components/studio/KanbanBoard';
 import { DataTableCard } from '@/modules/marketing/components/dashboard/data-table-card';
-import { PageShell } from '@/modules/marketing/components/layout/page-shell';
+import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { formatDate, t } from '@/core/i18n';
 import type { ContactResponse, DealResponse, DealStage } from '@/modules/marketing/types/api';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
@@ -105,11 +106,8 @@ export function CrmPipelinePage() {
   };
 
   return (
-    <PageShell
-      scrollable
-      title={t('crm.title')}
-      description={t('crm.subtitle')}
-    >
+    <CrmPageShell>
+      <PageHeader title={t('crm.title')} description={t('crm.subtitle')} />
       {loading ? (
         <Skeleton className="h-64 w-full rounded-xl" />
       ) : (
@@ -182,6 +180,6 @@ export function CrmPipelinePage() {
           </TabsContent>
         </Tabs>
       )}
-    </PageShell>
+    </CrmPageShell>
   );
 }

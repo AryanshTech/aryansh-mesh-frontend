@@ -162,7 +162,7 @@ export function ContentCollectionFormPage() {
         title={isNew ? t('content.form.createTitle') : t('content.form.title')}
         breadcrumbs={[
           ...(isWorkspace
-            ? [{ label: t('admin.tenants.title'), href: '/business/admin/tenants' }]
+            ? [{ label: t('admin.tenants.title'), href: '/admin/tenants' }]
             : []),
           { label: t('pages.content'), href: path('/content') },
           { label: isNew ? t('common.create') : collection?.label ?? '' },

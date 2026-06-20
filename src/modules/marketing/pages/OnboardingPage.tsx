@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { onboardingApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
-import { PageShell } from '@/modules/marketing/components/layout/page-shell';
+import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { t } from '@/core/i18n';
 import type { OnboardingStatus } from '@/modules/marketing/types/api';
 import { Badge } from '@/design-system/components/ui/badge';
@@ -52,11 +53,11 @@ export function OnboardingPage() {
   };
 
   return (
-    <PageShell
-      scrollable
-      title={t('onboarding.title')}
-      description={t('onboarding.subtitle')}
-    >
+    <CrmPageShell>
+      <PageHeader
+        title={t('onboarding.title')}
+        description={t('onboarding.subtitle')}
+      />
       {loading ? (
         <Skeleton className="h-48 w-full rounded-xl" />
       ) : (
@@ -89,6 +90,6 @@ export function OnboardingPage() {
           </CardContent>
         </Card>
       )}
-    </PageShell>
+    </CrmPageShell>
   );
 }

@@ -3,15 +3,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
+import { Alert, AlertDescription } from '@/design-system/components/ui/alert';
 import { Button } from '@/design-system/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/design-system/components/ui/card';
 import {
   Form,
   FormControl,
@@ -26,6 +19,7 @@ import { Textarea } from '@/design-system/components/ui/textarea';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
 import { ImageUpload } from '@/shared/components/crm/ImageUpload';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { FormSection } from '@/shared/components/crm/FormSection';
 import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { useBusinessProfile, useUpdateBusiness } from '@/modules/business/features/business/use-business';
 import { usePermissions } from '@/core/permissions/use-permissions';
@@ -132,7 +126,6 @@ export function BusinessPage() {
     return (
       <CrmPageShell>
         <Alert variant="destructive">
-          <AlertTitle>{t('errors.network')}</AlertTitle>
           <AlertDescription>{t('business.loadError')}</AlertDescription>
         </Alert>
       </CrmPageShell>
@@ -140,284 +133,303 @@ export function BusinessPage() {
   }
 
   return (
-    <CrmPageShell>
+    <CrmPageShell className="max-w-4xl">
       <PageHeader
         title={t('pages.business')}
         description={t('business.subtitle')}
         breadcrumbs={
           isWorkspace
             ? [
-                { label: t('admin.tenants.title'), href: '/business/admin/tenants' },
+                { label: t('admin.tenants.title'), href: '/admin/tenants' },
                 { label: t('pages.business') },
               ]
             : undefined
         }
+        action={
+          canEdit ? (
+            <Button
+              type="submit"
+              form="business-profile-form"
+              disabled={updateBusiness.isPending}
+            >
+              {updateBusiness.isPending ? t('common.loading') : t('common.save')}
+            </Button>
+          ) : undefined
+        }
       />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('pages.business')}</CardTitle>
-          <CardDescription>{t('business.subtitle')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {!canEdit && (
-            <Alert className="mb-4">
-              <AlertDescription>{t('common.readOnly')}</AlertDescription>
-            </Alert>
-          )}
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <Label>{t('business.form.logo')}</Label>
-                <ImageUpload
-                  endpoint={`/tenants/${tenantId}/business/logo`}
-                  currentUrl={data?.logoUrl}
-                  disabled={!canEdit}
-                  onUploaded={(url) => {
-                    void updateBusiness.mutateAsync({ logoUrl: url });
-                  }}
-                />
-              </div>
-              <FormField
-                control={form.control}
-                name="legalName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('business.form.legalName')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={!canEdit} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="tagline"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('business.form.tagline')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={!canEdit} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('business.form.description')}</FormLabel>
-                    <FormControl>
-                      <Textarea rows={4} {...field} disabled={!canEdit} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('auth.email')}</FormLabel>
-                      <FormControl>
-                        <Input type="email" {...field} disabled={!canEdit} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('business.form.phone')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} disabled={!canEdit} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <FormField
-                control={form.control}
-                name="websiteUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('business.form.website')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={!canEdit} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="allowedWebsiteOrigins"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('business.form.allowedWebsiteOrigins')}</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        rows={4}
-                        placeholder={t('business.form.allowedWebsiteOriginsPlaceholder')}
-                        {...field}
-                        disabled={!canEdit}
-                      />
-                    </FormControl>
-                    <p className="text-xs text-muted-foreground">
-                      {t('business.form.allowedWebsiteOriginsHint')}
-                    </p>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+      {!canEdit && (
+        <Alert>
+          <AlertDescription>{t('common.readOnly')}</AlertDescription>
+        </Alert>
+      )}
 
-              <div className="space-y-2">
-                <Label>{t('business.form.address')}</Label>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="street"
-                    render={({ field }) => (
-                      <FormItem className="sm:col-span-2">
-                        <FormLabel>{t('business.form.street')}</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={!canEdit} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('business.form.city')}</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={!canEdit} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="state"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('business.form.state')}</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={!canEdit} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="postalCode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('business.form.postalCode')}</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={!canEdit} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="country"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('business.form.country')}</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={!canEdit} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>{t('business.form.social')}</Label>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="facebook"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('business.form.facebook')}</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={!canEdit} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="instagram"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('business.form.instagram')}</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={!canEdit} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="linkedin"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('business.form.linkedin')}</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={!canEdit} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="twitter"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('business.form.twitter')}</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={!canEdit} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              {canEdit && (
-                <Button type="submit" disabled={updateBusiness.isPending}>
-                  {updateBusiness.isPending ? t('common.loading') : t('common.save')}
-                </Button>
+      <Form {...form}>
+        <form
+          id="business-profile-form"
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col gap-4"
+        >
+          <FormSection
+            title={t('business.form.sections.branding')}
+            description={t('business.form.sections.brandingDescription')}
+          >
+            <div className="flex flex-col gap-2">
+              <Label>{t('business.form.logo')}</Label>
+              <ImageUpload
+                endpoint={`/tenants/${tenantId}/business/logo`}
+                currentUrl={data?.logoUrl}
+                disabled={!canEdit}
+                onUploaded={(url) => {
+                  void updateBusiness.mutateAsync({ logoUrl: url });
+                }}
+              />
+            </div>
+            <FormField
+              control={form.control}
+              name="legalName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('business.form.legalName')}</FormLabel>
+                  <FormControl>
+                    <Input {...field} disabled={!canEdit} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+            />
+            <FormField
+              control={form.control}
+              name="tagline"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('business.form.tagline')}</FormLabel>
+                  <FormControl>
+                    <Input {...field} disabled={!canEdit} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('business.form.description')}</FormLabel>
+                  <FormControl>
+                    <Textarea rows={4} {...field} disabled={!canEdit} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </FormSection>
+
+          <FormSection
+            title={t('business.form.sections.contact')}
+            description={t('business.form.sections.contactDescription')}
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('auth.email')}</FormLabel>
+                    <FormControl>
+                      <Input type="email" {...field} disabled={!canEdit} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('business.form.phone')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} disabled={!canEdit} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <FormField
+              control={form.control}
+              name="websiteUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('business.form.website')}</FormLabel>
+                  <FormControl>
+                    <Input {...field} disabled={!canEdit} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="allowedWebsiteOrigins"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('business.form.allowedWebsiteOrigins')}</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      rows={4}
+                      placeholder={t('business.form.allowedWebsiteOriginsPlaceholder')}
+                      {...field}
+                      disabled={!canEdit}
+                    />
+                  </FormControl>
+                  <p className="text-xs text-muted-foreground">
+                    {t('business.form.allowedWebsiteOriginsHint')}
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </FormSection>
+
+          <FormSection title={t('business.form.address')}>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="street"
+                render={({ field }) => (
+                  <FormItem className="sm:col-span-2">
+                    <FormLabel>{t('business.form.street')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} disabled={!canEdit} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('business.form.city')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} disabled={!canEdit} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="state"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('business.form.state')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} disabled={!canEdit} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="postalCode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('business.form.postalCode')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} disabled={!canEdit} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('business.form.country')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} disabled={!canEdit} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </FormSection>
+
+          <FormSection title={t('business.form.social')}>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="facebook"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('business.form.facebook')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} disabled={!canEdit} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="instagram"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('business.form.instagram')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} disabled={!canEdit} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="linkedin"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('business.form.linkedin')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} disabled={!canEdit} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="twitter"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('business.form.twitter')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} disabled={!canEdit} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </FormSection>
+
+          {canEdit && (
+            <div className="flex justify-end pb-2">
+              <Button type="submit" disabled={updateBusiness.isPending}>
+                {updateBusiness.isPending ? t('common.loading') : t('common.save')}
+              </Button>
+            </div>
+          )}
+        </form>
+      </Form>
     </CrmPageShell>
   );
 }

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Outlet, Route } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import { AdminRoute } from '@/core/auth/guards';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
 import { AgencyOverviewPage } from '@/modules/marketing/pages/AgencyOverviewPage';
@@ -14,8 +14,6 @@ import { CreativeStudioPage } from '@/modules/marketing/pages/CreativeStudioPage
 import { SocialCalendarPage } from '@/modules/marketing/pages/SocialCalendarPage';
 import { CrmPipelinePage } from '@/modules/marketing/pages/CrmPipelinePage';
 import { AdminUsersPage } from '@/modules/marketing/pages/AdminUsersPage';
-import { SidebarNavProvider } from '@/modules/marketing/contexts/sidebar-nav-context';
-
 const MarketingStudioPage = lazy(() =>
   import('@/modules/marketing/pages/MarketingStudioPage').then((m) => ({
     default: m.MarketingStudioPage,
@@ -34,17 +32,9 @@ function LazyPage({ children }: { children: React.ReactNode }) {
   );
 }
 
-function MarketingShell() {
-  return (
-    <SidebarNavProvider>
-      <Outlet />
-    </SidebarNavProvider>
-  );
-}
-
 export function marketingRoutes() {
   return (
-  <Route element={<MarketingShell />}>
+  <>
     <Route index element={<AgencyOverviewPage />} />
     <Route path="companies" element={<CompaniesPage />} />
     <Route path="companies/:companyId" element={<CompanyProjectsPage />} />
@@ -75,7 +65,7 @@ export function marketingRoutes() {
     <Route element={<AdminRoute />}>
       <Route path="admin/users" element={<AdminUsersPage />} />
     </Route>
-  </Route>
+  </>
   );
 }
 

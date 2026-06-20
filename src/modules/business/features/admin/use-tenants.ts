@@ -7,14 +7,14 @@ export function useTenants(page: number, size: number) {
   return useQuery({
     queryKey: queryKeys.admin.tenants(page, size),
     queryFn: () =>
-      api.get<TenantListResponse>(`/business/admin/tenants?page=${page}&size=${size}`),
+      api.get<TenantListResponse>(`/admin/tenants?page=${page}&size=${size}`),
   });
 }
 
 export function useTenant(id: string) {
   return useQuery({
     queryKey: queryKeys.admin.tenant(id),
-    queryFn: () => api.get<Tenant>(`/business/admin/tenants/${id}`),
+    queryFn: () => api.get<Tenant>(`/admin/tenants/${id}`),
     enabled: Boolean(id),
   });
 }
@@ -30,7 +30,7 @@ export function useCreateTenant() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: CreateTenantInput) =>
-      api.post<Tenant>('/business/admin/tenants', input),
+      api.post<Tenant>('/admin/tenants', input),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['admin', 'tenants'] });
     },

@@ -6,7 +6,8 @@ import { companiesApi, projectsApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
 import { DataTableCard } from '@/modules/marketing/components/dashboard/data-table-card';
 import { StatCard } from '@/modules/marketing/components/dashboard/stat-card';
-import { PageShell } from '@/modules/marketing/components/layout/page-shell';
+import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { useSidebarNavContext } from '@/modules/marketing/contexts/sidebar-nav-context';
 import { invalidateProjects, queryKeys } from '@/modules/marketing/hooks/query-client';
 import { formatDate, t } from '@/core/i18n';
@@ -97,12 +98,12 @@ export function CompanyProjectsPage() {
   ) : undefined;
 
   return (
-    <PageShell
-      scrollable
-      title={t('projects.title')}
-      description={t('projects.subtitle', { company: company?.name ?? '' })}
-      headerActions={createButton}
-    >
+    <CrmPageShell>
+      <PageHeader
+        title={t('projects.title')}
+        description={t('projects.subtitle', { company: company?.name ?? '' })}
+        action={createButton}
+      />
       {loading ? (
         <Skeleton className="h-28 w-full max-w-sm rounded-xl" />
       ) : (
@@ -201,6 +202,6 @@ export function CompanyProjectsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </PageShell>
+    </CrmPageShell>
   );
 }

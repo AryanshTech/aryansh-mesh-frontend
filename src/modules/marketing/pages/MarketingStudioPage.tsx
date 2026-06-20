@@ -26,7 +26,8 @@ import {
   STUDIO_PLATFORMS,
   StyleReferenceCard,
 } from '@/modules/marketing/components/studio/StyleReferenceCard';
-import { PageShell } from '@/modules/marketing/components/layout/page-shell';
+import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { invalidateProjectStudio, queryKeys } from '@/modules/marketing/hooks/query-client';
 import { platformColors } from '@/design-system/tokens/colors';
 import { t } from '@/core/i18n';
@@ -594,11 +595,8 @@ export function MarketingStudioPage() {
     (activeTab === 'mindmap' && mindmapQuery.isLoading);
 
   return (
-    <PageShell
-      scrollable
-      title={t('studio.title')}
-      description={t('studio.subtitle')}
-    >
+    <CrmPageShell className="min-w-0">
+      <PageHeader title={t('studio.title')} description={t('studio.subtitle')} />
       {jobsQuery.data && (
         <div className="rounded-xl border border-border bg-card p-4">
           <h3 className="mb-3 text-sm font-medium text-muted-foreground">
@@ -608,8 +606,8 @@ export function MarketingStudioPage() {
         </div>
       )}
 
-      <Tabs value={activeTab} onValueChange={(v) => setTab(v as StudioTab)}>
-        <TabsList className="flex-wrap">
+      <Tabs value={activeTab} onValueChange={(v) => setTab(v as StudioTab)} className="min-w-0 w-full">
+        <TabsList className="flex-wrap h-auto w-full justify-start">
           {STUDIO_TABS.map((tab) => (
             <TabsTrigger key={tab} value={tab}>
               {t(`studio.tabs.${tab}`)}
@@ -798,7 +796,7 @@ export function MarketingStudioPage() {
                   {savingMindmap ? t('common.loading') : t('studio.mindmap.save')}
                 </Button>
               </div>
-              <div className="h-[500px] rounded-xl border border-border bg-secondary/20">
+              <div className="h-[min(500px,50vh)] min-w-0 w-full overflow-hidden rounded-xl border border-border bg-secondary/20">
                 <ReactFlow
                   nodes={nodes}
                   edges={edges}
@@ -903,6 +901,6 @@ export function MarketingStudioPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </PageShell>
+    </CrmPageShell>
   );
 }

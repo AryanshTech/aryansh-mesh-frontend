@@ -79,7 +79,7 @@ export function TenantCreatePage() {
         currency: values.currency.toUpperCase(),
       });
       toast.success(t('admin.tenants.created'));
-      navigate(`/business/admin/tenants/${tenant.id}`);
+      navigate(`/admin/tenants/${tenant.id}`);
     } catch (error) {
       if (error instanceof ApiError) {
         if (error.status === 409) {
@@ -97,7 +97,7 @@ export function TenantCreatePage() {
       <PageHeader
         title={t('admin.tenants.create')}
         breadcrumbs={[
-          { label: t('admin.tenants.title'), href: '/business/admin/tenants' },
+          { label: t('admin.tenants.title'), href: '/admin/tenants' },
           { label: t('admin.tenants.create') },
         ]}
       />
@@ -176,7 +176,7 @@ export function TenantCreatePage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => navigate('/business/admin/tenants')}
+                onClick={() => navigate('/admin/tenants')}
               >
                 {t('common.cancel')}
               </Button>

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Copy } from 'lucide-react';
+import { ExternalLink, Globe, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
 import { Badge } from '@/design-system/components/ui/badge';
@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/des
 import { Input } from '@/design-system/components/ui/input';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/design-system/components/ui/tabs';
+import { appColors } from '@/design-system/tokens/colors';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { PageHeader } from '@/shared/components/crm/PageHeader';
 import {
@@ -24,6 +25,8 @@ import { ApiError } from '@/modules/business/types/api';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api/v1';
 const EMBED_ORIGIN = API_BASE.replace(/\/api\/v1\/?$/, '');
+const COMPANY_SITE_URL =
+  import.meta.env.VITE_COMPANY_SITE_URL?.replace(/\/$/, '') ?? 'https://aryansh.tech';
 
 export function PublishPage() {
   const { t } = useTranslation();
@@ -90,7 +93,7 @@ export function PublishPage() {
         breadcrumbs={
           isWorkspace
             ? [
-                { label: t('admin.tenants.title'), href: '/business/admin/tenants' },
+                { label: t('admin.tenants.title'), href: '/admin/tenants' },
                 { label: t('pages.publish') },
               ]
             : undefined
@@ -106,6 +109,61 @@ export function PublishPage() {
           ) : undefined
         }
       />
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card className={appColors.publish.hubCard}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Globe className="size-4 text-primary" />
+              {t('publish.hub.publicSiteTitle')}
+            </CardTitle>
+            <CardDescription>{t('publish.hub.publicSiteDescription')}</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <p className="type-body-sm text-ink-subtle">{t('publish.hub.publicSiteHint')}</p>
+            {tenantSlug ? (
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge className={appColors.publish.statusBadge}>
+                  {t('publish.hub.slugLabel', { slug: tenantSlug })}
+                </Badge>
+                <Button variant="outline" size="sm" asChild>
+                  <a
+                    href={`${API_BASE}/public/tenants/${tenantSlug}/snapshot`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <ExternalLink className="size-4" data-icon="inline-start" />
+                    {t('publish.hub.viewApiSnapshot')}
+                  </a>
+                </Button>
+              </div>
+            ) : (
+              <p className="type-body-sm text-ink-subtle">{t('publish.hub.noSlug')}</p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className={appColors.publish.hubCard}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ExternalLink className="size-4 text-primary" />
+              {t('publish.hub.landingTitle')}
+            </CardTitle>
+            <CardDescription>{t('publish.hub.landingDescription')}</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <p className="type-body-sm text-ink-subtle">{t('publish.hub.landingHint')}</p>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" asChild>
+                <a href={COMPANY_SITE_URL} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="size-4" data-icon="inline-start" />
+                  {t('publish.hub.openCompanySite')}
+                </a>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {tenantSlug ? (
         <ConnectorGuideCard
@@ -196,7 +254,7 @@ export function PublishPage() {
 
       <Tabs defaultValue="business">
         <TabsList>
-          <TabsTrigger value="business">{t('nav.business')}</TabsTrigger>
+          <TabsTrigger value="business">{t('nav.profile')}</TabsTrigger>
           <TabsTrigger value="products">{t('nav.products')}</TabsTrigger>
           <TabsTrigger value="locations">{t('nav.locations')}</TabsTrigger>
           <TabsTrigger value="testimonials">{t('nav.testimonials')}</TabsTrigger>
@@ -205,7 +263,7 @@ export function PublishPage() {
         <TabsContent value="business">
           <Card>
             <CardHeader>
-              <CardTitle>{t('nav.business')}</CardTitle>
+              <CardTitle>{t('nav.profile')}</CardTitle>
             </CardHeader>
             <CardContent>
               <pre className="max-h-64 overflow-auto rounded-md bg-muted p-4 text-xs">

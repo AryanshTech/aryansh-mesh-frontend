@@ -6,7 +6,8 @@ import { companiesApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
 import { DataTableCard } from '@/modules/marketing/components/dashboard/data-table-card';
 import { StatCard } from '@/modules/marketing/components/dashboard/stat-card';
-import { PageShell } from '@/modules/marketing/components/layout/page-shell';
+import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { useSidebarNavContext } from '@/modules/marketing/contexts/sidebar-nav-context';
 import { invalidateCompanies, queryKeys } from '@/modules/marketing/hooks/query-client';
 import { formatDate, t } from '@/core/i18n';
@@ -100,12 +101,12 @@ export function CompaniesPage() {
   ) : undefined;
 
   return (
-    <PageShell
-      scrollable
-      title={t('companies.title')}
-      description={t('companies.subtitle')}
-      headerActions={createButton}
-    >
+    <CrmPageShell>
+      <PageHeader
+        title={t('companies.title')}
+        description={t('companies.subtitle')}
+        action={createButton}
+      />
       {loading ? (
         <div className="grid gap-4 md:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -176,7 +177,7 @@ export function CompaniesPage() {
                     {company.companyCode}
                   </TableCell>
                   <TableCell className="font-medium">{company.name}</TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="font-tabular text-muted-foreground">
                     {formatDate(company.createdAt)}
                   </TableCell>
                 </TableRow>
@@ -222,6 +223,6 @@ export function CompaniesPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </PageShell>
+    </CrmPageShell>
   );
 }

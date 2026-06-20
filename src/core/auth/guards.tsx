@@ -53,7 +53,7 @@ export function AdminRoute() {
     if (!isPlatformAdmin) return <Navigate to="/marketing" replace />;
     return <Outlet />;
   }
-  if (!isSuperAdmin) return <Navigate to="/business/dashboard" replace />;
+  if (!isSuperAdmin && !isPlatformAdmin) return <Navigate to="/dashboard" replace />;
   return <Outlet />;
 }
 
@@ -62,7 +62,7 @@ export function OnboardingRoute() {
 
   if (loading) return <Skeleton className="h-64 w-full" />;
   if (session?.onboardingComplete) {
-    return <Navigate to="/business/dashboard" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
   return <Outlet />;
 }

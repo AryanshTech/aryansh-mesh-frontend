@@ -67,7 +67,7 @@ export function OnboardingPage() {
       });
       await refreshSession();
       toast.success(t('onboarding.completeSuccess'));
-      navigate('/business/dashboard');
+      navigate('/dashboard');
     } catch (error) {
       if (error instanceof ApiError) {
         toast.error(error.message);

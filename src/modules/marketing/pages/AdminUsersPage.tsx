@@ -4,7 +4,8 @@ import { platformTeamApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
 import { DataTableCard } from '@/modules/marketing/components/dashboard/data-table-card';
 import { StatCard } from '@/modules/marketing/components/dashboard/stat-card';
-import { PageShell } from '@/modules/marketing/components/layout/page-shell';
+import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { formatDateTime, t } from '@/core/i18n';
 import { Badge } from '@/design-system/components/ui/badge';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
@@ -48,11 +49,8 @@ export function AdminUsersPage() {
   }, [getToken]);
 
   return (
-    <PageShell
-      scrollable
-      title={t('admin.title')}
-      description={t('admin.subtitle')}
-    >
+    <CrmPageShell>
+      <PageHeader title={t('admin.title')} description={t('admin.subtitle')} />
       {loading ? (
         <div className="grid gap-4 md:grid-cols-2">
           {Array.from({ length: 2 }).map((_, i) => (
@@ -91,7 +89,7 @@ export function AdminUsersPage() {
                     <TableCell>
                       <Badge variant="secondary">platform_team</Badge>
                     </TableCell>
-                    <TableCell>{formatDateTime(member.createdAt)}</TableCell>
+                    <TableCell className="font-tabular">{formatDateTime(member.createdAt)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -99,6 +97,6 @@ export function AdminUsersPage() {
           </DataTableCard>
         </>
       )}
-    </PageShell>
+    </CrmPageShell>
   );
 }

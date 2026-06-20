@@ -20,11 +20,31 @@
       "en": "EN",
       "fr": "FR",
       "toggle": "Changer de langue"
+    },
+    "status": {
+      "draft": "Brouillon",
+      "published": "Publié",
+      "archived": "Archivé",
+      "suspended": "Suspendu"
     }
   },
   "auth": {
     "loginTitle": "Connexion à Business Manager",
     "loginSubtitle": "Gérez le contenu de votre entreprise en un seul endroit.",
+    "welcomeTitle": "Bon retour",
+    "welcomeSubtitle": "Connectez-vous pour gérer l'entreprise et le marketing au même endroit.",
+    "signingIn": "Connexion…",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
+    "emailPlaceholder": "vous@entreprise.com",
+    "panelTagline": "Plateforme Business et Marketing",
+    "panelHeadline": "Un seul espace pour toute votre opération.",
+    "panelQuote": "Gérez locataires, campagnes, contenu et CRM sans changer d'outil.",
+    "panelAttribution": "© Aryansh Tech",
+    "signInFootnote": "L'accès se fait sur invitation. Contactez votre administrateur si vous avez besoin d'un compte.",
+    "featureBusiness": "Locataires, produits, clients et publication",
+    "featureMarketing": "Flux GTM, studio de contenu et CRM",
+    "featureUnified": "Un compte pour Business Manager et Marketing Hub",
     "email": "Courriel",
     "password": "Mot de passe",
     "signIn": "Se connecter",
@@ -64,13 +84,87 @@
     }
   },
   "shell": {
-    "productSwitcher": {
-      "business": "Business Manager",
-      "marketing": "Marketing Hub"
+    "expandSidebar": "Développer la barre latérale",
+    "collapseSidebar": "Réduire la barre latérale",
+    "footerCopyright": "© {{year}} Aryansh Tech",
+    "theme": {
+      "light": "Mode clair",
+      "dark": "Mode sombre"
+    },
+    "commandPalette": {
+      "title": "Palette de commandes",
+      "description": "Accéder à n'importe quelle page du CRM",
+      "placeholder": "Rechercher des pages…",
+      "open": "Ouvrir la palette de commandes",
+      "noMatches": "Aucune page correspondante"
     },
     "nav": {
       "collapse": "Réduire",
       "logout": "Se déconnecter"
+    }
+  },
+  "nav": {
+    "appName": "Aryansh Mesh",
+    "dashboard": "Tableau de bord",
+    "dashboardDescription": "Aperçu et indicateurs clés",
+    "profile": "Profil entreprise",
+    "profileDescription": "Détails et image de marque",
+    "locations": "Emplacements",
+    "locationsDescription": "Points de vente et bureaux",
+    "products": "Produits",
+    "productsDescription": "Catalogue produits",
+    "costs": "Coûts",
+    "costsDescription": "Suivi des coûts",
+    "testimonials": "Témoignages",
+    "testimonialsDescription": "Témoignages clients",
+    "content": "Contenu personnalisé",
+    "contentDescription": "Collections de contenu",
+    "clients": "Clients",
+    "clientsDescription": "Contacts clients",
+    "bookings": "Réservations",
+    "bookingsDescription": "Demandes de réservation",
+    "publish": "Site et publication",
+    "publishDescription": "Site public et API",
+    "marketingOverview": "Aperçu marketing",
+    "marketingOverviewDescription": "Tableau de bord agence",
+    "companies": "Entreprises",
+    "companiesDescription": "Entreprises clientes",
+    "projects": "Projets",
+    "projectDashboard": "Tableau de bord projet",
+    "projectDashboardDescription": "Vue d'ensemble GTM",
+    "studio": "Studio",
+    "studioDescription": "Studio marketing",
+    "onboarding": "Intégration",
+    "onboardingDescription": "Intégration projet",
+    "spy": "Spy",
+    "spyDescription": "Veille concurrentielle",
+    "brandMemory": "Mémoire de marque",
+    "brandMemoryDescription": "Directives de marque",
+    "marketingContent": "Studio contenu",
+    "marketingContentDescription": "Création de contenu",
+    "creative": "Créatif",
+    "creativeDescription": "Assets créatifs",
+    "social": "Calendrier social",
+    "socialDescription": "Planification réseaux sociaux",
+    "crm": "Pipeline CRM",
+    "crmDescription": "Pipeline commercial",
+    "workspace": "Espace IA",
+    "workspaceDescription": "Fil de discussion et briefs",
+    "tenants": "Locataires",
+    "tenantsDescription": "Gestion des locataires",
+    "marketingUsers": "Utilisateurs marketing",
+    "marketingUsersDescription": "Gestion des utilisateurs",
+    "team": "Équipe",
+    "teamDescription": "Membres et invitations",
+    "account": "Compte",
+    "accountDescription": "Paramètres du compte",
+    "sections": {
+      "core": "Principal",
+      "operations": "Opérations",
+      "marketing": "Marketing",
+      "admin": "Administration",
+      "settings": "Paramètres",
+      "project": "Projet"
     }
   },
   "business": {
@@ -91,6 +185,7 @@
       "tenants": "Locataires",
       "menu": "Menu",
       "platform": "Plateforme",
+      "platformAdmin": "Admin plateforme",
       "workspace": "Espace de travail",
       "language": "Langue",
       "english": "EN",
@@ -189,6 +284,8 @@
           "inviteLinkHint": "Copiez ce lien et envoyez-le au propriétaire.",
           "inviteLinkCopied": "Lien d'invitation copié.",
           "manageTenant": "Gérer l'entreprise",
+          "manageModules": "Modules entreprise",
+          "manageModulesHint": "Ouvrez n'importe quel module CRM pour ce locataire. Vous avez un accès complet en tant qu'admin plateforme.",
           "managingTenant": "Gestion de {{name}}",
           "managingTenantHint": "Vous modifiez ce client en tant qu'administrateur de la plateforme.",
           "managingShort": "Espace client",
@@ -235,6 +332,12 @@
       "saved": "Profil d'entreprise enregistré.",
       "loadError": "Impossible de charger le profil d'entreprise.",
       "form": {
+        "sections": {
+          "branding": "Image de marque",
+          "brandingDescription": "Logo, nom et description publique.",
+          "contact": "Contact et site web",
+          "contactDescription": "Comment les clients vous joignent et où votre site est hébergé."
+        },
         "legalName": "Raison sociale",
         "tagline": "Slogan",
         "description": "Description",
@@ -462,6 +565,18 @@
         "copied": "Script copié.",
         "unavailable": "Identifiant (slug) du tenant non disponible.",
         "apiUrl": "API publique : {{url}}"
+      },
+      "hub": {
+        "publicSiteTitle": "API publique et intégration",
+        "publicSiteDescription": "Données en direct pour vos pages et sites.",
+        "publicSiteHint": "Publiez depuis cette page, puis connectez votre site via le script ou l'API snapshot.",
+        "slugLabel": "Slug tenant : {{slug}}",
+        "viewApiSnapshot": "Voir l'API snapshot",
+        "noSlug": "Terminez l'intégration pour obtenir un slug public.",
+        "landingTitle": "Pages d'atterrissage",
+        "landingDescription": "Site marketing et pages client.",
+        "landingHint": "Gérez le site Aryansh ou créez des pages dans le projet landing-page.",
+        "openCompanySite": "Ouvrir le site entreprise"
       },
       "connectorGuide": {
         "title": "Guide développeur site web",

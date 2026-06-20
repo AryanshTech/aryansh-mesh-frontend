@@ -23,6 +23,7 @@ import {
   TableRow,
 } from '@/design-system/components/ui/table';
 import { ConfirmDialog } from '@/shared/components/crm/ConfirmDialog';
+import { FeatureListShell } from '@/shared/components/crm/FeatureListShell';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { useCosts, useDeleteCost } from '@/modules/business/features/costs/use-costs';
@@ -83,7 +84,7 @@ export function CostListPage() {
         breadcrumbs={
           isWorkspace
             ? [
-                { label: t('admin.tenants.title'), href: '/business/admin/tenants' },
+                { label: t('admin.tenants.title'), href: '/admin/tenants' },
                 { label: t('pages.costs') },
               ]
             : undefined
@@ -118,7 +119,7 @@ export function CostListPage() {
           )}
         </Empty>
       ) : (
-        <div className="rounded-md border">
+        <FeatureListShell>
           <Table>
             <TableHeader>
               <TableRow>
@@ -158,7 +159,7 @@ export function CostListPage() {
               ))}
             </TableBody>
           </Table>
-        </div>
+        </FeatureListShell>
       )}
 
       <ConfirmDialog

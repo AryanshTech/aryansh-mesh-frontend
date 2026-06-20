@@ -105,7 +105,7 @@ export function TestimonialFormPage() {
         title={isNew ? t('testimonials.form.createTitle') : t('testimonials.form.title')}
         breadcrumbs={[
           ...(isWorkspace
-            ? [{ label: t('admin.tenants.title'), href: '/business/admin/tenants' }]
+            ? [{ label: t('admin.tenants.title'), href: '/admin/tenants' }]
             : []),
           { label: t('pages.testimonials'), href: path('/testimonials') },
           { label: isNew ? t('common.create') : testimonial?.author ?? '' },

@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { MessageSquareQuote, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
-import { Badge } from '@/design-system/components/ui/badge';
 import { Button } from '@/design-system/components/ui/button';
 import {
   Empty,
@@ -24,6 +23,8 @@ import {
   TableRow,
 } from '@/design-system/components/ui/table';
 import { ConfirmDialog } from '@/shared/components/crm/ConfirmDialog';
+import { FeatureListShell } from '@/shared/components/crm/FeatureListShell';
+import { StatusBadge } from '@/shared/components/crm/StatusBadge';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { PageHeader } from '@/shared/components/crm/PageHeader';
 import {
@@ -87,7 +88,7 @@ export function TestimonialListPage() {
         breadcrumbs={
           isWorkspace
             ? [
-                { label: t('admin.tenants.title'), href: '/business/admin/tenants' },
+                { label: t('admin.tenants.title'), href: '/admin/tenants' },
                 { label: t('pages.testimonials') },
               ]
             : undefined
@@ -122,7 +123,7 @@ export function TestimonialListPage() {
           )}
         </Empty>
       ) : (
-        <div className="rounded-md border">
+        <FeatureListShell>
           <Table>
             <TableHeader>
               <TableRow>
@@ -138,7 +139,7 @@ export function TestimonialListPage() {
                   <TableCell className="font-medium">{testimonial.author}</TableCell>
                   <TableCell>{testimonial.rating}/5</TableCell>
                   <TableCell>
-                    <Badge variant="secondary">{testimonial.status}</Badge>
+                    <StatusBadge status={testimonial.status} />
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
@@ -162,7 +163,7 @@ export function TestimonialListPage() {
               ))}
             </TableBody>
           </Table>
-        </div>
+        </FeatureListShell>
       )}
 
       <ConfirmDialog

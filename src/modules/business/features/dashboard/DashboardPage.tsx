@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/design-system/compon
 import { Skeleton } from '@/design-system/components/ui/skeleton';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { appColors } from '@/design-system/tokens/colors';
 import { useDashboard } from '@/modules/business/features/dashboard/use-dashboard';
 import { useTenantScope } from '@/modules/business/hooks/use-tenant-scope';
 
@@ -53,7 +54,7 @@ export function DashboardPage() {
         breadcrumbs={
           isWorkspace
             ? [
-                { label: t('admin.tenants.title'), href: '/business/admin/tenants' },
+                { label: t('admin.tenants.title'), href: '/admin/tenants' },
                 { label: t('pages.dashboard') },
               ]
             : undefined
@@ -65,15 +66,19 @@ export function DashboardPage() {
       )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map(({ key, value, href }) => (
-          <Card key={key}>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">
+        {stats.map(({ key, value, href }, index) => (
+          <Card
+            key={key}
+            className={appColors.dashboard.metricCard}
+            style={{ animationDelay: `${index * 60}ms` }}
+          >
+            <CardHeader className="pb-2">
+              <CardTitle className={appColors.dashboard.metricLabel}>
                 {t(`dashboard.stats.${key}`)}
               </CardTitle>
             </CardHeader>
             <CardContent className="flex items-center justify-between">
-              <p className="text-3xl font-semibold">{value}</p>
+              <p className={appColors.dashboard.metricValue}>{value}</p>
               <Button variant="ghost" size="sm" asChild>
                 <Link to={href}>{t('common.edit')}</Link>
               </Button>

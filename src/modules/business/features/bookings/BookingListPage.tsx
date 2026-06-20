@@ -18,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/design-system/components/ui/table';
+import { FeatureListShell } from '@/shared/components/crm/FeatureListShell';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { useBookings } from '@/modules/business/features/bookings/use-bookings';
@@ -58,7 +59,7 @@ export function BookingListPage() {
         breadcrumbs={
           isWorkspace
             ? [
-                { label: t('admin.tenants.title'), href: '/business/admin/tenants' },
+                { label: t('admin.tenants.title'), href: '/admin/tenants' },
                 { label: t('pages.bookings') },
               ]
             : undefined
@@ -76,7 +77,7 @@ export function BookingListPage() {
           </EmptyHeader>
         </Empty>
       ) : (
-        <div className="rounded-md border">
+        <FeatureListShell>
           <Table>
             <TableHeader>
               <TableRow>
@@ -103,7 +104,7 @@ export function BookingListPage() {
               ))}
             </TableBody>
           </Table>
-        </div>
+        </FeatureListShell>
       )}
     </CrmPageShell>
   );

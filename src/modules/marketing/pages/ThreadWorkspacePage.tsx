@@ -16,7 +16,8 @@ import { BriefEditor } from '@/modules/marketing/components/brief/BriefEditor';
 import { ChatComposer } from '@/modules/marketing/components/chat/ChatComposer';
 import { MessageList } from '@/modules/marketing/components/chat/MessageList';
 import { OutputsPanel } from '@/modules/marketing/components/outputs/OutputsPanel';
-import { PageShell } from '@/modules/marketing/components/layout/page-shell';
+import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { useSidebarNavContext } from '@/modules/marketing/contexts/sidebar-nav-context';
 import { t } from '@/core/i18n';
 import type {
@@ -237,17 +238,18 @@ export function ThreadWorkspacePage() {
   }
 
   return (
-    <PageShell
-      title={t('workspace.chat')}
-      headerActions={
-        canWrite ? (
-          <Button size="sm" variant="outline" onClick={() => setBriefOpen(true)}>
-            <FileTextIcon data-icon="inline-start" />
-            {t('workspace.editBrief')}
-          </Button>
-        ) : undefined
-      }
-    >
+    <CrmPageShell className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+      <PageHeader
+        title={t('workspace.chat')}
+        action={
+          canWrite ? (
+            <Button size="sm" variant="outline" onClick={() => setBriefOpen(true)}>
+              <FileTextIcon data-icon="inline-start" />
+              {t('workspace.editBrief')}
+            </Button>
+          ) : undefined
+        }
+      />
       <ResizablePanelGroup
         orientation="horizontal"
         className="min-h-0 flex-1 rounded-lg border"
@@ -304,6 +306,6 @@ export function ThreadWorkspacePage() {
         open={briefOpen}
         onClose={() => setBriefOpen(false)}
       />
-    </PageShell>
+    </CrmPageShell>
   );
 }

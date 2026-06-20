@@ -1,72 +1,100 @@
 @import "tailwindcss";
+@import "./tokens.css";
+@import "./typography.css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-sidebar: hsl(var(--sidebar));
-  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
-  --color-sidebar-primary: hsl(var(--sidebar-primary));
-  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
-  --color-sidebar-accent: hsl(var(--sidebar-accent));
-  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
-  --color-sidebar-border: hsl(var(--sidebar-border));
-  --color-sidebar-ring: hsl(var(--sidebar-ring));
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 9999px;
+
+  --color-canvas: rgb(var(--rgb-canvas) / <alpha-value>);
+  --color-surface-1: rgb(var(--rgb-surface-1) / <alpha-value>);
+  --color-surface-2: rgb(var(--rgb-surface-2) / <alpha-value>);
+  --color-surface-3: rgb(var(--rgb-surface-3) / <alpha-value>);
+  --color-surface-4: rgb(var(--rgb-surface-4) / <alpha-value>);
+
+  --color-ink: rgb(var(--rgb-ink) / <alpha-value>);
+  --color-ink-muted: rgb(var(--rgb-ink-muted) / <alpha-value>);
+  --color-ink-subtle: rgb(var(--rgb-ink-subtle) / <alpha-value>);
+  --color-ink-tertiary: rgb(var(--rgb-ink-tertiary) / <alpha-value>);
+
+  --color-hairline: rgb(var(--rgb-hairline) / <alpha-value>);
+  --color-hairline-strong: rgb(var(--rgb-hairline-strong) / <alpha-value>);
+  --color-hairline-tertiary: rgb(var(--rgb-hairline-tertiary) / <alpha-value>);
+
+  --color-background: rgb(var(--background) / <alpha-value>);
+  --color-foreground: rgb(var(--foreground) / <alpha-value>);
+  --color-card: rgb(var(--card) / <alpha-value>);
+  --color-card-foreground: rgb(var(--card-foreground) / <alpha-value>);
+  --color-popover: rgb(var(--popover) / <alpha-value>);
+  --color-popover-foreground: rgb(var(--popover-foreground) / <alpha-value>);
+  --color-primary: rgb(var(--primary) / <alpha-value>);
+  --color-primary-foreground: rgb(var(--primary-foreground) / <alpha-value>);
+  --color-primary-hover: rgb(var(--rgb-primary-hover) / <alpha-value>);
+  --color-primary-focus: rgb(var(--rgb-primary-focus) / <alpha-value>);
+  --color-secondary: rgb(var(--secondary) / <alpha-value>);
+  --color-secondary-foreground: rgb(var(--secondary-foreground) / <alpha-value>);
+  --color-muted: rgb(var(--muted) / <alpha-value>);
+  --color-muted-foreground: rgb(var(--muted-foreground) / <alpha-value>);
+  --color-accent: rgb(var(--accent) / <alpha-value>);
+  --color-accent-foreground: rgb(var(--accent-foreground) / <alpha-value>);
+  --color-destructive: rgb(var(--destructive) / <alpha-value>);
+  --color-destructive-foreground: rgb(var(--destructive-foreground) / <alpha-value>);
+  --color-border: rgb(var(--border) / <alpha-value>);
+  --color-input: rgb(var(--input) / <alpha-value>);
+  --color-ring: rgb(var(--ring) / <alpha-value>);
+  --color-success: rgb(var(--success) / <alpha-value>);
+  --color-warning: rgb(var(--warning) / <alpha-value>);
+  --color-error: rgb(var(--error) / <alpha-value>);
+  --color-hover: rgb(var(--hover) / <alpha-value>);
+
+  --color-sidebar: rgb(var(--sidebar) / <alpha-value>);
+  --color-sidebar-foreground: rgb(var(--sidebar-foreground) / <alpha-value>);
+  --color-sidebar-primary: rgb(var(--sidebar-primary) / <alpha-value>);
+  --color-sidebar-primary-foreground: rgb(var(--sidebar-primary-foreground) / <alpha-value>);
+  --color-sidebar-accent: rgb(var(--sidebar-accent) / <alpha-value>);
+  --color-sidebar-accent-foreground: rgb(var(--sidebar-accent-foreground) / <alpha-value>);
+  --color-sidebar-border: rgb(var(--sidebar-border) / <alpha-value>);
+  --color-sidebar-ring: rgb(var(--sidebar-ring) / <alpha-value>);
+
+  --font-sans: "Inter", "SF Pro Display", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --spacing-xxs: 4px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+  --spacing-section: 96px;
+
+  --animate-fade-in-up: fadeInUp 0.45s ease-out both;
+  --animate-fade-in: fadeIn 0.3s ease-out both;
 }
 
-/* Stripe-inspired light theme — brand-dark sidebar */
-:root {
-  --radius: 0.75rem;
-  --background: 210 40% 98%;
-  --foreground: 210 67% 15%;
-  --card: 0 0% 100%;
-  --card-foreground: 210 67% 15%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 210 67% 15%;
-  --primary: 248 97% 62%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 210 40% 98%;
-  --secondary-foreground: 210 67% 15%;
-  --muted: 210 40% 98%;
-  --muted-foreground: 215 16% 47%;
-  --accent: 240 88% 85%;
-  --accent-foreground: 248 65% 52%;
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 214 24% 91%;
-  --input: 206 45% 77%;
-  --ring: 248 97% 62%;
-  --sidebar: 237 49% 22%;
-  --sidebar-foreground: 0 0% 100%;
-  --sidebar-primary: 248 97% 62%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 237 40% 28%;
-  --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-border: 237 35% 30%;
-  --sidebar-ring: 248 97% 62%;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @layer base {
@@ -74,8 +102,16 @@
     @apply border-border outline-ring/50;
   }
 
+  html.theme-transition,
+  html.theme-transition * {
+    transition:
+      background-color 200ms cubic-bezier(0.23, 1, 0.32, 1),
+      border-color 200ms cubic-bezier(0.23, 1, 0.32, 1),
+      color 200ms cubic-bezier(0.23, 1, 0.32, 1) !important;
+  }
+
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-canvas text-ink font-sans antialiased;
     font-feature-settings: 'ss01';
   }
 }
@@ -83,6 +119,29 @@
 @layer utilities {
   .font-tabular {
     font-feature-settings: 'tnum', 'ss01';
+  }
+
+  .page-shell {
+    @apply mx-auto w-full min-w-0 max-w-[1600px] px-3 py-5 md:px-4 lg:px-5;
+  }
+
+  .auth-panel {
+    @apply border-r border-hairline;
+    background:
+      radial-gradient(ellipse 90% 70% at 0% 30%, rgb(var(--rgb-primary) / 0.14), transparent 55%),
+      radial-gradient(ellipse 60% 50% at 100% 100%, rgb(var(--rgb-primary) / 0.06), transparent 50%),
+      rgb(var(--rgb-surface-1));
+  }
+
+  .auth-form-surface {
+    background:
+      radial-gradient(ellipse 70% 50% at 100% 0%, rgb(var(--rgb-primary) / 0.05), transparent 60%),
+      rgb(var(--rgb-canvas));
+  }
+
+  .auth-feature-dot {
+    background: rgb(var(--rgb-primary));
+    box-shadow: 0 0 12px rgb(var(--rgb-primary) / 0.45);
   }
 }
 

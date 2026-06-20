@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
-import { Badge } from '@/design-system/components/ui/badge';
 import { Button } from '@/design-system/components/ui/button';
 import {
   Empty,
@@ -22,7 +21,9 @@ import {
   TableRow,
 } from '@/design-system/components/ui/table';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { FeatureListShell } from '@/shared/components/crm/FeatureListShell';
 import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { StatusBadge } from '@/shared/components/crm/StatusBadge';
 import { useProducts } from '@/modules/business/features/products/use-products';
 import { usePermissions } from '@/core/permissions/use-permissions';
 import { useTenantScope } from '@/modules/business/hooks/use-tenant-scope';
@@ -64,7 +65,7 @@ export function ProductListPage() {
         breadcrumbs={
           isWorkspace
             ? [
-                { label: t('admin.tenants.title'), href: '/business/admin/tenants' },
+                { label: t('admin.tenants.title'), href: '/admin/tenants' },
                 { label: t('pages.products') },
               ]
             : undefined
@@ -99,7 +100,7 @@ export function ProductListPage() {
           )}
         </Empty>
       ) : (
-        <div className="rounded-md border">
+        <FeatureListShell>
           <Table>
             <TableHeader>
               <TableRow>
@@ -117,18 +118,20 @@ export function ProductListPage() {
                     {product.price} {product.currency}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary">{product.status}</Badge>
+                    <StatusBadge status={product.status} />
                   </TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link to={path(`/products/${product.id}`)}>{t('common.edit')}</Link>
-                    </Button>
+                    {canEdit ? (
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link to={path(`/products/${product.id}`)}>{t('common.edit')}</Link>
+                      </Button>
+                    ) : null}
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        </div>
+        </FeatureListShell>
       )}
     </CrmPageShell>
   );

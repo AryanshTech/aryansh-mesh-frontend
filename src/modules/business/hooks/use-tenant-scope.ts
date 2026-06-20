@@ -7,7 +7,7 @@ export function useTenantScope() {
   const location = useLocation();
 
   const workspaceMatch = location.pathname.match(
-    /^\/business\/admin\/tenants\/([^/]+)\/workspace(?:\/|$)/,
+    /^\/admin\/tenants\/([^/]+)\/workspace(?:\/|$)/,
   );
   const workspaceTenantId = workspaceMatch?.[1] ?? routeTenantId;
   const isWorkspace = Boolean(workspaceMatch);
@@ -17,11 +17,14 @@ export function useTenantScope() {
     : session?.tenantId ?? '';
 
   const basePath = isWorkspace && workspaceTenantId
-    ? `/business/admin/tenants/${workspaceTenantId}/workspace`
-    : '/business';
+    ? `/admin/tenants/${workspaceTenantId}/workspace`
+    : '';
 
   function path(suffix: string) {
-    return `${basePath}${suffix}`;
+    if (basePath) {
+      return `${basePath}${suffix}`;
+    }
+    return suffix;
   }
 
   return {

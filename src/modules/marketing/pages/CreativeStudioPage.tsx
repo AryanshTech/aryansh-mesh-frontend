@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
-import { PageShell } from '@/modules/marketing/components/layout/page-shell';
+import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { t } from '@/core/i18n';
 import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/design-system/components/ui/card';
@@ -9,11 +10,8 @@ export function CreativeStudioPage() {
   const { projectId = '' } = useParams();
 
   return (
-    <PageShell
-      scrollable
-      title={t('creative.title')}
-      description={t('creative.subtitle')}
-    >
+    <CrmPageShell>
+      <PageHeader title={t('creative.title')} description={t('creative.subtitle')} />
       <Alert>
         <PaletteIcon />
         <AlertTitle>{t('creative.comingSoonTitle')}</AlertTitle>
@@ -30,6 +28,6 @@ export function CreativeStudioPage() {
           </p>
         </CardContent>
       </Card>
-    </PageShell>
+    </CrmPageShell>
   );
 }

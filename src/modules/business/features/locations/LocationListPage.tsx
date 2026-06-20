@@ -6,6 +6,8 @@ import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
 import { Badge } from '@/design-system/components/ui/badge';
 import { Button } from '@/design-system/components/ui/button';
+import { StatusBadge } from '@/shared/components/crm/StatusBadge';
+import { FeatureListShell } from '@/shared/components/crm/FeatureListShell';
 import {
   Empty,
   EmptyContent,
@@ -84,7 +86,7 @@ export function LocationListPage() {
         breadcrumbs={
           isWorkspace
             ? [
-                { label: t('admin.tenants.title'), href: '/business/admin/tenants' },
+                { label: t('admin.tenants.title'), href: '/admin/tenants' },
                 { label: t('pages.locations') },
               ]
             : undefined
@@ -119,7 +121,7 @@ export function LocationListPage() {
           )}
         </Empty>
       ) : (
-        <div className="rounded-md border">
+        <FeatureListShell>
           <Table>
             <TableHeader>
               <TableRow>
@@ -153,7 +155,7 @@ export function LocationListPage() {
                       : '—'}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline">{location.status}</Badge>
+                    <StatusBadge status={location.status} />
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-1">
@@ -173,7 +175,7 @@ export function LocationListPage() {
               ))}
             </TableBody>
           </Table>
-        </div>
+        </FeatureListShell>
       )}
 
       <ConfirmDialog

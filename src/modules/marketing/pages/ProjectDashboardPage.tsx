@@ -12,7 +12,8 @@ import {
 import { agentJobsApi, onboardingApi, projectsApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
 import { AgentPipelineViz } from '@/modules/marketing/components/studio/AgentPipelineViz';
-import { PageShell } from '@/modules/marketing/components/layout/page-shell';
+import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { t } from '@/core/i18n';
 import type { AgentJobResponse, OnboardingStatus, ProjectResponse } from '@/modules/marketing/types/api';
 import { Badge } from '@/design-system/components/ui/badge';
@@ -87,11 +88,11 @@ export function ProjectDashboardPage() {
   const recentJobs = jobs.slice(0, 5);
 
   return (
-    <PageShell
-      scrollable
-      title={project?.name ?? t('projectDashboard.title')}
-      description={t('projectDashboard.subtitle')}
-    >
+    <CrmPageShell>
+      <PageHeader
+        title={project?.name ?? t('projectDashboard.title')}
+        description={t('projectDashboard.subtitle')}
+      />
       {loading ? (
         <Skeleton className="h-48 w-full rounded-xl" />
       ) : (
@@ -240,6 +241,6 @@ export function ProjectDashboardPage() {
           </Link>
         </Button>
       </div>
-    </PageShell>
+    </CrmPageShell>
   );
 }

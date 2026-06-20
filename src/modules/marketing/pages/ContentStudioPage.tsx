@@ -4,7 +4,8 @@ import { CheckIcon, XIcon } from 'lucide-react';
 import { contentApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
 import { DataTableCard } from '@/modules/marketing/components/dashboard/data-table-card';
-import { PageShell } from '@/modules/marketing/components/layout/page-shell';
+import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { t } from '@/core/i18n';
 import type { ContentItemResponse } from '@/modules/marketing/types/api';
 import { Badge } from '@/design-system/components/ui/badge';
@@ -75,11 +76,8 @@ export function ContentStudioPage() {
   };
 
   return (
-    <PageShell
-      scrollable
-      title={t('content.title')}
-      description={t('content.subtitle')}
-    >
+    <CrmPageShell>
+      <PageHeader title={t('content.title')} description={t('content.subtitle')} />
       {loading ? (
         <Skeleton className="h-64 w-full rounded-xl" />
       ) : (
@@ -143,6 +141,6 @@ export function ContentStudioPage() {
           </Table>
         </DataTableCard>
       )}
-    </PageShell>
+    </CrmPageShell>
   );
 }

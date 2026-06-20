@@ -1,13 +1,16 @@
 import type { SessionResponse } from '@/core/auth/types';
 
 export function getPostLoginPath(session: SessionResponse): string {
-  if (session.role === 'platform_super_admin') {
-    return '/business/admin/tenants';
+  if (
+    session.role === 'platform_super_admin' ||
+    session.accessLevel === 'platform_admin'
+  ) {
+    return '/admin/tenants';
   }
   if (!session.onboardingComplete && session.role === 'tenant_owner') {
-    return '/business/onboarding';
+    return '/onboarding';
   }
-  return '/business/dashboard';
+  return '/dashboard';
 }
 
 export function slugify(value: string): string {

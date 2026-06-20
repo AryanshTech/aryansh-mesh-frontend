@@ -141,7 +141,7 @@ export function LocationFormPage() {
         title={isNew ? t('locations.form.createTitle') : t('locations.form.title')}
         breadcrumbs={[
           ...(isWorkspace
-            ? [{ label: t('admin.tenants.title'), href: '/business/admin/tenants' }]
+            ? [{ label: t('admin.tenants.title'), href: '/admin/tenants' }]
             : []),
           { label: t('pages.locations'), href: path('/locations') },
           { label: isNew ? t('common.create') : location?.name ?? '' },

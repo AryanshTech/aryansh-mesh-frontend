@@ -27,22 +27,38 @@ export function usePermissions() {
   const services = session?.services ?? [];
 
   return useMemo(
-    () => ({
-      role,
-      canEdit: role ? EDIT_ROLES.includes(role) : false,
-      canPublish: role ? PUBLISH_ROLES.includes(role) : false,
-      canManageTeam: role ? TEAM_ROLES.includes(role) : false,
-      isSuperAdmin: role === 'platform_super_admin',
-      isViewer: role === 'tenant_viewer',
-      isPlatformAdmin: profile?.accessLevel === 'platform_admin',
-      isPlatformTeam: profile?.accessLevel === 'platform_team',
-      canAccessBusiness:
-        role === 'platform_super_admin' || services.includes('business-manager'),
-      canAccessMarketing:
+    () => {
+      const isPlatformOperator =
+        role === 'platform_super_admin' ||
         profile?.accessLevel === 'platform_admin' ||
-        profile?.accessLevel === 'platform_team' ||
-        services.includes('marketing-hub'),
-    }),
+        profile?.accessLevel === 'platform_team';
+
+      return {
+        role,
+        canEdit:
+          (role ? EDIT_ROLES.includes(role) : false) || isPlatformOperator,
+        canPublish:
+          (role ? PUBLISH_ROLES.includes(role) : false) ||
+          role === 'platform_super_admin' ||
+          profile?.accessLevel === 'platform_admin',
+        canManageTeam:
+          (role ? TEAM_ROLES.includes(role) : false) ||
+          role === 'platform_super_admin' ||
+          profile?.accessLevel === 'platform_admin',
+        isSuperAdmin:
+          role === 'platform_super_admin' || profile?.accessLevel === 'platform_admin',
+        isViewer: role === 'tenant_viewer' && !isPlatformOperator,
+        isPlatformAdmin: profile?.accessLevel === 'platform_admin',
+        isPlatformTeam: profile?.accessLevel === 'platform_team',
+        isPlatformOperator,
+        canAccessBusiness:
+          role === 'platform_super_admin' || services.includes('business-manager'),
+        canAccessMarketing:
+          profile?.accessLevel === 'platform_admin' ||
+          profile?.accessLevel === 'platform_team' ||
+          services.includes('marketing-hub'),
+      };
+    },
     [role, profile, services],
   );
 }

@@ -1,124 +1,122 @@
 export const fontFamily =
   "'Inter', 'SF Pro Display', system-ui, -apple-system, sans-serif";
 
+export const fontFamilyMono =
+  "'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace";
+
+/** Linear-inspired type scale */
 export const typography = {
-  displayXxl: {
-    fontSize: '56px',
-    fontWeight: 300,
-    lineHeight: 1.03,
-    letterSpacing: '-1.4px',
-  },
   displayXl: {
-    fontSize: '48px',
-    fontWeight: 300,
-    lineHeight: 1.15,
-    letterSpacing: '-0.96px',
+    fontSize: '80px',
+    fontWeight: 600,
+    lineHeight: 1.05,
+    letterSpacing: '-3px',
   },
   displayLg: {
-    fontSize: '32px',
-    fontWeight: 300,
+    fontSize: '56px',
+    fontWeight: 600,
     lineHeight: 1.1,
-    letterSpacing: '-0.64px',
+    letterSpacing: '-1.8px',
   },
   displayMd: {
-    fontSize: '26px',
-    fontWeight: 300,
-    lineHeight: 1.12,
-    letterSpacing: '-0.26px',
+    fontSize: '40px',
+    fontWeight: 600,
+    lineHeight: 1.15,
+    letterSpacing: '-1px',
   },
-  headingLg: {
+  headline: {
+    fontSize: '28px',
+    fontWeight: 600,
+    lineHeight: 1.2,
+    letterSpacing: '-0.6px',
+  },
+  cardTitle: {
     fontSize: '22px',
-    fontWeight: 300,
-    lineHeight: 1.1,
-    letterSpacing: '-0.22px',
+    fontWeight: 500,
+    lineHeight: 1.25,
+    letterSpacing: '-0.4px',
   },
-  headingMd: {
+  subhead: {
     fontSize: '20px',
-    fontWeight: 300,
+    fontWeight: 400,
     lineHeight: 1.4,
     letterSpacing: '-0.2px',
   },
-  headingSm: {
-    fontSize: '18px',
-    fontWeight: 300,
-    lineHeight: 1.4,
-    letterSpacing: '0',
-  },
   bodyLg: {
-    fontSize: '16px',
-    fontWeight: 300,
-    lineHeight: 1.4,
-    letterSpacing: '0',
+    fontSize: '18px',
+    fontWeight: 400,
+    lineHeight: 1.5,
+    letterSpacing: '-0.1px',
   },
-  bodyMd: {
-    fontSize: '15px',
-    fontWeight: 300,
-    lineHeight: 1.4,
-    letterSpacing: '0',
-  },
-  bodyTabular: {
-    fontSize: '14px',
-    fontWeight: 300,
-    lineHeight: 1.4,
-    letterSpacing: '-0.42px',
-  },
-  buttonMd: {
+  body: {
     fontSize: '16px',
     fontWeight: 400,
-    lineHeight: 1,
-    letterSpacing: '0',
+    lineHeight: 1.5,
+    letterSpacing: '-0.05px',
   },
-  buttonSm: {
+  bodySm: {
     fontSize: '14px',
     fontWeight: 400,
-    lineHeight: 1,
+    lineHeight: 1.5,
     letterSpacing: '0',
   },
   caption: {
-    fontSize: '13px',
+    fontSize: '12px',
     fontWeight: 400,
-    lineHeight: 1.4,
-    letterSpacing: '-0.39px',
-  },
-  micro: {
-    fontSize: '11px',
-    fontWeight: 300,
     lineHeight: 1.4,
     letterSpacing: '0',
   },
-  microCap: {
-    fontSize: '10px',
+  button: {
+    fontSize: '14px',
+    fontWeight: 500,
+    lineHeight: 1.2,
+    letterSpacing: '0',
+  },
+  eyebrow: {
+    fontSize: '13px',
+    fontWeight: 500,
+    lineHeight: 1.3,
+    letterSpacing: '0.4px',
+  },
+  mono: {
+    fontSize: '13px',
     fontWeight: 400,
-    lineHeight: 1.15,
-    letterSpacing: '0.1px',
+    lineHeight: 1.5,
+    letterSpacing: '0',
   },
   pageTitle: {
     fontSize: '24px',
-    fontWeight: 300,
-    lineHeight: 1.1,
-    letterSpacing: '-0.24px',
+    fontWeight: 600,
+    lineHeight: 1.2,
+    letterSpacing: '-0.4px',
   },
   sectionTitle: {
     fontSize: '18px',
-    fontWeight: 300,
+    fontWeight: 500,
     lineHeight: 1.4,
-    letterSpacing: '0',
+    letterSpacing: '-0.1px',
   },
   label: {
     fontSize: '14px',
-    fontWeight: 400,
+    fontWeight: 500,
     lineHeight: 1.4,
     letterSpacing: '0',
   },
 } as const;
 
-/** Tailwind class strings for components ported from Marketing Hub */
 export const typographyClasses = {
-  caption: 'text-xs text-muted-foreground',
-  pageTitle: 'text-2xl font-light tracking-tight text-foreground',
-  pageSubtitle: 'text-sm text-muted-foreground',
-  sectionTitle: 'text-lg font-light',
-  headingSm: 'text-lg font-light',
+  displayMd: 'type-display-md',
+  headline: 'type-headline',
+  cardTitle: 'type-card-title',
+  subhead: 'type-subhead',
+  body: 'type-body',
+  bodySm: 'type-body-sm',
+  caption: 'type-caption text-ink-subtle',
+  button: 'type-button',
+  eyebrow: 'type-eyebrow',
+  pageTitle: 'type-headline text-xl font-semibold tracking-tight text-ink',
+  pageSubtitle: 'type-body-sm text-ink-subtle',
+  sectionTitle: 'type-card-title text-base',
 } as const;
 
 export type TypographyToken = keyof typeof typography;

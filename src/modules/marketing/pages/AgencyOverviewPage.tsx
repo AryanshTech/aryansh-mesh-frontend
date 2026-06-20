@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Building2Icon,
@@ -6,10 +6,11 @@ import {
   PlusIcon,
   SparklesIcon,
 } from 'lucide-react';
-import { companiesApi } from '@/modules/marketing/api/endpoints';
-import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
 import { StatCard } from '@/modules/marketing/components/dashboard/stat-card';
-import { PageShell } from '@/modules/marketing/components/layout/page-shell';
+import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { FeatureListShell } from '@/shared/components/crm/FeatureListShell';
+import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { useAgencyCompanies } from '@/modules/marketing/hooks/use-agency-companies';
 import { useSidebarNavContext } from '@/modules/marketing/contexts/sidebar-nav-context';
 import { formatDate, t } from '@/core/i18n';
 import type { CompanyResponse } from '@/modules/marketing/types/api';
@@ -31,52 +32,35 @@ function countNewThisMonth(companies: CompanyResponse[]): number {
 }
 
 export function AgencyOverviewPage() {
-  const { getToken } = useAuth();
   const navigate = useNavigate();
   const { projectsByCompany } = useSidebarNavContext();
-  const [companies, setCompanies] = useState<CompanyResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useAgencyCompanies();
+  const companies = data?.items ?? [];
 
   const projectCount = useMemo(
     () =>
       Object.values(projectsByCompany).reduce(
         (sum, projects) => sum + projects.length,
-        0
+        0,
       ),
-    [projectsByCompany]
+    [projectsByCompany],
   );
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      try {
-        const res = await apiFetchWithRetry(
-          (token) => companiesApi.list(token),
-          getToken
-        );
-        setCompanies(res.items);
-      } finally {
-        setLoading(false);
-      }
-    };
-    void load();
-  }, [getToken]);
-
   return (
-    <PageShell
-      scrollable
-      title={t('agency.title')}
-      description={t('agency.subtitle')}
-      headerActions={
-        <Button size="sm" asChild>
-          <Link to="/marketing/companies">
-            <PlusIcon data-icon="inline-start" />
-            {t('companies.create')}
-          </Link>
-        </Button>
-      }
-    >
-      {loading ? (
+    <CrmPageShell>
+      <PageHeader
+        title={t('agency.title')}
+        description={t('agency.subtitle')}
+        action={
+          <Button size="sm" asChild>
+            <Link to="/marketing/companies">
+              <PlusIcon data-icon="inline-start" />
+              {t('companies.create')}
+            </Link>
+          </Button>
+        }
+      />
+      {isLoading ? (
         <div className="grid gap-4 md:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
             <Skeleton key={i} className="h-28 w-full rounded-xl" />
@@ -113,13 +97,14 @@ export function AgencyOverviewPage() {
         </Button>
       </div>
 
-      {!loading && companies.length > 0 && (
-        <Card>
+      {!isLoading && companies.length > 0 && (
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>{t('agency.recentCompanies')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <Table>
+          <CardContent className="p-0 pb-4">
+            <FeatureListShell>
+              <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('companies.tableCode')}</TableHead>
@@ -145,9 +130,10 @@ export function AgencyOverviewPage() {
                 ))}
               </TableBody>
             </Table>
+            </FeatureListShell>
           </CardContent>
         </Card>
       )}
-    </PageShell>
+    </CrmPageShell>
   );
 }

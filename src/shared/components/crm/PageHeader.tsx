@@ -8,6 +8,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/design-system/components/ui/breadcrumb';
+import { typographyClasses } from '@/design-system/tokens/typography';
+import { cn } from '@/design-system/lib/utils';
 import { Link } from 'react-router-dom';
 
 export interface BreadcrumbItemConfig {
@@ -29,10 +31,10 @@ export function PageHeader({
   action,
 }: PageHeaderProps) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex w-full min-w-0 max-w-full flex-col gap-4">
       {breadcrumbs && breadcrumbs.length > 0 && (
         <Breadcrumb>
-          <BreadcrumbList>
+          <BreadcrumbList className="min-w-0 flex-wrap">
             {breadcrumbs.map((item, index) => (
               <Fragment key={`${item.label}-${index}`}>
                 {index > 0 && <BreadcrumbSeparator />}
@@ -50,14 +52,14 @@ export function PageHeader({
           </BreadcrumbList>
         </Breadcrumb>
       )}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-page-title font-semibold tracking-tight">{title}</h1>
+      <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0 flex flex-col gap-1">
+          <h1 className={cn('truncate', typographyClasses.pageTitle)}>{title}</h1>
           {description && (
-            <p className="text-sm text-muted-foreground">{description}</p>
+            <p className={typographyClasses.pageSubtitle}>{description}</p>
           )}
         </div>
-        {action}
+        {action && <div className="shrink-0">{action}</div>}
       </div>
     </div>
   );

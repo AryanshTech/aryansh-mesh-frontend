@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { brandMemoriesApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
-import { PageShell } from '@/modules/marketing/components/layout/page-shell';
+import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
+import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { t } from '@/core/i18n';
 import type { BrandMemoryResponse } from '@/modules/marketing/types/api';
 import { Badge } from '@/design-system/components/ui/badge';
@@ -52,17 +53,17 @@ export function BrandMemoryPage() {
   };
 
   return (
-    <PageShell
-      scrollable
-      title={t('brandMemory.title')}
-      description={t('brandMemory.subtitle')}
-      headerActions={
-        <Badge variant="outline" className="gap-1.5">
-          <span className="size-2 animate-pulse rounded-full bg-green-500" />
-          {t('brandMemory.live')}
-        </Badge>
-      }
-    >
+    <CrmPageShell>
+      <PageHeader
+        title={t('brandMemory.title')}
+        description={t('brandMemory.subtitle')}
+        action={
+          <Badge variant="outline" className="gap-1.5">
+            <span className="size-2 animate-pulse rounded-full bg-green-500" />
+            {t('brandMemory.live')}
+          </Badge>
+        }
+      />
       {loading ? (
         <Skeleton className="h-96 w-full rounded-xl" />
       ) : (
@@ -92,6 +93,6 @@ export function BrandMemoryPage() {
           </CardContent>
         </Card>
       )}
-    </PageShell>
+    </CrmPageShell>
   );
 }

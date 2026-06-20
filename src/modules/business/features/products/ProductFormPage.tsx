@@ -112,7 +112,7 @@ export function ProductFormPage() {
         title={isNew ? t('products.form.createTitle') : t('products.form.title')}
         breadcrumbs={[
           ...(isWorkspace
-            ? [{ label: t('admin.tenants.title'), href: '/business/admin/tenants' }]
+            ? [{ label: t('admin.tenants.title'), href: '/admin/tenants' }]
             : []),
           { label: t('pages.products'), href: path('/products') },
           { label: isNew ? t('common.create') : product?.name ?? '' },

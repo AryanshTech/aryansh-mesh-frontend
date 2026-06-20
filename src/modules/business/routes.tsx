@@ -29,7 +29,8 @@ function workspaceRoutes() {
     <>
       <Route index element={<Navigate to="dashboard" replace />} />
       <Route path="dashboard" element={<DashboardPage />} />
-      <Route path="business" element={<BusinessPage />} />
+      <Route path="profile" element={<BusinessPage />} />
+      <Route path="business" element={<Navigate to="../profile" replace relative="path" />} />
       <Route path="products" element={<ProductListPage />} />
       <Route path="products/new" element={<ProductFormPage />} />
       <Route path="products/:id" element={<ProductFormPage />} />

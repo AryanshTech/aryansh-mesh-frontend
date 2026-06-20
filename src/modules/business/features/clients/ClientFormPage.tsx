@@ -107,7 +107,7 @@ export function ClientFormPage() {
         title={isNew ? t('clients.form.createTitle') : t('clients.form.title')}
         breadcrumbs={[
           ...(isWorkspace
-            ? [{ label: t('admin.tenants.title'), href: '/business/admin/tenants' }]
+            ? [{ label: t('admin.tenants.title'), href: '/admin/tenants' }]
             : []),
           { label: t('pages.clients'), href: path('/clients') },
           { label: isNew ? t('common.create') : client?.name ?? '' },
