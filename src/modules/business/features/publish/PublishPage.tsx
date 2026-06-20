@@ -1,11 +1,11 @@
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ExternalLink, Globe, Copy } from 'lucide-react';
+import { ExternalLink, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
 import { Badge } from '@/design-system/components/ui/badge';
 import { Button } from '@/design-system/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/design-system/components/ui/card';
-import { Input } from '@/design-system/components/ui/input';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/design-system/components/ui/tabs';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
@@ -15,7 +15,9 @@ import {
   usePublishLatest,
   usePublishStatus,
 } from '@/modules/business/features/publish/use-publish';
-import { ConnectorGuideCard } from '@/modules/business/features/publish/ConnectorGuideCard';
+import { WebsiteIntegrationPanel } from '@/modules/business/features/publish/WebsiteIntegrationPanel';
+import { useBusinessProfile } from '@/modules/business/features/business/use-business';
+import { useWorkspaceBreadcrumbs } from '@/modules/business/hooks/use-workspace-breadcrumbs';
 import { useTenant } from '@/modules/business/features/admin/use-tenants';
 import { useAuth } from '@/core/auth/use-auth';
 import { resolveApiV1BaseUrl, resolveGatewayOrigin } from '@/core/api/config';
@@ -31,12 +33,28 @@ const COMPANY_SITE_URL =
 export function PublishPage() {
   const { t } = useTranslation();
   const { session } = useAuth();
-  const { isWorkspace, tenantId } = useTenantScope();
+  const { isWorkspace, tenantId, path } = useTenantScope();
+  const breadcrumbs = useWorkspaceBreadcrumbs(t('pages.publish'));
   const { data: workspaceTenant } = useTenant(isWorkspace ? tenantId : '');
+  const { data: businessProfile } = useBusinessProfile();
   const { canPublish } = usePermissions();
   const { data: status, isLoading, isError } = usePublishStatus();
   const { data: latest } = usePublishLatest();
   const publish = usePublish();
+  const allowedOrigins = useMemo(() => {
+    const origins = [...(businessProfile?.allowedWebsiteOrigins ?? [])];
+    if (businessProfile?.websiteUrl) {
+      try {
+        const websiteOrigin = new URL(businessProfile.websiteUrl).origin;
+        if (!origins.includes(websiteOrigin)) {
+          origins.unshift(websiteOrigin);
+        }
+      } catch {
+        // ignore invalid website URL
+      }
+    }
+    return origins;
+  }, [businessProfile]);
 
   async function handlePublish() {
     try {
@@ -75,28 +93,12 @@ export function PublishPage() {
   const tenantSlug = isWorkspace ? workspaceTenant?.slug : session?.tenantSlug;
   const tenantName =
     (isWorkspace ? workspaceTenant?.name : session?.tenantName) ?? tenantSlug ?? '';
-  const embedScript = tenantSlug
-    ? `<script src="${EMBED_ORIGIN}/embed.js" data-slug="${tenantSlug}" data-api="${API_V1_BASE}"></script>`
-    : '';
-
-  async function copyEmbedScript() {
-    if (!embedScript) return;
-    await navigator.clipboard.writeText(embedScript);
-    toast.success(t('publish.embed.copied'));
-  }
 
   return (
     <CrmPageShell>
       <PageHeader
         description={t('publish.subtitle')}
-        breadcrumbs={
-          isWorkspace
-            ? [
-                { label: t('admin.tenants.title'), href: '/admin/tenants' },
-                { label: t('pages.publish') },
-              ]
-            : undefined
-        }
+        breadcrumbs={breadcrumbs}
         action={
           canPublish ? (
             <Button
@@ -165,11 +167,13 @@ export function PublishPage() {
       </div>
 
       {tenantSlug ? (
-        <ConnectorGuideCard
+        <WebsiteIntegrationPanel
           tenantName={tenantName}
           tenantSlug={tenantSlug}
           apiBase={API_V1_BASE}
           embedOrigin={EMBED_ORIGIN}
+          profilePath={path('/profile')}
+          allowedOrigins={allowedOrigins}
         />
       ) : null}
 
@@ -207,33 +211,6 @@ export function PublishPage() {
           </CardContent>
         </Card>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('publish.embed.title')}</CardTitle>
-          <CardDescription>{t('publish.embed.description')}</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3">
-          <p className="text-sm text-muted-foreground">{t('publish.embed.hint')}</p>
-          {embedScript ? (
-            <div className="flex gap-2">
-              <Input readOnly value={embedScript} className="font-mono text-xs" />
-              <Button type="button" variant="outline" size="icon" onClick={() => void copyEmbedScript()}>
-                <Copy className="size-4" />
-              </Button>
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">{t('publish.embed.unavailable')}</p>
-          )}
-          {tenantSlug && (
-            <p className="text-xs text-muted-foreground">
-              {t('publish.embed.apiUrl', {
-                url: `${API_V1_BASE}/public/tenants/${tenantSlug}/snapshot`,
-              })}
-            </p>
-          )}
-        </CardContent>
-      </Card>
 
       {Object.keys(draftCounts).length > 0 && (
         <Card>

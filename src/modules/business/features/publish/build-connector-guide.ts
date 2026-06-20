@@ -1,3 +1,14 @@
+import {
+  buildCorsExampleOrigins,
+  buildDebugCurl,
+  buildEmbedScript,
+  buildEnvBlock,
+  buildFetchSnippet,
+  buildNextProxySnippet,
+  buildViteProxySnippet,
+  type WebsiteIntegrationContext,
+} from '@/modules/business/features/publish/website-integration-snippets';
+
 export interface ConnectorGuideInput {
   tenantName: string;
   tenantSlug: string;
@@ -11,16 +22,145 @@ export function buildConnectorGuide({
   apiBase,
   embedOrigin,
 }: ConnectorGuideInput): string {
+  const ctx: WebsiteIntegrationContext = { tenantName, tenantSlug, apiBase, embedOrigin };
   const snapshotUrl = `${apiBase}/public/tenants/${tenantSlug}/snapshot`;
   const availabilityUrl = `${apiBase}/public/tenants/${tenantSlug}/availability?date=YYYY-MM-DD`;
   const bookingsUrl = `${apiBase}/public/tenants/${tenantSlug}/bookings`;
-  const embedScript = `<script src="${embedOrigin}/embed.js" data-slug="${tenantSlug}" data-api="${apiBase}"></script>`;
+  const embedScript = buildEmbedScript(ctx);
+  const gatewayOrigin = apiBase.replace(/\/api\/v1$/, '');
 
-  return `# ${tenantName} — Business Manager Website Connection
+  return `# ${tenantName} — Website integration (Aryansh Mesh + API gateway)
 
-Give this file to your website developer. It documents **every public data type** Business Manager exposes for **${tenantName}**.
+Give this file to your website developer. It combines the **Aryansh Mesh website integration** workflow with the full **public API field reference** for **${tenantName}**.
 
-> **No Firebase. No API keys. No secrets.** Only the values below.
+> **No Firebase credentials. No API keys. No secrets.** Client Firebase projects are for **hosting only**.
+
+All browser traffic uses the **API gateway** (\`${gatewayOrigin}\`) — never direct Cloud Run URLs and never Firestore from the client website.
+
+---
+
+## How it works
+
+1. This business exists as a **tenant** in Aryansh Mesh (slug \`${tenantSlug}\`).
+2. Content is edited in **Aryansh Mesh → Business** (products, locations, profile, etc.).
+3. Click **Publish** on this page to push public data to Firestore.
+4. The client website calls **public gateway routes** — no \`Authorization\` header.
+
+---
+
+## Client website checklist
+
+- [ ] Tenant slug known: \`${tenantSlug}\`
+- [ ] Content **published** in Aryansh Mesh
+- [ ] Every browser **origin** registered in Mesh → **Business profile → Website domains (CORS)**
+- [ ] Frontend env points to gateway \`/api/v1\`, not Cloud Run directly
+- [ ] Only **public** routes used (snapshot, availability, bookings)
+- [ ] Snapshot returns 200: \`curl "${snapshotUrl}"\`
+
+---
+
+## Step 1 — Register CORS origins (required)
+
+In **Aryansh Mesh → Business → Business profile**:
+
+| Field | What to enter |
+|-------|----------------|
+| **Website URL** | Primary site URL (origin is added automatically) |
+| **Website domains (CORS)** | One origin per line — every host/port the site uses |
+
+**Origin format** (scheme + host + port only — no path):
+
+\`\`\`
+${buildCorsExampleOrigins()}
+\`\`\`
+
+Rules:
+
+- Use \`https://\` in production; include both \`.web.app\` and \`.firebaseapp.com\` if you use Firebase Hosting.
+- Add each local dev port (\`5173\`, \`3000\`, etc.).
+- Changes apply within **~60 seconds** — no backend redeploy.
+
+You do **not** ask Aryansh ops to redeploy the gateway when adding a new client domain.
+
+---
+
+## Step 2 — Configure the frontend
+
+**Always call the gateway**, not Firebase and not a raw Cloud Run URL.
+
+\`\`\`env
+${buildEnvBlock(ctx)}
+\`\`\`
+
+---
+
+## Step 3 — Use only public API routes
+
+From a client website origin, the gateway allows:
+
+| Access | Methods | Paths |
+|--------|---------|-------|
+| **Read** | \`GET\`, \`OPTIONS\` | \`/api/v1/public/tenants/**\`, \`/embed.js\` |
+| **Write** | \`POST\`, \`OPTIONS\` | \`/api/v1/public/tenants/{slug}/bookings\` |
+
+**Not allowed from client origins:** auth, tenant admin, uploads, marketing hub, etc.
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | \`${snapshotUrl}\` | Business, products, locations, testimonials, custom content |
+| GET | \`${availabilityUrl}\` | Booked time slots for a date |
+| POST | \`${bookingsUrl}\` | Create a reservation |
+
+Bookings require \`bookingSettings.enabled: true\` on the business profile. CORS allows the request; the API returns \`403\` if bookings are disabled.
+
+---
+
+## Step 4 — Fetch data in code
+
+\`\`\`typescript
+${buildFetchSnippet(ctx)}
+\`\`\`
+
+---
+
+## Step 5 — Embed script (optional, plain HTML)
+
+\`\`\`html
+${embedScript}
+\`\`\`
+
+\`\`\`javascript
+const snapshot = await window.BusinessManager.fetchSnapshot();
+const availability = await window.BusinessManager.getAvailability("2026-06-15");
+await window.BusinessManager.createBooking({
+  customerName: "Marie",
+  customerPhone: "514-555-0100",
+  partySize: 2,
+  notes: "Terrace if possible",
+  date: "2026-06-15",
+  time: "10:00",
+});
+\`\`\`
+
+The page origin must be registered in **Website domains (CORS)**.
+
+---
+
+## Dev proxy (recommended for local dev)
+
+Avoid CORS in local dev by proxying through your dev server.
+
+**Vite:**
+
+\`\`\`typescript
+${buildViteProxySnippet()}
+\`\`\`
+
+**Next.js:**
+
+\`\`\`javascript
+${buildNextProxySnippet()}
+\`\`\`
 
 ---
 
@@ -31,23 +171,6 @@ Give this file to your website developer. It documents **every public data type*
 | Tenant slug | \`${tenantSlug}\` |
 | API base URL | \`${apiBase}\` |
 | Snapshot URL | \`${snapshotUrl}\` |
-
-\`\`\`env
-VITE_CRM_API_BASE_URL=${apiBase}
-VITE_CRM_TENANT_SLUG=${tenantSlug}
-\`\`\`
-
-**Next.js:** use \`NEXT_PUBLIC_CRM_API_BASE_URL\` and \`NEXT_PUBLIC_CRM_TENANT_SLUG\`.
-
----
-
-## Public API endpoints
-
-| Method | URL | Purpose |
-|--------|-----|---------|
-| GET | \`${snapshotUrl}\` | All published content (menu, locations, reviews, business info) |
-| GET | \`${availabilityUrl}\` | Booked time slots for a date |
-| POST | \`${bookingsUrl}\` | Create a table reservation |
 
 ---
 
@@ -497,15 +620,37 @@ export async function fetchSnapshot() {
 
 ## CORS (browser websites)
 
-Register every origin where the site runs. In the CRM: **Business → Website domains (CORS)**, one per line:
+Register every origin where the site runs. In **Aryansh Mesh → Business → Business profile → Website domains (CORS)**, one per line:
 
 \`\`\`
-https://your-production-domain.com
-http://localhost:5173
-http://localhost:3000
+${buildCorsExampleOrigins()}
 \`\`\`
 
 The **Website URL** on the business profile is also allowed automatically. Changes apply within about one minute.
+
+Platform apps (Aryansh Mesh) use separate platform CORS — client domains are managed only in CRM.
+
+---
+
+## Troubleshooting CORS
+
+| Symptom | Likely cause | Fix |
+|---------|--------------|-----|
+| Browser: blocked by CORS policy | Origin not in CRM website domains | Add exact origin in Mesh Business profile; wait ~60s |
+| Works in curl, fails in browser | curl has no Origin header | Register browser origin in CRM |
+| \`401\` on snapshot | Wrong URL or authenticated route | Use \`/public/tenants/{slug}/snapshot\`, no auth header |
+| \`403\` on booking | Bookings disabled | Enable in Business profile booking settings |
+| \`404\` on snapshot | Nothing published yet | Click **Publish** in Aryansh Mesh |
+
+---
+
+## Debug commands
+
+\`\`\`bash
+${buildDebugCurl(ctx)}
+\`\`\`
+
+Expect \`Access-Control-Allow-Origin: https://your-site.com\` when the origin is registered.
 
 ---
 
@@ -533,6 +678,6 @@ curl "${snapshotUrl}"
 
 ---
 
-*Generated from Business Manager for tenant \`${tenantSlug}\`.*
+*Generated from Aryansh Mesh for tenant \`${tenantSlug}\`. Based on the Aryansh website integration guides.*
 `;
 }

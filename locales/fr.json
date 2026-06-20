@@ -611,10 +611,78 @@
       },
       "connectorGuide": {
         "title": "Guide développeur site web",
-        "description": "Référence API complète : entreprise, produits, emplacements, témoignages, réservations et CORS.",
-        "hint": "Copiez ce markdown et partagez-le avec votre développeur web. Il liste tous les champs fournis par l'API publique.",
+        "description": "Référence markdown complète : flux d'intégration, CORS, champs API publics, réservations et dépannage.",
+        "hint": "Copiez ce markdown et partagez-le avec votre développeur web. Il suit les guides d'intégration Aryansh Mesh.",
         "copy": "Copier le guide",
         "copied": "Guide d'intégration copié."
+      },
+      "integration": {
+        "title": "Intégration site client",
+        "description": "Transmettez ce flux à votre développeur. Il suit les guides d'intégration Aryansh pour connecter tout site client à la passerelle API.",
+        "howItWorks": "Le contenu est géré dans Aryansh Mesh, publié depuis cette page, puis consommé par le site client via les routes publiques de la passerelle — sans identifiants Firebase sur le site.",
+        "copy": "Copier",
+        "copied": "Copié dans le presse-papiers.",
+        "openProfile": "Ouvrir le profil entreprise (domaines CORS)",
+        "registeredOrigins": "Origines web enregistrées",
+        "noOrigins": "Aucun domaine web enregistré. Ajoutez-les dans le profil entreprise avant que le site client puisse appeler l'API depuis un navigateur.",
+        "exampleOrigins": "Exemples d'origines à enregistrer",
+        "envVars": "Variables d'environnement frontend",
+        "fetchExample": "Exemple fetch (React / Vite / Next.js)",
+        "viteProxy": "Proxy dev Vite (recommandé)",
+        "nextProxy": "Proxy dev Next.js",
+        "devIntro": "Proxifiez les appels API via votre serveur de dev pour rester same-origin et éviter le CORS en local.",
+        "debugCommands": "Commandes de débogage (curl)",
+        "corsIntro": "Enregistrez chaque origine navigateur où le site client s'exécute. Dans Aryansh Mesh → Profil entreprise → URL du site et Domaines web (CORS). Les changements s'appliquent en environ une minute.",
+        "tabs": {
+          "setup": "Configuration",
+          "cors": "CORS",
+          "api": "API",
+          "embed": "Intégration",
+          "dev": "Dev local",
+          "troubleshoot": "Dépannage",
+          "guide": "Guide complet"
+        },
+        "steps": {
+          "publish": "Publiez le contenu depuis cette page pour que le snapshot public inclue produits, emplacements et infos entreprise.",
+          "cors": "Enregistrez chaque origine dans Profil entreprise → Domaines web (CORS), y compris les URL de production et les ports locaux.",
+          "env": "Définissez VITE_CRM_API_BASE_URL et VITE_CRM_TENANT_SLUG (ou NEXT_PUBLIC_*) vers la passerelle API et le slug tenant.",
+          "routes": "Utilisez uniquement les routes publiques : snapshot, disponibilité et réservations. Pas d'en-tête Authorization sur le site client.",
+          "verify": "Vérifiez avec curl ou le lien Voir l'API snapshot — attendez HTTP 200 et du JSON avec products, locations et meta.publishedAt."
+        },
+        "endpoints": {
+          "snapshot": "Tout le contenu publié (entreprise, produits, emplacements, témoignages, contenu personnalisé)",
+          "availability": "Créneaux réservés pour une date",
+          "bookings": "Créer une réservation"
+        },
+        "table": {
+          "method": "Méthode",
+          "path": "Chemin",
+          "purpose": "Usage",
+          "symptom": "Symptôme",
+          "fix": "Solution"
+        },
+        "troubleshoot": {
+          "corsBlocked": {
+            "symptom": "Navigateur : bloqué par la politique CORS",
+            "fix": "Ajoutez l'origine exacte (schéma + hôte + port) dans Profil entreprise → Domaines web ; attendez ~60 secondes."
+          },
+          "curlWorks": {
+            "symptom": "Fonctionne en curl, échoue dans le navigateur",
+            "fix": "curl n'envoie pas d'en-tête Origin — enregistrez l'origine du navigateur dans les domaines web CRM."
+          },
+          "unauthorized": {
+            "symptom": "401 sur snapshot",
+            "fix": "Utilisez /public/tenants/{slug}/snapshot sans en-tête Authorization."
+          },
+          "booking403": {
+            "symptom": "403 sur réservation",
+            "fix": "Activez bookingSettings.enabled sur le profil entreprise."
+          },
+          "notFound": {
+            "symptom": "404 sur snapshot",
+            "fix": "Rien n'est publié — cliquez Publier sur cette page."
+          }
+        }
       }
     },
     "bookings": {

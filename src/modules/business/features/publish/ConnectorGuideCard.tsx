@@ -11,6 +11,7 @@ interface ConnectorGuideCardProps {
   tenantSlug: string;
   apiBase: string;
   embedOrigin: string;
+  embedded?: boolean;
 }
 
 export function ConnectorGuideCard({
@@ -18,6 +19,7 @@ export function ConnectorGuideCard({
   tenantSlug,
   apiBase,
   embedOrigin,
+  embedded = false,
 }: ConnectorGuideCardProps) {
   const { t } = useTranslation();
   const guide = buildConnectorGuide({ tenantName, tenantSlug, apiBase, embedOrigin });
@@ -27,19 +29,32 @@ export function ConnectorGuideCard({
     toast.success(t('publish.connectorGuide.copied'));
   }
 
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
-        <div className="flex flex-col gap-1.5">
-          <CardTitle>{t('publish.connectorGuide.title')}</CardTitle>
-          <CardDescription>{t('publish.connectorGuide.description')}</CardDescription>
+  const body = (
+    <>
+      {!embedded ? (
+        <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
+          <div className="flex flex-col gap-1.5">
+            <CardTitle>{t('publish.connectorGuide.title')}</CardTitle>
+            <CardDescription>{t('publish.connectorGuide.description')}</CardDescription>
+          </div>
+          <Button type="button" variant="outline" size="sm" onClick={() => void copyGuide()}>
+            <Copy className="mr-2 size-4" />
+            {t('publish.connectorGuide.copy')}
+          </Button>
+        </CardHeader>
+      ) : (
+        <div className="mb-3 flex items-start justify-between gap-4">
+          <div className="flex flex-col gap-1">
+            <p className="text-sm font-medium">{t('publish.connectorGuide.title')}</p>
+            <p className="text-sm text-muted-foreground">{t('publish.connectorGuide.description')}</p>
+          </div>
+          <Button type="button" variant="outline" size="sm" onClick={() => void copyGuide()}>
+            <Copy className="mr-2 size-4" />
+            {t('publish.connectorGuide.copy')}
+          </Button>
         </div>
-        <Button type="button" variant="outline" size="sm" onClick={() => void copyGuide()}>
-          <Copy className="mr-2 size-4" />
-          {t('publish.connectorGuide.copy')}
-        </Button>
-      </CardHeader>
-      <CardContent>
+      )}
+      <CardContent className={embedded ? 'p-0' : undefined}>
         <p className="mb-3 text-sm text-muted-foreground">{t('publish.connectorGuide.hint')}</p>
         <Textarea
           readOnly
@@ -48,6 +63,12 @@ export function ConnectorGuideCard({
           aria-label={t('publish.connectorGuide.title')}
         />
       </CardContent>
-    </Card>
+    </>
   );
+
+  if (embedded) {
+    return <div>{body}</div>;
+  }
+
+  return <Card>{body}</Card>;
 }
