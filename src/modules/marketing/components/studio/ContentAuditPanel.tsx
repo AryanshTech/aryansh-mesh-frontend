@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { DownloadIcon, PlayIcon } from 'lucide-react';
-import { t } from '@/core/i18n';
+import { safeT, t } from '@/core/i18n';
 import type {
   ContentAuditResponse,
   ContentAuditRowResponse,
@@ -86,7 +86,7 @@ export function ContentAuditPanel({
                 <SelectContent>
                   {STUDIO_PLATFORMS.map((item) => (
                     <SelectItem key={item} value={item}>
-                      {t(`studio.platforms.${item}`)}
+                      {safeT(`studio.platforms.${item}`, item)}
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -1,4 +1,4 @@
-import { t } from '@/core/i18n';
+import { safeT, t } from '@/core/i18n';
 import type { AgentJobResponse, AgentJobStatus, WorkflowId } from '@/modules/marketing/types/api';
 import { Badge } from '@/design-system/components/ui/badge';
 import { Card, CardContent } from '@/design-system/components/ui/card';
@@ -68,11 +68,11 @@ export function AgentPipelineViz({ jobs }: AgentPipelineVizProps) {
             >
               <CardContent className="flex flex-col gap-1 p-0">
                 <span className="text-sm font-medium">
-                  {t(`studio.pipeline.steps.${step.key}`)}
+                  {safeT(`studio.pipeline.steps.${step.key}`, step.key)}
                 </span>
                 <Badge variant={statusVariant(status)}>
                   {status
-                    ? t(`jobStatus.${status}`)
+                    ? safeT(`jobStatus.${status}`, status)
                     : t('studio.pipeline.notStarted')}
                 </Badge>
               </CardContent>

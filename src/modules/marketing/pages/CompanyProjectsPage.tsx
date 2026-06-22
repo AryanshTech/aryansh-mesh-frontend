@@ -4,15 +4,14 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowRightIcon, FolderKanbanIcon, PlusIcon } from 'lucide-react';
 import { companiesApi, projectsApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
-import { DataTableCard } from '@/modules/marketing/components/dashboard/data-table-card';
-import { StatCard } from '@/modules/marketing/components/dashboard/stat-card';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
-import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { LinearPageHeader, LinearStatCard } from '@/shared/components/linear';
 import { useSidebarNavContext } from '@/modules/marketing/contexts/sidebar-nav-context';
 import { invalidateProjects, queryKeys } from '@/modules/marketing/hooks/query-client';
 import { formatDate, t } from '@/core/i18n';
 import type { CompanyResponse } from '@/modules/marketing/types/api';
 import { Button } from '@/design-system/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/design-system/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -38,6 +37,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/design-system/components/ui/table';
+import { typographyClasses } from '@/design-system/tokens/typography';
+import { cn } from '@/design-system/lib/utils';
 
 export function CompanyProjectsPage() {
   const { companyId = '' } = useParams();
@@ -100,22 +101,18 @@ export function CompanyProjectsPage() {
 
   return (
     <CrmPageShell>
-      <PageHeader
+      <LinearPageHeader
+        title={company?.name ?? t('projects.title')}
         description={t('projects.subtitle', { company: company?.name ?? '' })}
-        breadcrumbs={[
-          { label: t('breadcrumb.companies'), href: '/marketing/companies' },
-          { label: company?.name ?? t('projects.title') },
-        ]}
-        action={createButton}
+        actions={createButton}
       />
       {loading ? (
         <Skeleton className="h-28 w-full max-w-sm rounded-lg" />
       ) : (
         <div className="grid gap-4 md:max-w-sm">
-          <StatCard
-            title={t('projects.statTotal')}
+          <LinearStatCard
+            label={t('projects.statTotal')}
             value={projects.length}
-            description={t('projects.statTotalHint')}
             icon={FolderKanbanIcon}
           />
         </div>
@@ -138,17 +135,23 @@ export function CompanyProjectsPage() {
           ) : null}
         </Empty>
       ) : (
-        <DataTableCard
-          title={t('projects.tableTitle')}
-          description={t('projects.tableDescription')}
-        >
+        <Card className="overflow-hidden">
+          <CardHeader dense className="border-b border-border">
+            <CardTitle className={cn(typographyClasses.cardTitle, 'text-foreground')}>
+              {t('projects.tableTitle')}
+            </CardTitle>
+            <p className={cn(typographyClasses.bodySm, 'text-muted-foreground')}>
+              {t('projects.tableDescription')}
+            </p>
+          </CardHeader>
+          <CardContent dense className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t('projects.tableName')}</TableHead>
-                <TableHead>{t('projects.tableOnboarding')}</TableHead>
-                <TableHead>{t('projects.tableCreated')}</TableHead>
-                <TableHead className="text-right">
+                <TableHead className={typographyClasses.eyebrowUpper}>{t('projects.tableName')}</TableHead>
+                <TableHead className={typographyClasses.eyebrowUpper}>{t('projects.tableOnboarding')}</TableHead>
+                <TableHead className={typographyClasses.eyebrowUpper}>{t('projects.tableCreated')}</TableHead>
+                <TableHead className={cn('text-right', typographyClasses.eyebrowUpper)}>
                   {t('projects.tableActions')}
                 </TableHead>
               </TableRow>
@@ -175,7 +178,8 @@ export function CompanyProjectsPage() {
               ))}
             </TableBody>
           </Table>
-        </DataTableCard>
+          </CardContent>
+        </Card>
       )}
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>

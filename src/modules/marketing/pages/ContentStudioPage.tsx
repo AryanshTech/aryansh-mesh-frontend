@@ -1,17 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { CheckIcon, FileTextIcon, XIcon } from 'lucide-react';
+import { Check, Edit, RefreshCw, Sparkles, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { contentApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
-import { DataTableCard } from '@/modules/marketing/components/dashboard/data-table-card';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { PageAsyncShell } from '@/shared/components/crm/PageAsyncShell';
-import { PageHeader } from '@/shared/components/crm/PageHeader';
-import { t } from '@/core/i18n';
+import { LinearPageHeader, LinearQueueList, LinearSplitLayout } from '@/shared/components/linear';
+import { safeT, t } from '@/core/i18n';
 import type { ContentItemResponse } from '@/modules/marketing/types/api';
 import { Badge } from '@/design-system/components/ui/badge';
 import { Button } from '@/design-system/components/ui/button';
+import { Card, CardContent } from '@/design-system/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -28,15 +28,10 @@ import {
 } from '@/design-system/components/ui/empty';
 import { Input } from '@/design-system/components/ui/input';
 import { Label } from '@/design-system/components/ui/label';
+import { ScrollArea } from '@/design-system/components/ui/scroll-area';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/design-system/components/ui/table';
+import { typographyClasses } from '@/design-system/tokens/typography';
+import { cn } from '@/design-system/lib/utils';
 
 export function ContentStudioPage() {
   const { projectId = '' } = useParams();
@@ -45,6 +40,7 @@ export function ContentStudioPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [acting, setActing] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | undefined>();
   const [rejectOpen, setRejectOpen] = useState(false);
   const [rejectTargetId, setRejectTargetId] = useState<string | null>(null);
   const [rejectFeedback, setRejectFeedback] = useState('');
@@ -55,7 +51,7 @@ export function ContentStudioPage() {
     try {
       const res = await apiFetchWithRetry(
         (token) => contentApi.list(token, projectId),
-        getToken
+        getToken,
       );
       setItems(res);
     } catch (err) {
@@ -69,12 +65,31 @@ export function ContentStudioPage() {
     void load();
   }, [projectId, getToken]);
 
+  const pendingItems = useMemo(
+    () => items.filter((item) => item.status === 'PENDING_APPROVAL'),
+    [items],
+  );
+
+  const queueItems = useMemo(
+    () =>
+      pendingItems.map((item) => ({
+        id: item.id,
+        eyebrow: safeT(`contentTypes.${item.type}`, item.type),
+        title: item.title,
+        subtitle: t('linear.studio.agentLabel'),
+        timestamp: new Date(item.createdAt).toLocaleDateString(),
+      })),
+    [pendingItems],
+  );
+
+  const selected = pendingItems.find((item) => item.id === (selectedId ?? pendingItems[0]?.id));
+
   const handleApprove = async (id: string) => {
     setActing(id);
     try {
       await apiFetchWithRetry(
         (token) => contentApi.approve(token, projectId, id),
-        getToken
+        getToken,
       );
       toast.success(t('content.approveSuccess'));
       await load();
@@ -100,7 +115,7 @@ export function ContentStudioPage() {
           contentApi.reject(token, projectId, rejectTargetId, {
             feedback: rejectFeedback.trim(),
           }),
-        getToken
+        getToken,
       );
       toast.success(t('content.rejectSuccess'));
       setRejectOpen(false);
@@ -114,74 +129,130 @@ export function ContentStudioPage() {
   };
 
   return (
-    <CrmPageShell>
-      <PageHeader description={t('content.subtitle')} />
+    <CrmPageShell mode="viewport" className="gap-4 p-6">
+      <LinearPageHeader
+        title={t('nav.content')}
+        description={t('content.queueDescription')}
+      />
       <PageAsyncShell
         loading={loading}
         error={error}
         onRetry={() => void load()}
         skeleton={<Skeleton className="h-64 w-full rounded-lg" />}
       >
-        {items.length === 0 ? (
+        {pendingItems.length === 0 ? (
           <Empty>
             <EmptyHeader>
               <EmptyMedia variant="icon">
-                <FileTextIcon />
+                <Sparkles />
               </EmptyMedia>
               <EmptyTitle>{t('content.empty')}</EmptyTitle>
               <EmptyDescription>{t('content.queueDescription')}</EmptyDescription>
             </EmptyHeader>
           </Empty>
         ) : (
-          <DataTableCard
-            title={t('content.queueTitle')}
-            description={t('content.queueDescription')}
-          >
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t('content.tableTitle')}</TableHead>
-                  <TableHead>{t('content.tableType')}</TableHead>
-                  <TableHead>{t('content.tableStatus')}</TableHead>
-                  <TableHead className="text-right">{t('content.tableActions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {items.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.title}</TableCell>
-                    <TableCell>{t(`contentTypes.${item.type}`)}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{t(`contentStatus.${item.status}`)}</Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {canWrite && item.status === 'PENDING_APPROVAL' && (
-                        <div className="flex justify-end gap-1">
-                          <Button
-                            size="sm"
-                            disabled={acting === item.id}
-                            onClick={() => void handleApprove(item.id)}
-                          >
-                            <CheckIcon data-icon="inline-start" />
-                            {t('content.approve')}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            disabled={acting === item.id}
-                            onClick={() => openRejectDialog(item.id)}
-                          >
-                            <XIcon data-icon="inline-start" />
-                            {t('content.reject')}
-                          </Button>
-                        </div>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </DataTableCard>
+          <LinearSplitLayout
+            leftDefaultSize={22}
+            rightDefaultSize={28}
+            left={
+              <LinearQueueList
+                title={t('linear.studio.pendingDrafts')}
+                count={pendingItems.length}
+                items={queueItems}
+                activeId={selected?.id}
+                onSelect={setSelectedId}
+                className="h-full min-h-[560px]"
+              />
+            }
+            center={
+              selected ? (
+                <div className="flex h-full min-h-[560px] flex-col bg-card">
+                  <div className="flex items-center justify-between border-b border-border px-8 py-4">
+                    <div>
+                      <h2 className={typographyClasses.displayLg}>
+                        {t('linear.studio.draftTitle', { title: selected.title })}
+                      </h2>
+                      <p className={typographyClasses.caption}>{t('linear.studio.reviewingAgent')}</p>
+                    </div>
+                    {canWrite ? (
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm">
+                          <Edit data-icon="inline-start" />
+                          {t('linear.studio.edit')}
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <RefreshCw data-icon="inline-start" />
+                          {t('linear.studio.regenerate')}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={acting === selected.id}
+                          onClick={() => openRejectDialog(selected.id)}
+                        >
+                          <X data-icon="inline-start" />
+                          {t('content.rejectConfirm')}
+                        </Button>
+                        <Button
+                          size="sm"
+                          disabled={acting === selected.id}
+                          onClick={() => void handleApprove(selected.id)}
+                        >
+                          <Check data-icon="inline-start" />
+                          {t('content.approve')}
+                        </Button>
+                      </div>
+                    ) : null}
+                  </div>
+                  <ScrollArea className="flex-1 scrollbar-linear">
+                    <div className="mx-auto max-w-3xl p-8">
+                      <Card>
+                        <CardContent dense className="prose prose-sm max-w-none pt-6 dark:prose-invert">
+                          <div className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                            {selected.contentMarkdown || t('linear.studio.noContent')}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </ScrollArea>
+                </div>
+              ) : null
+            }
+            right={
+              <div className="flex h-full min-h-[560px] flex-col border-l border-border bg-background">
+                <div className="border-b border-border px-4 py-4">
+                  <h3 className={cn(typographyClasses.eyebrow, 'flex items-center gap-2 text-foreground')}>
+                    {t('linear.studio.intelligenceContext')}
+                  </h3>
+                </div>
+                <ScrollArea className="flex-1 scrollbar-linear">
+                  <div className="flex flex-col gap-6 p-4">
+                    <section>
+                      <h4 className={typographyClasses.eyebrowUpper}>{t('linear.studio.brandMemory')}</h4>
+                      <Card className="mt-3">
+                        <CardContent dense className="text-xs text-muted-foreground">
+                          {t('linear.studio.brandVoiceHint')}
+                        </CardContent>
+                      </Card>
+                    </section>
+                    <section>
+                      <h4 className={typographyClasses.eyebrowUpper}>{t('linear.studio.systemInstructions')}</h4>
+                      <Card className="mt-3 font-mono text-xs">
+                        <CardContent dense>{t('linear.studio.systemInstructionsPreview')}</CardContent>
+                      </Card>
+                    </section>
+                    <section>
+                      <h4 className={typographyClasses.eyebrowUpper}>{t('linear.studio.gtmSignals')}</h4>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <Badge variant="outline">SaaS</Badge>
+                        <Badge variant="outline">Agentic</Badge>
+                      </div>
+                    </section>
+                  </div>
+                </ScrollArea>
+              </div>
+            }
+          />
         )}
       </PageAsyncShell>
 
@@ -190,7 +261,7 @@ export function ContentStudioPage() {
           <DialogHeader>
             <DialogTitle>{t('content.rejectDialogTitle')}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="reject-feedback">{t('content.rejectPrompt')}</Label>
             <Input
               id="reject-feedback"

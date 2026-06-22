@@ -1,4 +1,4 @@
-import { formatDateTime, t } from '@/core/i18n';
+import { formatDateTime, safeT, t } from '@/core/i18n';
 import type { StyleCaptureResponse } from '@/modules/marketing/types/api';
 import { Badge } from '@/design-system/components/ui/badge';
 import { Button } from '@/design-system/components/ui/button';
@@ -44,7 +44,7 @@ export function StyleCapturePanel({
             variant={selected?.id === capture.id ? 'default' : 'outline'}
             onClick={() => onSelectCapture(capture.id)}
           >
-            {t(`studio.platforms.${capture.platform}`)} · {capture.posts.length}{' '}
+            {safeT(`studio.platforms.${capture.platform}`, capture.platform)} · {capture.posts.length}{' '}
             {t('studio.captures.posts')}
           </Button>
         ))}
@@ -57,7 +57,7 @@ export function StyleCapturePanel({
               <CardTitle className="text-base">{t('studio.captures.title')}</CardTitle>
               <div className="flex flex-wrap gap-2">
                 <Badge variant="secondary">
-                  {t(`studio.analyzeStatus.${selected.analyzeStatus}`)}
+                  {safeT(`studio.analyzeStatus.${selected.analyzeStatus}`, selected.analyzeStatus)}
                 </Badge>
                 <span className="text-xs text-muted-foreground">
                   {formatDateTime(selected.createdAt)}

@@ -5,7 +5,7 @@ import { socialPostsApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { PageAsyncShell } from '@/shared/components/crm/PageAsyncShell';
-import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { LinearPageHeader } from '@/shared/components/linear';
 import { t } from '@/core/i18n';
 import type { SocialPostResponse } from '@/modules/marketing/types/api';
 import { Badge } from '@/design-system/components/ui/badge';
@@ -95,7 +95,7 @@ export function SocialCalendarPage() {
 
   return (
     <CrmPageShell>
-      <PageHeader description={t('social.subtitle')} />
+      <LinearPageHeader title={t('social.title')} description={t('social.subtitle')} />
       <PageAsyncShell
         loading={loading}
         error={error}
@@ -142,10 +142,10 @@ export function SocialCalendarPage() {
                         <Card key={post.id} className="shadow-none">
                           <CardContent className="space-y-1 p-2 text-xs">
                             <div className="mb-1 flex items-center justify-between gap-1">
-                              <Badge variant="outline" className="text-[10px]">
+                              <Badge variant="outline">
                                 {t(`socialPlatforms.${post.platform}`)}
                               </Badge>
-                              <Badge variant="secondary" className="text-[10px]">
+                              <Badge variant="secondary">
                                 {t(`socialStatus.${post.status}`)}
                               </Badge>
                             </div>

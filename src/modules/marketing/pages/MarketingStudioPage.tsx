@@ -27,10 +27,10 @@ import {
   StyleReferenceCard,
 } from '@/modules/marketing/components/studio/StyleReferenceCard';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
-import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { LinearPageHeader } from '@/shared/components/linear';
 import { invalidateProjectStudio, queryKeys } from '@/modules/marketing/hooks/query-client';
 import { ToggleGroup, ToggleGroupItem } from '@/design-system/components/ui/toggle-group';
-import { t } from '@/core/i18n';
+import { safeT, t } from '@/core/i18n';
 import type {
   ContentStatus,
   FeedbackStatus,
@@ -353,7 +353,7 @@ export function MarketingStudioPage() {
     () =>
       (['OPEN', 'IN_REVIEW', 'RESOLVED'] as FeedbackStatus[]).map((id) => ({
         id,
-        title: t(`studio.feedbackStatus.${id}`),
+        title: safeT(`studio.feedbackStatus.${id}`, id),
       })),
     []
   );
@@ -364,7 +364,7 @@ export function MarketingStudioPage() {
         id: fb.id,
         columnId: fb.status,
         title: fb.feedbackText,
-        subtitle: t(`studio.feedbackTarget.${fb.targetType}`),
+        subtitle: safeT(`studio.feedbackTarget.${fb.targetType}`, fb.targetType),
       })),
     [feedbackQuery.data]
   );
@@ -374,7 +374,7 @@ export function MarketingStudioPage() {
       (['BACKLOG', 'READY', 'IN_PROGRESS', 'DONE'] as PostIdeaStatus[]).map(
         (id) => ({
           id,
-          title: t(`studio.postIdeaStatus.${id}`),
+          title: safeT(`studio.postIdeaStatus.${id}`, id),
         })
       ),
     []
@@ -405,7 +405,7 @@ export function MarketingStudioPage() {
         ] as ContentStatus[]
       ).map((id) => ({
         id,
-        title: t(`contentStatus.${id}`),
+        title: safeT(`contentStatus.${id}`, id),
       })),
     []
   );
@@ -420,7 +420,7 @@ export function MarketingStudioPage() {
           id: item.id,
           columnId: item.status,
           title: item.title,
-          subtitle: t(`contentTypes.${item.type}`),
+          subtitle: safeT(`contentTypes.${item.type}`, item.type),
         })),
     [contentQuery.data, contentColumns]
   );
@@ -597,11 +597,11 @@ export function MarketingStudioPage() {
 
   return (
     <CrmPageShell className="min-w-0">
-      <PageHeader description={t('studio.subtitle')} />
+      <LinearPageHeader title={t('studio.title')} description={t('studio.subtitle')} />
       {jobsQuery.data && (
         <Card>
           <CardHeader className="pb-4">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="typo-body-sm text-muted-foreground">
               {t('studio.pipelineTitle')}
             </CardTitle>
           </CardHeader>
@@ -615,7 +615,7 @@ export function MarketingStudioPage() {
         <TabsList className="flex-wrap h-auto w-full justify-start">
           {STUDIO_TABS.map((tab) => (
             <TabsTrigger key={tab} value={tab}>
-              {t(`studio.tabs.${tab}`)}
+              {safeT(`studio.tabs.${tab}`, tab)}
             </TabsTrigger>
           ))}
         </TabsList>
@@ -694,7 +694,7 @@ export function MarketingStudioPage() {
                   >
                     {STUDIO_PLATFORMS.map((platform) => (
                       <ToggleGroupItem key={platform} value={platform} className="text-sm">
-                        {t(`studio.platforms.${platform}`)}
+                        {safeT(`studio.platforms.${platform}`, platform)}
                       </ToggleGroupItem>
                     ))}
                   </ToggleGroup>
@@ -862,7 +862,7 @@ export function MarketingStudioPage() {
           <FieldGroup>
             <Field>
               <FieldLabel>{t('studio.styles.platform')}</FieldLabel>
-              <Input value={t(`studio.platforms.${refPlatform}`)} disabled />
+              <Input value={safeT(`studio.platforms.${refPlatform}`, refPlatform)} disabled />
             </Field>
             <Field>
               <FieldLabel>{t('studio.styles.sourceUrl')}</FieldLabel>

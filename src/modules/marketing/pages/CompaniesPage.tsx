@@ -4,15 +4,14 @@ import { Link } from 'react-router-dom';
 import { Building2Icon, FolderKanbanIcon, PlusIcon, UsersIcon } from 'lucide-react';
 import { companiesApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
-import { DataTableCard } from '@/modules/marketing/components/dashboard/data-table-card';
-import { StatCard } from '@/modules/marketing/components/dashboard/stat-card';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
-import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { LinearPageHeader, LinearStatCard } from '@/shared/components/linear';
 import { useSidebarNavContext } from '@/modules/marketing/contexts/sidebar-nav-context';
 import { invalidateCompanies, queryKeys } from '@/modules/marketing/hooks/query-client';
 import { formatDate, t } from '@/core/i18n';
 import type { CompanyResponse } from '@/modules/marketing/types/api';
 import { Button } from '@/design-system/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/design-system/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -39,6 +38,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/design-system/components/ui/table';
+import { typographyClasses } from '@/design-system/tokens/typography';
+import { cn } from '@/design-system/lib/utils';
 
 function countNewThisMonth(companies: CompanyResponse[]): number {
   const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
@@ -102,9 +103,10 @@ export function CompaniesPage() {
 
   return (
     <CrmPageShell>
-      <PageHeader
+      <LinearPageHeader
+        title={t('nav.companies')}
         description={t('companies.subtitle')}
-        action={createButton}
+        actions={createButton}
       />
       {loading ? (
         <div className="grid gap-4 md:grid-cols-3">
@@ -114,22 +116,19 @@ export function CompaniesPage() {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-3">
-          <StatCard
-            title={t('companies.statTotal')}
+          <LinearStatCard
+            label={t('companies.statTotal')}
             value={companies.length}
-            description={t('companies.statTotalHint')}
             icon={Building2Icon}
           />
-          <StatCard
-            title={t('companies.statNewMonth')}
+          <LinearStatCard
+            label={t('companies.statNewMonth')}
             value={countNewThisMonth(companies)}
-            description={t('companies.statNewMonthHint')}
             icon={UsersIcon}
           />
-          <StatCard
-            title={t('companies.statProjects')}
+          <LinearStatCard
+            label={t('companies.statProjects')}
             value={projectCount}
-            description={t('companies.statProjectsHint')}
             icon={FolderKanbanIcon}
           />
         </div>
@@ -155,16 +154,22 @@ export function CompaniesPage() {
           ) : null}
         </Empty>
       ) : (
-        <DataTableCard
-          title={t('companies.tableTitle')}
-          description={t('companies.tableDescription')}
-        >
+        <Card className="overflow-hidden">
+          <CardHeader dense className="border-b border-border">
+            <CardTitle className={cn(typographyClasses.cardTitle, 'text-foreground')}>
+              {t('companies.tableTitle')}
+            </CardTitle>
+            <p className={cn(typographyClasses.bodySm, 'text-muted-foreground')}>
+              {t('companies.tableDescription')}
+            </p>
+          </CardHeader>
+          <CardContent dense className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t('companies.tableCode')}</TableHead>
-                <TableHead>{t('companies.tableName')}</TableHead>
-                <TableHead>{t('companies.tableCreated')}</TableHead>
+                <TableHead className={typographyClasses.eyebrowUpper}>{t('companies.tableCode')}</TableHead>
+                <TableHead className={typographyClasses.eyebrowUpper}>{t('companies.tableName')}</TableHead>
+                <TableHead className={typographyClasses.eyebrowUpper}>{t('companies.tableCreated')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -193,7 +198,8 @@ export function CompaniesPage() {
               ))}
             </TableBody>
           </Table>
-        </DataTableCard>
+          </CardContent>
+        </Card>
       )}
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>

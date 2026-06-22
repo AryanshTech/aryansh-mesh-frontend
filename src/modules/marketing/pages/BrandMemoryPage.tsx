@@ -5,7 +5,7 @@ import { brandMemoriesApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { PageAsyncShell } from '@/shared/components/crm/PageAsyncShell';
-import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { LinearPageHeader } from '@/shared/components/linear';
 import { t } from '@/core/i18n';
 import type { BrandMemoryResponse } from '@/modules/marketing/types/api';
 import { Badge } from '@/design-system/components/ui/badge';
@@ -65,10 +65,10 @@ export function BrandMemoryPage() {
 
   return (
     <CrmPageShell>
-      <PageHeader
+      <LinearPageHeader
         title={t('brandMemory.title')}
         description={t('brandMemory.subtitle')}
-        action={
+        actions={
           <Badge variant="outline" className="gap-1.5">
             <span className="size-2 animate-pulse rounded-full bg-success" />
             {t('brandMemory.live')}

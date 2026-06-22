@@ -1,4 +1,4 @@
-import { formatDateTime, t } from '@/core/i18n';
+import { formatDateTime, safeT, t } from '@/core/i18n';
 import type { FeedEventResponse } from '@/modules/marketing/types/api';
 import { Badge } from '@/design-system/components/ui/badge';
 import { Card, CardContent } from '@/design-system/components/ui/card';
@@ -22,7 +22,7 @@ export function FeedTimeline({ events }: FeedTimelineProps) {
             <CardContent className="flex flex-col gap-2 px-4">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="outline">
-                  {t(`studio.feedEventTypes.${event.type}`)}
+                  {safeT(`studio.feedEventTypes.${event.type}`, event.type)}
                 </Badge>
                 <span className="text-xs text-muted-foreground">
                   {formatDateTime(event.occurredAt)}

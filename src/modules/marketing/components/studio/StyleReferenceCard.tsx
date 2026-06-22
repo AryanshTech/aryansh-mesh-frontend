@@ -1,5 +1,5 @@
 import { platformColors } from '@/design-system/tokens/platformColors';
-import { formatDateTime, t } from '@/core/i18n';
+import { formatDateTime, safeT, t } from '@/core/i18n';
 import type { SocialPlatform, StyleReferenceResponse } from '@/modules/marketing/types/api';
 import { Badge } from '@/design-system/components/ui/badge';
 import { Button } from '@/design-system/components/ui/button';
@@ -39,7 +39,7 @@ export function StyleReferenceCard({
                 : undefined
             }
           >
-            {t(`studio.platforms.${reference.platform}`)}
+            {safeT(`studio.platforms.${reference.platform}`, reference.platform)}
           </Badge>
         </div>
       </CardHeader>
@@ -64,7 +64,7 @@ export function StyleReferenceCard({
         )}
         <div className="flex flex-wrap gap-1">
           <Badge variant="secondary">
-            {t(`studio.analyzeStatus.${reference.analyzeStatus}`)}
+            {safeT(`studio.analyzeStatus.${reference.analyzeStatus}`, reference.analyzeStatus)}
           </Badge>
           {reference.formatTags.map((tag) => (
             <Badge key={tag} variant="outline">

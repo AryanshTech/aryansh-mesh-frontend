@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { onboardingApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
-import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { LinearPageHeader } from '@/shared/components/linear';
 import { t } from '@/core/i18n';
 import type { OnboardingStatus } from '@/modules/marketing/types/api';
 import { Badge } from '@/design-system/components/ui/badge';
@@ -54,7 +54,7 @@ export function OnboardingPage() {
 
   return (
     <CrmPageShell>
-      <PageHeader
+      <LinearPageHeader
         title={t('onboarding.title')}
         description={t('onboarding.subtitle')}
       />
@@ -69,7 +69,7 @@ export function OnboardingPage() {
             </Badge>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
+            <p className="typo-body-sm text-muted-foreground">
               {t('onboarding.prompt')}
             </p>
             <Textarea

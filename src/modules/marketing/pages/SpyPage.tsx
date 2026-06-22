@@ -4,13 +4,13 @@ import { EyeIcon, PlusIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { agentJobsApi, competitorsApi } from '@/modules/marketing/api/endpoints';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
-import { DataTableCard } from '@/modules/marketing/components/dashboard/data-table-card';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { PageAsyncShell } from '@/shared/components/crm/PageAsyncShell';
-import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { LinearPageHeader } from '@/shared/components/linear';
 import { formatDate, t } from '@/core/i18n';
 import type { CompetitorResponse } from '@/modules/marketing/types/api';
 import { Button } from '@/design-system/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/design-system/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -37,6 +37,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/design-system/components/ui/table';
+import { typographyClasses } from '@/design-system/tokens/typography';
+import { cn } from '@/design-system/lib/utils';
 
 export function SpyPage() {
   const { projectId = '' } = useParams();
@@ -107,10 +109,10 @@ export function SpyPage() {
 
   return (
     <CrmPageShell>
-      <PageHeader
+      <LinearPageHeader
         title={t('spy.title')}
         description={t('spy.subtitle')}
-        action={
+        actions={
           canWrite ? (
             <div className="flex gap-2">
               <Button size="sm" variant="outline" onClick={() => setModalOpen(true)}>
@@ -151,16 +153,22 @@ export function SpyPage() {
             ) : null}
           </Empty>
         ) : (
-          <DataTableCard
-            title={t('spy.tableTitle')}
-            description={t('spy.tableDescription')}
-          >
+          <Card className="overflow-hidden">
+            <CardHeader dense className="border-b border-border">
+              <CardTitle className={cn(typographyClasses.cardTitle, 'text-foreground')}>
+                {t('spy.tableTitle')}
+              </CardTitle>
+              <p className={cn(typographyClasses.bodySm, 'text-muted-foreground')}>
+                {t('spy.tableDescription')}
+              </p>
+            </CardHeader>
+            <CardContent dense className="p-0">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('spy.tableName')}</TableHead>
-                  <TableHead>{t('spy.tableUrl')}</TableHead>
-                  <TableHead>{t('spy.tableLastProfiled')}</TableHead>
+                  <TableHead className={typographyClasses.eyebrowUpper}>{t('spy.tableName')}</TableHead>
+                  <TableHead className={typographyClasses.eyebrowUpper}>{t('spy.tableUrl')}</TableHead>
+                  <TableHead className={typographyClasses.eyebrowUpper}>{t('spy.tableLastProfiled')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -188,7 +196,8 @@ export function SpyPage() {
                 ))}
               </TableBody>
             </Table>
-          </DataTableCard>
+            </CardContent>
+          </Card>
         )}
       </PageAsyncShell>
 

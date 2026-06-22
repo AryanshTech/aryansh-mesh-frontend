@@ -30,7 +30,7 @@ import type {
 } from '@/modules/marketing/types/api';
 import { Alert, AlertDescription } from '@/design-system/components/ui/alert';
 import { Button } from '@/design-system/components/ui/button';
-import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { LinearPageHeader } from '@/shared/components/linear';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
 import { Spinner } from '@/design-system/components/ui/spinner';
 import {
@@ -259,8 +259,10 @@ export function ThreadWorkspacePage() {
 
   return (
     <CrmPageShell className={layout.dashboard.pageViewport}>
-      <PageHeader
-        action={
+      <LinearPageHeader
+        title={t('nav.workspace')}
+        description={t('nav.workspaceDescription')}
+        actions={
           canWrite ? (
             <ShellPageActions>
               <Button size="sm" variant="outline" onClick={() => setBriefOpen(true)}>
