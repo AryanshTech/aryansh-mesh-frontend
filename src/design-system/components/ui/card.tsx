@@ -2,19 +2,26 @@ import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/design-system/lib/utils"
+import { typographyClasses, mutedBodySm } from "@/design-system/tokens/typography"
 
 const cardVariants = cva(
-  "rounded-lg border border-border bg-card text-card-foreground",
+  "rounded-card border border-border bg-card text-card-foreground",
   {
     variants: {
       variant: {
         default: "",
         elevated: "shadow-whisper",
         floating: "shadow-floating",
+        interactive: "cursor-pointer shadow-whisper transition-colors hover:bg-muted/50",
+      },
+      size: {
+        default: "",
+        dense: "",
       },
     },
     defaultVariants: {
       variant: "elevated",
+      size: "default",
     },
   }
 )
@@ -24,10 +31,10 @@ export interface CardProps
     VariantProps<typeof cardVariants> {}
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant, ...props }, ref) => (
+  ({ className, variant, size, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn(cardVariants({ variant }), className)}
+      className={cn(cardVariants({ variant, size }), className)}
       {...props}
     />
   )
@@ -36,11 +43,15 @@ Card.displayName = "Card"
 
 const CardHeader = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
+  React.HTMLAttributes<HTMLDivElement> & { dense?: boolean }
+>(({ className, dense, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col gap-1.5 p-6", className)}
+    className={cn(
+      "flex flex-col gap-2 pb-4 pt-5",
+      dense ? "px-5" : "px-7 pt-7",
+      className
+    )}
     {...props}
   />
 ))
@@ -52,7 +63,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-xl font-semibold text-foreground", className)}
+    className={cn(typographyClasses.cardTitle, className)}
     {...props}
   />
 ))
@@ -64,7 +75,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn(mutedBodySm, className)}
     {...props}
   />
 ))
@@ -72,9 +83,13 @@ CardDescription.displayName = "CardDescription"
 
 const CardContent = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+  React.HTMLAttributes<HTMLDivElement> & { dense?: boolean }
+>(({ className, dense, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("pt-0", dense ? "px-5 pb-5" : "px-7 pb-7", className)}
+    {...props}
+  />
 ))
 CardContent.displayName = "CardContent"
 

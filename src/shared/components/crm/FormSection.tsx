@@ -19,9 +19,9 @@ interface FormSectionProps {
 
 export function FormSection({ title, description, children, className }: FormSectionProps) {
   return (
-    <Card className={cn('shadow-sm', className)}>
+    <Card className={cn('shadow-whisper', className)}>
       <CardHeader className="pb-4">
-        <CardTitle className={typographyClasses.sectionTitle}>{title}</CardTitle>
+        <CardTitle className={typographyClasses.cardTitle}>{title}</CardTitle>
         {description ? <CardDescription>{description}</CardDescription> : null}
       </CardHeader>
       <CardContent className="flex flex-col gap-4">{children}</CardContent>

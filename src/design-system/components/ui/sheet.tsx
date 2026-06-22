@@ -4,6 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
 
 import { cn } from "@/design-system/lib/utils"
+import { typographyClasses } from "@/design-system/tokens/typography"
 
 const Sheet = SheetPrimitive.Root
 
@@ -106,7 +107,7 @@ const SheetTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Title
     ref={ref}
-    className={cn("text-lg font-semibold text-foreground", className)}
+    className={cn(typographyClasses.cardTitle, "text-foreground", className)}
     {...props}
   />
 ))
@@ -118,7 +119,7 @@ const SheetDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Description
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn(typographyClasses.bodySm, "text-muted-foreground", className)}
     {...props}
   />
 ))

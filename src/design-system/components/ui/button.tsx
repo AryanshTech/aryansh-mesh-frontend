@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/design-system/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-[transform,background-color,color,border-color] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "typo-button inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md ring-offset-background transition-[transform,background-color,color,border-color] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -18,9 +18,9 @@ const buttonVariants = cva(
           "bg-muted text-foreground border border-border hover:bg-muted/80",
         ghost: "text-muted-foreground hover:bg-muted hover:text-foreground",
         link: "text-primary underline-offset-4 hover:text-primary/90 hover:underline",
-        pill: "rounded-pill bg-primary text-primary-foreground hover:bg-primary-hover text-base font-medium",
+        pill: "typo-body rounded-pill bg-primary text-primary-foreground hover:bg-primary-hover",
         "pill-outline":
-          "rounded-pill border border-border bg-card text-foreground hover:bg-muted text-base font-medium",
+          "typo-body rounded-pill border border-border bg-card text-foreground hover:bg-muted",
       },
       size: {
         default: "h-10 px-4",

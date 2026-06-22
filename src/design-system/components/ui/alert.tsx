@@ -2,9 +2,10 @@ import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/design-system/lib/utils"
+import { typographyClasses } from "@/design-system/tokens/typography"
 
 const alertVariants = cva(
-  "relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4",
+  "relative w-full rounded-card border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4",
   {
     variants: {
       variant: {
@@ -40,7 +41,7 @@ const AlertTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h5
     ref={ref}
-    className={cn("text-sm font-medium text-foreground", className)}
+    className={cn(typographyClasses.button, "text-foreground", className)}
     {...props}
   />
 ))
@@ -52,7 +53,7 @@ const AlertDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-sm text-muted-foreground [&_p]:leading-relaxed", className)}
+    className={cn(typographyClasses.bodySm, "text-muted-foreground [&_p]:leading-relaxed", className)}
     {...props}
   />
 ))

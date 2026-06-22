@@ -1,13 +1,14 @@
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/design-system/lib/utils"
+import { typographyClasses, mutedBodySm } from "@/design-system/tokens/typography"
 
 function Empty({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="empty"
       className={cn(
-        "flex w-full min-w-0 flex-col items-center justify-center rounded-lg border border-dashed p-6 text-center md:p-12",
+        "flex w-full min-w-0 flex-col items-center justify-center rounded-lg border border-dashed border-border bg-card p-6 text-center md:p-12",
         className
       )}
       {...props}
@@ -31,7 +32,7 @@ const emptyMediaVariants = cva(
     variants: {
       variant: {
         default: "bg-transparent",
-        icon: "flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground [&_svg:not([class*='size-'])]:size-6",
+        icon: "flex size-10 shrink-0 items-center justify-center rounded-card-inner bg-muted text-foreground [&_svg:not([class*='size-'])]:size-6",
       },
     },
     defaultVariants: {
@@ -55,11 +56,11 @@ function EmptyMedia({
   )
 }
 
-function EmptyTitle({ className, ...props }: React.ComponentProps<"div">) {
+function EmptyTitle({ className, ...props }: React.ComponentProps<"h3">) {
   return (
-    <div
+    <h3
       data-slot="empty-title"
-      className={cn("w-full text-lg font-medium tracking-tight text-foreground", className)}
+      className={cn(typographyClasses.headline, "w-full", className)}
       {...props}
     />
   )
@@ -70,7 +71,7 @@ function EmptyDescription({ className, ...props }: React.ComponentProps<"p">) {
     <p
       data-slot="empty-description"
       className={cn(
-        "mt-2 w-full min-w-[16rem] text-sm leading-relaxed text-muted-foreground",
+        mutedBodySm,
         className
       )}
       {...props}
@@ -83,7 +84,7 @@ function EmptyContent({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="empty-content"
       className={cn(
-        "mx-auto mt-4 flex w-full max-w-sm min-w-[16rem] flex-col gap-4 text-center text-sm",
+        "mx-auto mt-4 flex w-full max-w-sm min-w-[16rem] flex-col gap-4 text-center typo-body-sm",
         className
       )}
       {...props}

@@ -26,7 +26,7 @@ export function AuthFormCard({
   className,
 }: AuthFormCardProps) {
   return (
-    <Card variant="elevated" className={cn('w-full min-w-0 rounded-lg border-border shadow-whisper', className)}>
+    <Card variant="elevated" className={cn('w-full min-w-0 border-border shadow-whisper', className)}>
       <CardHeader className="space-y-1 pb-4">
         <CardTitle className={layout.auth.title}>{title}</CardTitle>
         {description ? (

@@ -13,7 +13,7 @@ export function FeatureListShell({ children, footer, className }: FeatureListShe
     <Card className={cn('w-full min-w-0 overflow-hidden', className)}>
       <CardContent className="p-0">
         <div className="w-full min-w-0 overflow-x-auto">{children}</div>
-        {footer ? <div className="border-t border-border p-6">{footer}</div> : null}
+        {footer ? <div className="border-t border-border px-6 py-5">{footer}</div> : null}
       </CardContent>
     </Card>
   );
