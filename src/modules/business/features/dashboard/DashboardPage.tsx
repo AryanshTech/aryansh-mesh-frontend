@@ -1,44 +1,63 @@
-import { Link } from 'react-router-dom';
-import { Box, MessageSquareQuote, Package, Receipt } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
-import { Badge } from '@/design-system/components/ui/badge';
-import { Button } from '@/design-system/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/design-system/components/ui/card';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
-import { StatCard } from '@/modules/marketing/components/dashboard/stat-card';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
-import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { typographyClasses, mutedBodySm } from '@/design-system/tokens/typography';
 import { layout } from '@/design-system/tokens/layout';
+import { usePermissions } from '@/core/permissions/use-permissions';
+import { DashboardActivityFeed } from '@/modules/business/features/dashboard/DashboardActivityFeed';
+import { DashboardInsightCard } from '@/modules/business/features/dashboard/DashboardInsightCard';
+import { DashboardPublishWidget } from '@/modules/business/features/dashboard/DashboardPublishWidget';
+import { DashboardSelectBusiness } from '@/modules/business/features/dashboard/DashboardSelectBusiness';
+import { DashboardStatGrid } from '@/modules/business/features/dashboard/DashboardStatGrid';
+import { DashboardWelcomeHeader } from '@/modules/business/features/dashboard/DashboardWelcomeHeader';
+import { useDashboardActivity } from '@/modules/business/features/dashboard/use-dashboard-activity';
 import { useDashboard } from '@/modules/business/features/dashboard/use-dashboard';
 import { useTenantScope } from '@/modules/business/hooks/use-tenant-scope';
-
-const STAT_ICONS = {
-  products: Package,
-  clients: Box,
-  testimonials: MessageSquareQuote,
-  costs: Receipt,
-} as const;
+import { LinearFab } from '@/shared/components/linear';
+import { cn } from '@/design-system/lib/utils';
+import { BarChart3 } from 'lucide-react';
 
 export function DashboardPage() {
   const { t } = useTranslation();
-  const { isWorkspace, path } = useTenantScope();
+  const { hasTenantContext, path } = useTenantScope();
+  const { isPlatformOperator } = usePermissions();
   const { data, isLoading, isError, isFetching } = useDashboard();
+  const activity = useDashboardActivity();
+
+  if (!hasTenantContext) {
+    return (
+      <CrmPageShell>
+        {isPlatformOperator ? (
+          <DashboardSelectBusiness />
+        ) : (
+          <Alert variant="destructive">
+            <AlertTitle>{t('dashboard.missingTenant.title')}</AlertTitle>
+            <AlertDescription>{t('dashboard.missingTenant.description')}</AlertDescription>
+          </Alert>
+        )}
+      </CrmPageShell>
+    );
+  }
 
   if (isLoading && !data) {
     return (
       <CrmPageShell>
-        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-10 w-64" />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, index) => (
-            <Skeleton key={index} className="h-24 w-full" />
+            <Skeleton key={index} className="h-28 w-full rounded-lg" />
           ))}
+        </div>
+        <div className="grid gap-8 lg:grid-cols-3">
+          <Skeleton className="h-64 rounded-lg lg:col-span-2" />
+          <Skeleton className="h-64 rounded-lg" />
         </div>
       </CrmPageShell>
     );
   }
 
-  if (isError) {
+  if (isError || !data) {
     return (
       <CrmPageShell>
         <Alert variant="destructive">
@@ -49,75 +68,46 @@ export function DashboardPage() {
     );
   }
 
-  const stats = [
-    { key: 'products', value: data?.products ?? 0, href: path('/products') },
-    { key: 'clients', value: data?.clients ?? 0, href: path('/clients') },
-    { key: 'testimonials', value: data?.testimonials ?? 0, href: path('/testimonials') },
-    { key: 'costs', value: data?.costs ?? 0, href: path('/costs') },
-  ] as const;
-
   return (
     <CrmPageShell>
-      <PageHeader
-        breadcrumbs={
-          isWorkspace
-            ? [
-                { label: t('admin.tenants.title'), href: '/admin/tenants' },
-                { label: t('pages.dashboard') },
-              ]
-            : undefined
-        }
-      />
+      <DashboardWelcomeHeader hasLiveSignals={data.hasUnpublishedChanges} />
 
       {isFetching ? (
-        <p className="text-xs text-muted-foreground">{t('dashboard.refreshing')}</p>
+        <p className={typographyClasses.caption}>{t('dashboard.refreshing')}</p>
       ) : null}
 
-      <div className={`${layout.dashboard.section} grid gap-4 md:grid-cols-2 lg:grid-cols-4`}>
-        {stats.map(({ key, value, href }, index) => {
-          const Icon = STAT_ICONS[key];
-          return (
-            <div
-              key={key}
-              className="stagger-item"
-              style={{ ['--stagger-delay' as string]: `${index * 50}ms` }}
-            >
-              <StatCard
-                title={t(`dashboard.stats.${key}`)}
-                value={value}
-                icon={Icon}
-                action={
-                  <Button variant="link" size="sm" asChild className="h-auto p-0">
-                    <Link to={href}>{t('common.edit')}</Link>
-                  </Button>
-                }
-              />
-            </div>
-          );
-        })}
+      <DashboardStatGrid stats={data} />
+
+      <div className="grid gap-8 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <DashboardActivityFeed
+            items={activity.items}
+            isLoading={activity.isLoading}
+            viewAllHref={path('/clients')}
+          />
+        </div>
+        <div className="space-y-6">
+          <DashboardPublishWidget stats={data} publishPath={path('/publish')} />
+          <DashboardInsightCard
+            stats={data}
+            publishPath={path('/publish')}
+            productsPath={path('/products')}
+            clientsPath={path('/clients')}
+          />
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('dashboard.stats.publish')}</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-2">
-          <Badge variant={data?.hasUnpublishedChanges ? 'default' : 'secondary'}>
-            {data?.hasUnpublishedChanges
-              ? t('publish.status.pending')
-              : t('publish.status.upToDate')}
-          </Badge>
-          {data?.lastPublishedAt ? (
-            <p className="text-sm text-muted-foreground">
-              {t('publish.status.lastPublished')}:{' '}
-              {new Date(data.lastPublishedAt).toLocaleString()}
-            </p>
-          ) : null}
-          <Button variant="outline" size="sm" className="w-fit" asChild>
-            <Link to={path('/publish')}>{t('pages.publish')}</Link>
-          </Button>
-        </CardContent>
-      </Card>
+      <section className={cn(layout.linear.hairlineCard, 'p-12 text-center')}>
+        <div className="mx-auto max-w-md">
+          <BarChart3 className="mx-auto mb-4 size-8 text-muted-foreground" />
+          <h3 className={cn('mb-2', typographyClasses.subhead, 'text-foreground')}>
+            {t('linear.dashboard.visualizationTitle')}
+          </h3>
+          <p className={mutedBodySm}>{t('linear.dashboard.visualizationDescription')}</p>
+        </div>
+      </section>
+
+      <LinearFab ariaLabel={t('linear.dashboard.fabLabel')} />
     </CrmPageShell>
   );
 }

@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/des
 import { Input } from '@/design-system/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/design-system/components/ui/tabs';
 import { Textarea } from '@/design-system/components/ui/textarea';
+import { typographyClasses, mutedBodySm } from '@/design-system/tokens/typography';
+import { cn } from '@/design-system/lib/utils';
 import { ConnectorGuideCard } from '@/modules/business/features/publish/ConnectorGuideCard';
 import {
   buildCorsExampleOrigins,
@@ -45,13 +47,13 @@ function CopyBlock({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-sm font-medium text-foreground">{label}</p>
+        <p className={typographyClasses.button}>{label}</p>
         <Button type="button" variant="outline" size="sm" onClick={() => void copy()}>
           <Copy className="size-4" data-icon="inline-start" />
           {copyLabel}
         </Button>
       </div>
-      <Textarea readOnly value={value} className="min-h-[120px] resize-y font-mono text-xs leading-relaxed" />
+      <Textarea readOnly value={value} className={cn('min-h-[120px] resize-y', typographyClasses.mono)} />
     </div>
   );
 }
@@ -103,14 +105,14 @@ export function WebsiteIntegrationPanel({
           </TabsList>
 
           <TabsContent value="setup" className="flex flex-col gap-4">
-            <p className="text-sm text-muted-foreground">{t('publish.integration.howItWorks')}</p>
+            <p className={mutedBodySm}>{t('publish.integration.howItWorks')}</p>
             <ol className="flex flex-col gap-3">
               {setupSteps.map((key, index) => (
-                <li key={key} className="flex gap-3 rounded-lg border border-border bg-muted/30 p-3">
+                <li key={key} className="flex gap-3 rounded-card-inner border border-border bg-muted/30 p-3">
                   <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
                     {index + 1}
                   </span>
-                  <p className="text-sm text-foreground">{t(key)}</p>
+                  <p className={typographyClasses.bodySm}>{t(key)}</p>
                 </li>
               ))}
             </ol>
@@ -126,10 +128,10 @@ export function WebsiteIntegrationPanel({
           </TabsContent>
 
           <TabsContent value="cors" className="flex flex-col gap-4">
-            <p className="text-sm text-muted-foreground">{t('publish.integration.corsIntro')}</p>
+            <p className={mutedBodySm}>{t('publish.integration.corsIntro')}</p>
             {allowedOrigins.length > 0 ? (
               <div className="flex flex-col gap-2">
-                <p className="text-sm font-medium">{t('publish.integration.registeredOrigins')}</p>
+                <p className={typographyClasses.button}>{t('publish.integration.registeredOrigins')}</p>
                 <div className="flex flex-wrap gap-2">
                   {allowedOrigins.map((origin) => (
                     <Badge key={origin} variant="outline">
@@ -139,7 +141,7 @@ export function WebsiteIntegrationPanel({
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">{t('publish.integration.noOrigins')}</p>
+              <p className={mutedBodySm}>{t('publish.integration.noOrigins')}</p>
             )}
             <CopyBlock
               label={t('publish.integration.exampleOrigins')}
@@ -159,13 +161,13 @@ export function WebsiteIntegrationPanel({
               copiedLabel={t('publish.integration.copied')}
               copyLabel={copyLabel}
             />
-            <div className="overflow-x-auto rounded-lg border border-border">
-              <table className="w-full min-w-[520px] text-left text-sm">
+            <div className="overflow-x-auto rounded-card-inner border border-border">
+              <table className={cn('w-full min-w-[520px] text-left', typographyClasses.bodySm)}>
                 <thead className="border-b border-border bg-muted/40">
                   <tr>
-                    <th className="px-3 py-2 font-medium">{t('publish.integration.table.method')}</th>
-                    <th className="px-3 py-2 font-medium">{t('publish.integration.table.path')}</th>
-                    <th className="px-3 py-2 font-medium">{t('publish.integration.table.purpose')}</th>
+                    <th className={cn('px-3 py-2', typographyClasses.eyebrowUpper)}>{t('publish.integration.table.method')}</th>
+                    <th className={cn('px-3 py-2', typographyClasses.eyebrowUpper)}>{t('publish.integration.table.path')}</th>
+                    <th className={cn('px-3 py-2', typographyClasses.eyebrowUpper)}>{t('publish.integration.table.purpose')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -174,8 +176,8 @@ export function WebsiteIntegrationPanel({
                       <td className="px-3 py-2">
                         <Badge variant="outline">{endpoint.method}</Badge>
                       </td>
-                      <td className="px-3 py-2 font-mono text-xs">{endpoint.path}</td>
-                      <td className="px-3 py-2 text-muted-foreground">{t(endpoint.purposeKey)}</td>
+                      <td className={cn('px-3 py-2', typographyClasses.mono)}>{endpoint.path}</td>
+                      <td className={cn('px-3 py-2 text-muted-foreground', typographyClasses.bodySm)}>{t(endpoint.purposeKey)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -190,7 +192,7 @@ export function WebsiteIntegrationPanel({
           </TabsContent>
 
           <TabsContent value="embed" className="flex flex-col gap-4">
-            <p className="text-sm text-muted-foreground">{t('publish.embed.hint')}</p>
+            <p className={mutedBodySm}>{t('publish.embed.hint')}</p>
             <CopyBlock
               label={t('publish.embed.title')}
               value={buildEmbedScript(ctx)}
@@ -200,7 +202,7 @@ export function WebsiteIntegrationPanel({
           </TabsContent>
 
           <TabsContent value="dev" className="flex flex-col gap-4">
-            <p className="text-sm text-muted-foreground">{t('publish.integration.devIntro')}</p>
+            <p className={mutedBodySm}>{t('publish.integration.devIntro')}</p>
             <CopyBlock
               label={t('publish.integration.viteProxy')}
               value={buildViteProxySnippet()}
@@ -216,19 +218,19 @@ export function WebsiteIntegrationPanel({
           </TabsContent>
 
           <TabsContent value="troubleshoot" className="flex flex-col gap-4">
-            <div className="overflow-x-auto rounded-lg border border-border">
-              <table className="w-full min-w-[520px] text-left text-sm">
+            <div className="overflow-x-auto rounded-card-inner border border-border">
+              <table className={cn('w-full min-w-[520px] text-left', typographyClasses.bodySm)}>
                 <thead className="border-b border-border bg-muted/40">
                   <tr>
-                    <th className="px-3 py-2 font-medium">{t('publish.integration.table.symptom')}</th>
-                    <th className="px-3 py-2 font-medium">{t('publish.integration.table.fix')}</th>
+                    <th className={cn('px-3 py-2', typographyClasses.eyebrowUpper)}>{t('publish.integration.table.symptom')}</th>
+                    <th className={cn('px-3 py-2', typographyClasses.eyebrowUpper)}>{t('publish.integration.table.fix')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {troubleshootRows.map(([symptomKey, fixKey]) => (
                     <tr key={symptomKey} className="border-b border-border last:border-0">
-                      <td className="px-3 py-2 align-top">{t(symptomKey)}</td>
-                      <td className="px-3 py-2 align-top text-muted-foreground">{t(fixKey)}</td>
+                      <td className={cn('px-3 py-2 align-top', typographyClasses.bodySm)}>{t(symptomKey)}</td>
+                      <td className={cn('px-3 py-2 align-top text-muted-foreground', typographyClasses.bodySm)}>{t(fixKey)}</td>
                     </tr>
                   ))}
                 </tbody>

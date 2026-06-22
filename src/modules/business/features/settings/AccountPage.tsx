@@ -11,6 +11,7 @@ import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { setLocale, getLocale } from '@/core/i18n';
 import { useAuth } from '@/core/auth/use-auth';
 import { getAuthErrorKey, isPasswordResetUserNotFound } from '@/core/auth/auth-errors';
+import { typographyClasses, mutedBodySm } from '@/design-system/tokens/typography';
 
 export function AccountPage() {
   const { t } = useTranslation();
@@ -58,7 +59,7 @@ export function AccountPage() {
               </div>
               <div className="flex flex-col gap-2">
                 <Label>{t('account.password')}</Label>
-                <p className="text-sm text-muted-foreground">{t('account.passwordHint')}</p>
+                <p className={mutedBodySm}>{t('account.passwordHint')}</p>
                 <Button
                   type="button"
                   variant="outline"

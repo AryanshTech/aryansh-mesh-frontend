@@ -5,6 +5,7 @@ import { Blocks, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
 import { Button } from '@/design-system/components/ui/button';
+import { Card, CardContent } from '@/design-system/components/ui/card';
 import {
   Empty,
   EmptyContent,
@@ -23,10 +24,8 @@ import {
   TableRow,
 } from '@/design-system/components/ui/table';
 import { ConfirmDialog } from '@/shared/components/crm/ConfirmDialog';
-import { FeatureListShell } from '@/shared/components/crm/FeatureListShell';
-import { StatusBadge } from '@/shared/components/crm/StatusBadge';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
-import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { LinearPageHeader, LinearStatCard, LinearStatusBadge } from '@/shared/components/linear';
 import {
   useContentCollections,
   useDeleteContentCollection,
@@ -34,6 +33,7 @@ import {
 import { usePermissions } from '@/core/permissions/use-permissions';
 import { useTenantScope } from '@/modules/business/hooks/use-tenant-scope';
 import { ApiError } from '@/modules/business/types/api';
+import { typographyClasses } from '@/design-system/tokens/typography';
 
 export function ContentCollectionListPage() {
   const { t } = useTranslation();
@@ -82,17 +82,15 @@ export function ContentCollectionListPage() {
 
   return (
     <CrmPageShell>
-      <PageHeader
+      <LinearPageHeader
+        title={t('pages.content')}
         description={t('content.subtitle')}
-        breadcrumbs={
+        metaPills={
           isWorkspace
-            ? [
-                { label: t('admin.tenants.title'), href: '/admin/tenants' },
-                { label: t('pages.content') },
-              ]
+            ? [{ id: 'workspace', label: t('admin.tenants.title'), value: t('pages.content') }]
             : undefined
         }
-        action={
+        actions={
           canEdit ? (
             <Button asChild>
               <Link to={path('/content/new')}>
@@ -103,6 +101,10 @@ export function ContentCollectionListPage() {
           ) : undefined
         }
       />
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <LinearStatCard label={t('pages.content')} value={items.length} icon={Blocks} />
+      </div>
 
       {items.length === 0 ? (
         <Empty>
@@ -122,7 +124,8 @@ export function ContentCollectionListPage() {
           )}
         </Empty>
       ) : (
-        <FeatureListShell>
+        <Card className="overflow-hidden">
+          <CardContent dense className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
@@ -138,11 +141,16 @@ export function ContentCollectionListPage() {
                 <TableRow key={collection.id}>
                   <TableCell className="font-medium">{collection.label}</TableCell>
                   <TableCell>
-                    <code className="text-xs">{collection.key}</code>
+                    <code className={typographyClasses.mono}>{collection.key}</code>
                   </TableCell>
                   <TableCell>{collection.items.length}</TableCell>
                   <TableCell>
-                    <StatusBadge status={collection.status} />
+                    <LinearStatusBadge
+                      label={t(`common.status.${collection.status.toLowerCase()}`, {
+                        defaultValue: collection.status,
+                      })}
+                      variant={collection.status.toLowerCase() === 'published' ? 'active' : 'muted'}
+                    />
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
@@ -164,7 +172,8 @@ export function ContentCollectionListPage() {
               ))}
             </TableBody>
           </Table>
-        </FeatureListShell>
+          </CardContent>
+        </Card>
       )}
 
       <ConfirmDialog

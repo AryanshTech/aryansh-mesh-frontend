@@ -29,6 +29,7 @@ export function useTenantScope() {
 
   return {
     tenantId,
+    hasTenantContext: Boolean(tenantId),
     isWorkspace,
     basePath,
     path,

@@ -5,6 +5,7 @@ import { MessageSquareQuote, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
 import { Button } from '@/design-system/components/ui/button';
+import { Card, CardContent } from '@/design-system/components/ui/card';
 import {
   Empty,
   EmptyContent,
@@ -23,10 +24,8 @@ import {
   TableRow,
 } from '@/design-system/components/ui/table';
 import { ConfirmDialog } from '@/shared/components/crm/ConfirmDialog';
-import { FeatureListShell } from '@/shared/components/crm/FeatureListShell';
-import { StatusBadge } from '@/shared/components/crm/StatusBadge';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
-import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { LinearPageHeader, LinearStatCard, LinearStatusBadge } from '@/shared/components/linear';
 import {
   useDeleteTestimonial,
   useTestimonials,
@@ -82,17 +81,15 @@ export function TestimonialListPage() {
 
   return (
     <CrmPageShell>
-      <PageHeader
+      <LinearPageHeader
+        title={t('pages.testimonials')}
         description={t('testimonials.subtitle')}
-        breadcrumbs={
+        metaPills={
           isWorkspace
-            ? [
-                { label: t('admin.tenants.title'), href: '/admin/tenants' },
-                { label: t('pages.testimonials') },
-              ]
+            ? [{ id: 'workspace', label: t('admin.tenants.title'), value: t('pages.testimonials') }]
             : undefined
         }
-        action={
+        actions={
           canEdit ? (
             <Button asChild>
               <Link to={path('/testimonials/new')}>
@@ -103,6 +100,10 @@ export function TestimonialListPage() {
           ) : undefined
         }
       />
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <LinearStatCard label={t('pages.testimonials')} value={items.length} icon={MessageSquareQuote} />
+      </div>
 
       {items.length === 0 ? (
         <Empty>
@@ -122,7 +123,8 @@ export function TestimonialListPage() {
           )}
         </Empty>
       ) : (
-        <FeatureListShell>
+        <Card className="overflow-hidden">
+          <CardContent dense className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
@@ -138,7 +140,12 @@ export function TestimonialListPage() {
                   <TableCell className="font-medium">{testimonial.author}</TableCell>
                   <TableCell>{testimonial.rating}/5</TableCell>
                   <TableCell>
-                    <StatusBadge status={testimonial.status} />
+                    <LinearStatusBadge
+                      label={t(`common.status.${testimonial.status.toLowerCase()}`, {
+                        defaultValue: testimonial.status,
+                      })}
+                      variant={testimonial.status.toLowerCase() === 'published' ? 'active' : 'muted'}
+                    />
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
@@ -162,7 +169,8 @@ export function TestimonialListPage() {
               ))}
             </TableBody>
           </Table>
-        </FeatureListShell>
+          </CardContent>
+        </Card>
       )}
 
       <ConfirmDialog

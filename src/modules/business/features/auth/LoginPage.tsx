@@ -9,6 +9,8 @@ import { getAuthErrorKey } from '@/core/auth/auth-errors';
 import { getPostLoginPath } from '@/modules/business/navigation';
 import { ApiError } from '@/modules/business/types/api';
 import { layout } from '@/design-system/tokens/layout';
+import { typographyClasses } from '@/design-system/tokens/typography';
+import { cn } from '@/design-system/lib/utils';
 import { AuthShell } from '@/shell/AuthShell';
 import { AuthFormCard } from '@/shared/components/layout/AuthFormCard';
 import { Alert, AlertDescription } from '@/design-system/components/ui/alert';
@@ -90,13 +92,13 @@ export function LoginPage() {
           description={t('auth.welcomeSubtitle')}
           footer={
             <>
-              <p className="text-center text-sm text-muted-foreground">
+              <p className={cn('text-center', typographyClasses.bodySm, 'text-muted-foreground')}>
                 {t('auth.noAccount')}{' '}
                 <Button variant="link" size="sm" asChild className="h-auto p-0">
                   <Link to="/accept-invite">{t('auth.acceptInviteCta')}</Link>
                 </Button>
               </p>
-              <p className="text-center text-xs text-muted-foreground leading-relaxed">
+              <p className={cn('text-center', typographyClasses.caption)}>
                 {t('auth.signInFootnote')}
               </p>
             </>

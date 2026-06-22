@@ -42,6 +42,7 @@ import { useInviteOwner } from '@/modules/business/features/admin/use-invite';
 import { useTenant } from '@/modules/business/features/admin/use-tenants';
 import { formatDate } from '@/modules/business/navigation';
 import { getLocale } from '@/core/i18n';
+import { typographyClasses, mutedBodySm } from '@/design-system/tokens/typography';
 import { ApiError } from '@/modules/business/types/api';
 
 const inviteSchema = z.object({
@@ -243,8 +244,8 @@ function DetailField({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-sm text-muted-foreground">{label}</span>
-      <span className="text-sm font-medium">{value}</span>
+      <span className={mutedBodySm}>{label}</span>
+      <span className={typographyClasses.button}>{value}</span>
     </div>
   );
 }

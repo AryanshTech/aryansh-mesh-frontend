@@ -6,8 +6,7 @@ import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
 import { Badge } from '@/design-system/components/ui/badge';
 import { Button } from '@/design-system/components/ui/button';
-import { StatusBadge } from '@/shared/components/crm/StatusBadge';
-import { FeatureListShell } from '@/shared/components/crm/FeatureListShell';
+import { Card, CardContent } from '@/design-system/components/ui/card';
 import {
   Empty,
   EmptyContent,
@@ -27,7 +26,7 @@ import {
 } from '@/design-system/components/ui/table';
 import { ConfirmDialog } from '@/shared/components/crm/ConfirmDialog';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
-import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { LinearPageHeader, LinearStatCard, LinearStatusBadge } from '@/shared/components/linear';
 import { useDeleteLocation, useLocations } from '@/modules/business/features/locations/use-locations';
 import { usePermissions } from '@/core/permissions/use-permissions';
 import { useTenantScope } from '@/modules/business/hooks/use-tenant-scope';
@@ -80,17 +79,15 @@ export function LocationListPage() {
 
   return (
     <CrmPageShell>
-      <PageHeader
+      <LinearPageHeader
+        title={t('pages.locations')}
         description={t('locations.subtitle')}
-        breadcrumbs={
+        metaPills={
           isWorkspace
-            ? [
-                { label: t('admin.tenants.title'), href: '/admin/tenants' },
-                { label: t('pages.locations') },
-              ]
+            ? [{ id: 'workspace', label: t('admin.tenants.title'), value: t('pages.locations') }]
             : undefined
         }
-        action={
+        actions={
           canEdit ? (
             <Button asChild>
               <Link to={path('/locations/new')}>
@@ -101,6 +98,10 @@ export function LocationListPage() {
           ) : undefined
         }
       />
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <LinearStatCard label={t('pages.locations')} value={items.length} icon={MapPin} />
+      </div>
 
       {items.length === 0 ? (
         <Empty>
@@ -120,7 +121,8 @@ export function LocationListPage() {
           )}
         </Empty>
       ) : (
-        <FeatureListShell>
+        <Card className="overflow-hidden">
+          <CardContent dense className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
@@ -148,13 +150,18 @@ export function LocationListPage() {
                     </div>
                   </TableCell>
                   <TableCell>{location.city || '—'}</TableCell>
-                  <TableCell className="text-muted-foreground text-sm">
+                  <TableCell className="text-muted-foreground">
                     {location.latitude != null && location.longitude != null
                       ? `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`
                       : '—'}
                   </TableCell>
                   <TableCell>
-                    <StatusBadge status={location.status} />
+                    <LinearStatusBadge
+                      label={t(`common.status.${location.status.toLowerCase()}`, {
+                        defaultValue: location.status,
+                      })}
+                      variant={location.status.toLowerCase() === 'published' ? 'active' : 'muted'}
+                    />
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-1">
@@ -174,7 +181,8 @@ export function LocationListPage() {
               ))}
             </TableBody>
           </Table>
-        </FeatureListShell>
+          </CardContent>
+        </Card>
       )}
 
       <ConfirmDialog

@@ -40,6 +40,8 @@ import { usePermissions } from '@/core/permissions/use-permissions';
 import { useTenantScope } from '@/modules/business/hooks/use-tenant-scope';
 import { queryKeys } from '@/modules/business/api/query-keys';
 import { ApiError } from '@/modules/business/types/api';
+import { typographyClasses, mutedBodySm } from '@/design-system/tokens/typography';
+import { cn } from '@/design-system/lib/utils';
 
 const itemSchema = z.object({
   id: z.string().optional(),
@@ -205,7 +207,7 @@ export function ContentCollectionFormPage() {
                       <FormControl>
                         <Input {...field} disabled={!canEdit} placeholder="prices" />
                       </FormControl>
-                      <p className="text-xs text-muted-foreground">{t('content.form.keyHint')}</p>
+                      <p className={typographyClasses.caption}>{t('content.form.keyHint')}</p>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -293,7 +295,7 @@ export function ContentCollectionFormPage() {
                 </div>
 
                 {fields.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">{t('content.form.noItems')}</p>
+                  <p className={mutedBodySm}>{t('content.form.noItems')}</p>
                 ) : (
                   fields.map((field, index) => {
                     const itemId = form.watch(`items.${index}.id`);
@@ -301,7 +303,7 @@ export function ContentCollectionFormPage() {
                     return (
                       <Card key={field.id}>
                         <CardHeader className="flex flex-row items-center justify-between py-3">
-                          <CardTitle className="text-sm font-medium">
+                          <CardTitle className={typographyClasses.button}>
                             {t('content.form.itemNumber', { number: index + 1 })}
                           </CardTitle>
                           {canEdit && (
@@ -370,7 +372,7 @@ export function ContentCollectionFormPage() {
                             </div>
                           )}
                           {isNew && (
-                            <p className="md:col-span-2 text-xs text-muted-foreground">
+                            <p className={cn('md:col-span-2', typographyClasses.caption)}>
                               {t('content.form.saveBeforeImage')}
                             </p>
                           )}

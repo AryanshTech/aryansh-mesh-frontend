@@ -28,6 +28,20 @@
       "suspended": "Suspended"
     }
   },
+  "admin": {
+    "subtitle": "Manage Marketing Hub user roles",
+    "stats": {
+      "team": "Team",
+      "admins": "Admins"
+    },
+    "table": {
+      "title": "Team members",
+      "email": "Email",
+      "name": "Name",
+      "role": "Role",
+      "joined": "Joined"
+    }
+  },
   "auth": {
     "loginTitle": "Sign in to Business Manager",
     "loginSubtitle": "Manage your business content in one place.",
@@ -101,6 +115,29 @@
       "dark": "Dark",
       "system": "System"
     },
+    "commandCenter": "Command Center",
+    "notifications": "Notifications",
+    "zone": {
+      "business": "Business Hub",
+      "marketing": "Marketing Agency",
+      "platform": "Platform Admin"
+    },
+    "sections": {
+      "overview": "Overview",
+      "catalog": "Catalog & content",
+      "operations": "Operations",
+      "website": "Website",
+      "marketingOverview": "Overview",
+      "intelligence": "Intelligence",
+      "content": "Content",
+      "pipeline": "Pipeline"
+    },
+    "contextHint": {
+      "platform": "Platform administration",
+      "workspaceNamed": "Managing {{name}} workspace",
+      "projectNamed": "Project: {{name}}",
+      "companyNamed": "Company: {{name}}"
+    },
     "commandPalette": {
       "title": "Command palette",
       "description": "Jump to any page in the CRM",
@@ -116,11 +153,21 @@
     "adminHub": {
       "businesses": "Businesses",
       "marketing": "Marketing",
+      "hubHome": "Hub home",
+      "viewAllBusinesses": "View all businesses",
+      "recentBusinesses": "Recent businesses",
+      "searchBusinesses": "Search businesses…",
+      "openWorkspace": "Open workspace",
+      "noRecentBusinesses": "No recent businesses. Open one from the list.",
+      "noRecentCompanies": "No recent companies.",
+      "noSearchResults": "No businesses match your search.",
       "noBusinesses": "No businesses yet. Create one to get started.",
       "noCompanies": "No marketing companies yet.",
       "noProjects": "No projects for {{company}} yet.",
       "backToBusinesses": "All businesses",
       "backToAll": "All workspaces",
+      "backToAgency": "Agency",
+      "backToCompanyProjects": "Company projects",
       "businessWorkspace": "Business workspace",
       "marketingCompany": "Marketing company",
       "loadingBusiness": "Loading business…",
@@ -139,7 +186,10 @@
   "nav": {
     "appName": "Aryansh Mesh",
     "dashboard": "Dashboard",
-    "dashboardDescription": "Overview and key metrics",
+    "overview": "Overview",
+    "overviewDescription": "Business hub overview and key metrics",
+    "catalog": "Catalog",
+    "catalogDescription": "Product catalog",
     "profile": "Business profile",
     "profileDescription": "Company details and branding",
     "locations": "Locations",
@@ -345,6 +395,34 @@
       "refreshing": "Updating stats…",
       "recentActivity": "Recent activity",
       "noActivity": "No recent activity",
+      "welcome": {
+        "title": "Business Hub Overview",
+        "subtitle": "Monitoring SMB tenant activity and real-time revenue signals."
+      },
+      "liveSignals": "Live Signals",
+      "exportReport": "Export Report",
+      "selectBusiness": {
+        "title": "Select a business to view the dashboard",
+        "description": "Open a business workspace to see stats, activity, and publish status.",
+        "action": "Open business workspace"
+      },
+      "missingTenant": {
+        "title": "Missing business context",
+        "description": "Your account is not linked to a business. Contact your administrator."
+      },
+      "gettingStarted": {
+        "title": "Get started",
+        "description": "Add your first product or client to populate the dashboard.",
+        "addProduct": "Add product",
+        "addClient": "Add client"
+      },
+      "insight": {
+        "title": "Insight",
+        "unpublished": "You have unpublished changes ready to deploy."
+      },
+      "publish": {
+        "neverPublished": "Your site has not been published yet."
+      },
       "stats": {
         "products": "Products",
         "clients": "Clients",
@@ -353,8 +431,14 @@
         "publish": "Publish status"
       },
       "activity": {
+        "name": "Name",
+        "customer": "Customer",
         "type": "Type",
-        "date": "Date"
+        "date": "Time",
+        "value": "Value",
+        "status": "Status",
+        "clientAdded": "New client",
+        "bookingReceived": "New booking"
       }
     },
     "onboarding": {
@@ -409,7 +493,8 @@
       "table": {
         "name": "Name",
         "price": "Price",
-        "status": "Status"
+        "status": "Status",
+        "category": "Category"
       },
       "form": {
         "title": "Product",
@@ -1266,6 +1351,212 @@
           "creative": "Creative"
         }
       }
+    }
+  },
+  "linear": {
+    "shell": {
+      "productContext": "Marketing / Business",
+      "create": "Create"
+    },
+    "insight": {
+      "badge": "Intelligence"
+    },
+    "dashboard": {
+      "totalRevenue": "Total Revenue",
+      "revenueValue": "$142,850.00",
+      "activeOrders": "Active Orders",
+      "newBookings": "New Bookings",
+      "convRate": "Conv. Rate",
+      "recentActivity": "Recent Customer Activity",
+      "viewAll": "View All",
+      "aiRecommendation": "AI Recommendation",
+      "aiRecommendationDescription": "Tenant activity suggests a 14% uptick in booking requests for Q3. Consider scaling EU-West nodes.",
+      "visualizationTitle": "Data Visualization Layer",
+      "visualizationDescription": "Connecting to real-time marketing data streams. Predictive GTM signals will populate here automatically.",
+      "fabLabel": "Open AI assistant"
+    },
+    "ai": {
+      "engine": "AI Engine",
+      "activeContexts": "Active Contexts",
+      "defaultContext": "Q4 Strategy",
+      "synthesizing": "Synthesizing rival data…",
+      "toneAnalysis": "Tone Analysis",
+      "matchingVoice": "Matching brand voice…",
+      "recentThinking": "Recent Thinking",
+      "thinkingSnippet": "Identified correlation between competitor post timing and market sentiment dip. Suggesting counter-post for Wednesday morning.",
+      "askPlaceholder": "Ask AI…",
+      "send": "Send message"
+    },
+    "catalog": {
+      "title": "Product Catalog",
+      "subtitle": "Manage your agency's service offerings, software tools, and pricing tiers.",
+      "filters": "Filters",
+      "newProduct": "New Product",
+      "totalProducts": "Total Products",
+      "activeServices": "Active Services",
+      "avgMargin": "Avg. Margin",
+      "inventoryValue": "Inventory Value",
+      "live": "Live",
+      "tabAll": "All Products",
+      "tabServices": "Services",
+      "tabSoftware": "Software",
+      "sortName": "Sort: Name (A-Z)",
+      "cost": "Cost",
+      "margin": "Margin",
+      "showing": "Showing {{from}} to {{to}} of {{total}} products",
+      "insightTitle": "GTM Optimization Signal",
+      "insightDescription": "Our AI analyzed your catalog. Consider prioritizing high-margin packages in your next campaign.",
+      "acceptRecommendation": "Accept Recommendation",
+      "dismiss": "Dismiss",
+      "categoryBreakdown": "Category Breakdown"
+    },
+    "publish": {
+      "title": "Publishing Center",
+      "publishToWebsite": "Publish to Website",
+      "liveProduction": "Live Production",
+      "currentVersion": "Current Version",
+      "visitorsToday": "Visitors today",
+      "stagedChanges": "Staged Changes",
+      "updatesPending": "{{count}} Updates Pending",
+      "modifiedBy": "Modified by team",
+      "manifestPreview": "Metadata Manifest Preview",
+      "pageTitle": "Page Title",
+      "ogDescription": "OG Description",
+      "ogDescriptionDefault": "The unified command center for high-stakes marketing and GTM strategies.",
+      "ogImage": "OG Image Preview",
+      "snapshotHistory": "Snapshot History",
+      "snapshotLive": "Snapshot #{{number}} (Live)",
+      "snapshotPrevious": "Snapshot #{{number}}",
+      "snapshotOlder": "Previous release",
+      "viewAuditLogs": "View Audit Logs",
+      "apiConnected": "API Server: Connected",
+      "cdnOptimized": "Assets CDN: Optimized",
+      "cluster": "Cluster: us-east-prod-01",
+      "secure": "SECURE",
+      "statusTitle": "Publish Status",
+      "previewLive": "Preview Live",
+      "domain": "Domain",
+      "health": "Health",
+      "deploySnapshot": "Deploy Snapshot",
+      "entities": {
+        "products": "Products",
+        "services": "Services",
+        "content": "Content",
+        "collections": "Content collections",
+        "locations": "Locations",
+        "testimonials": "Testimonials",
+        "business": "Business profile",
+        "settings": "Settings"
+      }
+    },
+    "bookings": {
+      "inbox": "Inbox",
+      "inquiry": "Inquiry",
+      "inquiryTitle": "Inquiry: {{service}}",
+      "assignedTo": "Assigned to your team",
+      "archive": "Archive",
+      "accept": "Accept Booking",
+      "projectDescription": "Project Description",
+      "noDescription": "No description provided.",
+      "noEmail": "No email on file",
+      "gtmIntelligence": "GTM Intelligence",
+      "gtmDescription": "High-intent lead based on recent activity signals.",
+      "requestedSlot": "Requested Slot",
+      "reschedule": "Reschedule",
+      "leadHistory": "Lead History",
+      "inquiryReceived": "Inquiry Received",
+      "autoResponse": "Auto-Response Sent",
+      "autoResponseTime": "Shortly after inquiry",
+      "internalNotes": "Internal Notes",
+      "notesPlaceholder": "Add a private note…",
+      "serviceRequested": "Service Requested",
+      "estimatedBudget": "Estimated Budget",
+      "budgetPlaceholder": "$2,400 – $5,000",
+      "archiveSuccess": "Inquiry archived",
+      "acceptSuccess": "Booking accepted"
+    },
+    "overview": {
+      "title": "Marketing Overview",
+      "aiCapacity": "AI Capacity",
+      "activeRisks": "Active Risks",
+      "gtmProgress": "Weekly GTM Progress",
+      "health": "Health",
+      "crmPipeline": "CRM Pipeline",
+      "totalPipeline": "Total Pipeline",
+      "proposalSent": "Proposal Sent",
+      "negotiation": "Negotiation",
+      "discovery": "Discovery",
+      "strategicInsight": "Strategic Insight",
+      "strategicInsightDescription": "Competitor activity suggests a tactical pivot for active Write-stage projects.",
+      "clientHealth": "Client Portfolio Health",
+      "systemNominal": "System nominal",
+      "budget": "Budget",
+      "liveBadge": "LIVE: 12 BATTLECARDS",
+      "hotLeads": "Hot Leads"
+    },
+    "project": {
+      "phaseLabel": "Phase {{n}}",
+      "phases": {
+        "spy": "Spy",
+        "write": "Write",
+        "film": "Film",
+        "publish": "Publish"
+      },
+      "activeMonitoring": "Active Monitoring",
+      "draftsPending": "{{count}} Drafts Pending",
+      "scheduledWed": "Scheduled for Wed",
+      "calendarLocked": "Calendar Locked",
+      "competitorRadar": "Competitor Intel Radar",
+      "realtime": "Real-time",
+      "competitorA": "Competitor A",
+      "redditCommunity": "Reddit Community",
+      "radarSnippet": "New campaign activity detected with rising engagement.",
+      "writingQueue": "Writing Queue (AI Generated)",
+      "reviewAll": "Review All",
+      "assetName": "Asset Name",
+      "tone": "Tone",
+      "status": "Status",
+      "thoughtLeader": "Thought Leader",
+      "socialCalendar": "Social Calendar",
+      "linkedinPost": "LinkedIn Post",
+      "twitterSpace": "Twitter Space",
+      "publishDensity": "Publish Density",
+      "peakEngagement": "Peak engagement predicted for Wednesday morning.",
+      "workflowTab": "Workflow",
+      "analyticsTab": "Analytics",
+      "subNav": "Project navigation",
+      "counterStrategy": "Counter-Strategy Ready",
+      "otmSignal": "GTM Signal Price Edge",
+      "weekLabel": "Week 42",
+      "calendarDay": "Mon 14"
+    },
+    "studio": {
+      "pendingDrafts": "Pending Drafts",
+      "draftTitle": "Draft: {{title}}",
+      "reviewingAgent": "Reviewing AI-generated output",
+      "edit": "Edit",
+      "regenerate": "Regenerate",
+      "noContent": "No content body available.",
+      "intelligenceContext": "Intelligence Context",
+      "brandMemory": "Brand Memory Active",
+      "brandVoiceHint": "Avoid hype. Use sophisticated vocabulary focused on long-term ROI.",
+      "systemInstructions": "System Instructions",
+      "systemInstructionsPreview": "Create professional, high-density GTM content aligned with brand memory.",
+      "gtmSignals": "GTM Signals",
+      "agentLabel": "Agent output"
+    },
+    "crm": {
+      "createDeal": "Create Deal",
+      "owner": "Owner",
+      "allAgents": "All Agents",
+      "date": "Date",
+      "last30Days": "Last 30 Days",
+      "searchDeals": "Search deals…",
+      "archiveWon": "Archive · Won",
+      "archiveLost": "Archive · Lost",
+      "priorityHigh": "High Priority",
+      "aiProbability": "AI Win Probability: {{pct}}%",
+      "dealOwner": "Assigned agent"
     }
   }
 }

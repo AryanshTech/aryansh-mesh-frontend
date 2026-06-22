@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Plus, ExternalLink } from 'lucide-react';
+import { Plus, ExternalLink, Search } from 'lucide-react';
 import { Button } from '@/design-system/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
 import { Badge } from '@/design-system/components/ui/badge';
 import { Card, CardContent } from '@/design-system/components/ui/card';
+import { Input } from '@/design-system/components/ui/input';
 import {
   Table,
   TableBody,
@@ -31,11 +32,13 @@ import {
 } from '@/design-system/components/ui/empty';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
-import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { ShellPageActions } from '@/shared/components/layout/ShellPageActions';
+import { LinearPageHeader } from '@/shared/components/linear';
 import { useTenants } from '@/modules/business/features/admin/use-tenants';
 import { formatDate } from '@/modules/business/navigation';
 import { getLocale } from '@/core/i18n';
+import { buildTenantWorkspacePath } from '@/shell/navigation';
+import { recordRecentTenant } from '@/shell/recent-workspaces';
 
 const PAGE_SIZE = 20;
 
@@ -43,22 +46,52 @@ export function TenantListPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
+  const [query, setQuery] = useState('');
   const locale = getLocale();
   const { data, isLoading, isError, refetch } = useTenants(page, PAGE_SIZE);
 
+  const filteredItems = useMemo(() => {
+    const items = data?.items ?? [];
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) return items;
+    return items.filter(
+      (tenant) =>
+        tenant.name.toLowerCase().includes(normalized) ||
+        tenant.slug.toLowerCase().includes(normalized),
+    );
+  }, [data?.items, query]);
+
+  const openWorkspace = (tenantId: string, tenantName: string) => {
+    const path = buildTenantWorkspacePath(tenantId, 'dashboard');
+    recordRecentTenant({ id: tenantId, name: tenantName, lastPath: path });
+    navigate(path);
+  };
+
   return (
     <CrmPageShell>
-      <PageHeader
+      <LinearPageHeader
+        title={t('admin.tenants.title')}
         description={t('admin.tenants.description')}
-        action={
+        actions={
           <ShellPageActions>
             <Button onClick={() => navigate('/admin/tenants/new')}>
-              <Plus />
+              <Plus data-icon="inline-start" />
               {t('admin.tenants.create')}
             </Button>
           </ShellPageActions>
         }
       />
+
+      <div className="relative max-w-md">
+        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder={t('shell.adminHub.searchBusinesses')}
+          className="pl-9"
+          aria-label={t('shell.adminHub.searchBusinesses')}
+        />
+      </div>
 
       <Card>
         <CardContent className="p-0">
@@ -98,7 +131,15 @@ export function TenantListPage() {
             </Empty>
           )}
 
-          {!isLoading && !isError && data && data.items.length > 0 && (
+          {!isLoading && !isError && data && data.items.length > 0 && filteredItems.length === 0 && (
+            <Empty className="border-0 py-8">
+              <EmptyHeader>
+                <EmptyTitle>{t('shell.adminHub.noSearchResults')}</EmptyTitle>
+              </EmptyHeader>
+            </Empty>
+          )}
+
+          {!isLoading && !isError && data && filteredItems.length > 0 && (
             <>
               <Table>
                 <TableHeader>
@@ -107,16 +148,23 @@ export function TenantListPage() {
                     <TableHead>{t('admin.tenants.table.slug')}</TableHead>
                     <TableHead>{t('admin.tenants.table.status')}</TableHead>
                     <TableHead>{t('admin.tenants.table.createdAt')}</TableHead>
-                    <TableHead className="w-[140px] text-right">{t('common.edit')}</TableHead>
+                    <TableHead className="w-[180px] text-right">{t('shell.adminHub.openWorkspace')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data.items.map((tenant) => (
+                  {filteredItems.map((tenant) => (
                     <TableRow key={tenant.id}>
                       <TableCell className="font-medium">
                         <Link
                           to={`/admin/tenants/${tenant.id}`}
                           className="text-foreground hover:text-primary"
+                          onClick={() =>
+                            recordRecentTenant({
+                              id: tenant.id,
+                              name: tenant.name,
+                              lastPath: `/admin/tenants/${tenant.id}`,
+                            })
+                          }
                         >
                           {tenant.name}
                         </Link>
@@ -136,23 +184,16 @@ export function TenantListPage() {
                         {formatDate(tenant.createdAt, locale)}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button
-                          size="sm"
-                          onClick={() =>
-                            navigate(
-                              `/admin/tenants/${tenant.id}/workspace/dashboard`,
-                            )
-                          }
-                        >
-                          <ExternalLink className="size-4" />
-                          {t('admin.tenants.detail.manageTenant')}
+                        <Button size="sm" onClick={() => openWorkspace(tenant.id, tenant.name)}>
+                          <ExternalLink data-icon="inline-start" />
+                          {t('shell.adminHub.openWorkspace')}
                         </Button>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-              {data.totalPages > 1 && (
+              {!query.trim() && data.totalPages > 1 && (
                 <Pagination className="p-4">
                   <PaginationContent>
                     <PaginationItem>

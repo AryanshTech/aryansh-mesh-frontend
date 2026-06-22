@@ -54,8 +54,18 @@ export function getLocale(): Locale {
   return i18n.language === 'fr' ? 'fr' : 'en';
 }
 
-export function t(key: string, params?: Record<string, string | number>): string {
+export function t(key: string, params?: Record<string, unknown>): string {
   return i18n.t(key, params);
+}
+
+export function safeT(
+  key: string,
+  defaultValue: string,
+  params?: Record<string, unknown>,
+): string {
+  const resolvedKey = resolveTranslationKey(key);
+  if (!i18n.exists(resolvedKey)) return defaultValue;
+  return i18n.t(resolvedKey, params);
 }
 
 const localeTag: Record<'en' | 'fr', string> = { en: 'en-US', fr: 'fr-CA' };

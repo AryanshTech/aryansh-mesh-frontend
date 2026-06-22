@@ -26,6 +26,7 @@ import { usePermissions } from '@/core/permissions/use-permissions';
 import { useTenantScope } from '@/modules/business/hooks/use-tenant-scope';
 import { useWorkspaceBreadcrumbs } from '@/modules/business/hooks/use-workspace-breadcrumbs';
 import { ApiError } from '@/modules/business/types/api';
+import { typographyClasses } from '@/design-system/tokens/typography';
 
 const schema = z.object({
   legalName: z.string().min(1),
@@ -279,7 +280,7 @@ export function BusinessPage() {
                       disabled={!canEdit}
                     />
                   </FormControl>
-                  <p className="text-xs text-muted-foreground">
+                  <p className={typographyClasses.caption}>
                     {t('business.form.allowedWebsiteOriginsHint')}
                   </p>
                   <FormMessage />

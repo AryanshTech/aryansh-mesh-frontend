@@ -39,6 +39,7 @@ import { usePermissions } from '@/core/permissions/use-permissions';
 import { useTenantScope } from '@/modules/business/hooks/use-tenant-scope';
 import { queryKeys } from '@/modules/business/api/query-keys';
 import { ApiError } from '@/modules/business/types/api';
+import { typographyClasses } from '@/design-system/tokens/typography';
 
 const schema = z.object({
   name: z.string().min(1),
@@ -288,7 +289,7 @@ export function LocationFormPage() {
 
               <div className="space-y-2">
                 <Label>{t('locations.form.coordinates')}</Label>
-                <p className="text-xs text-muted-foreground">{t('locations.form.coordinatesHint')}</p>
+                <p className={typographyClasses.caption}>{t('locations.form.coordinatesHint')}</p>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <FormField
                     control={form.control}
@@ -365,7 +366,7 @@ export function LocationFormPage() {
               {!isNew && (
                 <div className="flex flex-col gap-3">
                   <Label>{t('locations.form.images')}</Label>
-                  <p className="text-xs text-muted-foreground">{t('locations.form.imagesHint')}</p>
+                  <p className={typographyClasses.caption}>{t('locations.form.imagesHint')}</p>
                   {images.length > 0 && (
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                       {images.map((image, index) => (

@@ -5,6 +5,7 @@ import { DollarSign, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
 import { Button } from '@/design-system/components/ui/button';
+import { Card, CardContent } from '@/design-system/components/ui/card';
 import {
   Empty,
   EmptyContent,
@@ -23,9 +24,8 @@ import {
   TableRow,
 } from '@/design-system/components/ui/table';
 import { ConfirmDialog } from '@/shared/components/crm/ConfirmDialog';
-import { FeatureListShell } from '@/shared/components/crm/FeatureListShell';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
-import { PageHeader } from '@/shared/components/crm/PageHeader';
+import { LinearPageHeader, LinearStatCard } from '@/shared/components/linear';
 import { useCosts, useDeleteCost } from '@/modules/business/features/costs/use-costs';
 import { usePermissions } from '@/core/permissions/use-permissions';
 import { useTenantScope } from '@/modules/business/hooks/use-tenant-scope';
@@ -78,17 +78,15 @@ export function CostListPage() {
 
   return (
     <CrmPageShell>
-      <PageHeader
+      <LinearPageHeader
+        title={t('pages.costs')}
         description={t('costs.subtitle')}
-        breadcrumbs={
+        metaPills={
           isWorkspace
-            ? [
-                { label: t('admin.tenants.title'), href: '/admin/tenants' },
-                { label: t('pages.costs') },
-              ]
+            ? [{ id: 'workspace', label: t('admin.tenants.title'), value: t('pages.costs') }]
             : undefined
         }
-        action={
+        actions={
           canEdit ? (
             <Button asChild>
               <Link to={path('/costs/new')}>
@@ -99,6 +97,10 @@ export function CostListPage() {
           ) : undefined
         }
       />
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <LinearStatCard label={t('pages.costs')} value={items.length} icon={DollarSign} />
+      </div>
 
       {items.length === 0 ? (
         <Empty>
@@ -118,7 +120,8 @@ export function CostListPage() {
           )}
         </Empty>
       ) : (
-        <FeatureListShell>
+        <Card className="overflow-hidden">
+          <CardContent dense className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
@@ -158,7 +161,8 @@ export function CostListPage() {
               ))}
             </TableBody>
           </Table>
-        </FeatureListShell>
+          </CardContent>
+        </Card>
       )}
 
       <ConfirmDialog

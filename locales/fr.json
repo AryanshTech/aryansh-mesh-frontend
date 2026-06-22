@@ -28,6 +28,20 @@
       "suspended": "Suspendu"
     }
   },
+  "admin": {
+    "subtitle": "Gérez les rôles utilisateurs du Marketing Hub",
+    "stats": {
+      "team": "Équipe",
+      "admins": "Administrateurs"
+    },
+    "table": {
+      "title": "Membres de l'équipe",
+      "email": "E-mail",
+      "name": "Nom",
+      "role": "Rôle",
+      "joined": "Date d'arrivée"
+    }
+  },
   "auth": {
     "loginTitle": "Connexion à Business Manager",
     "loginSubtitle": "Gérez le contenu de votre entreprise en un seul endroit.",
@@ -101,6 +115,29 @@
       "dark": "Sombre",
       "system": "Système"
     },
+    "commandCenter": "Centre de commande",
+    "notifications": "Notifications",
+    "zone": {
+      "business": "Business Hub",
+      "marketing": "Agence Marketing",
+      "platform": "Admin plateforme"
+    },
+    "sections": {
+      "overview": "Vue d'ensemble",
+      "catalog": "Catalogue et contenu",
+      "operations": "Opérations",
+      "website": "Site web",
+      "marketingOverview": "Vue d'ensemble",
+      "intelligence": "Intelligence",
+      "content": "Contenu",
+      "pipeline": "Pipeline"
+    },
+    "contextHint": {
+      "platform": "Administration plateforme",
+      "workspaceNamed": "Gestion de l'espace {{name}}",
+      "projectNamed": "Projet : {{name}}",
+      "companyNamed": "Entreprise : {{name}}"
+    },
     "commandPalette": {
       "title": "Palette de commandes",
       "description": "Accéder à n'importe quelle page du CRM",
@@ -116,11 +153,21 @@
     "adminHub": {
       "businesses": "Entreprises",
       "marketing": "Marketing",
+      "hubHome": "Accueil hub",
+      "viewAllBusinesses": "Voir toutes les entreprises",
+      "recentBusinesses": "Entreprises récentes",
+      "searchBusinesses": "Rechercher des entreprises…",
+      "openWorkspace": "Ouvrir l'espace",
+      "noRecentBusinesses": "Aucune entreprise récente. Ouvrez-en une depuis la liste.",
+      "noRecentCompanies": "Aucune entreprise récente.",
+      "noSearchResults": "Aucune entreprise ne correspond à votre recherche.",
       "noBusinesses": "Aucune entreprise pour le moment. Créez-en une pour commencer.",
       "noCompanies": "Aucune entreprise marketing pour le moment.",
       "noProjects": "Aucun projet pour {{company}} pour le moment.",
       "backToBusinesses": "Toutes les entreprises",
       "backToAll": "Tous les espaces",
+      "backToAgency": "Agence",
+      "backToCompanyProjects": "Projets de l'entreprise",
       "businessWorkspace": "Espace business",
       "marketingCompany": "Entreprise marketing",
       "loadingBusiness": "Chargement de l'entreprise…",
@@ -139,6 +186,10 @@
   "nav": {
     "appName": "Aryansh Mesh",
     "dashboard": "Tableau de bord",
+    "overview": "Vue d'ensemble",
+    "overviewDescription": "Vue d'ensemble du hub business et indicateurs clés",
+    "catalog": "Catalogue",
+    "catalogDescription": "Catalogue de produits",
     "dashboardDescription": "Aperçu et indicateurs clés",
     "profile": "Profil entreprise",
     "profileDescription": "Détails et image de marque",
@@ -345,6 +396,34 @@
       "refreshing": "Mise à jour des statistiques…",
       "recentActivity": "Activité récente",
       "noActivity": "Aucune activité récente",
+      "welcome": {
+        "title": "Vue d'ensemble Business Hub",
+        "subtitle": "Suivi de l'activité des tenants PME et des signaux de revenus en temps réel."
+      },
+      "liveSignals": "Signaux en direct",
+      "exportReport": "Exporter le rapport",
+      "selectBusiness": {
+        "title": "Sélectionnez une entreprise pour voir le tableau de bord",
+        "description": "Ouvrez un espace business pour voir les statistiques, l'activité et le statut de publication.",
+        "action": "Ouvrir l'espace business"
+      },
+      "missingTenant": {
+        "title": "Contexte business manquant",
+        "description": "Votre compte n'est pas lié à une entreprise. Contactez votre administrateur."
+      },
+      "gettingStarted": {
+        "title": "Commencer",
+        "description": "Ajoutez votre premier produit ou client pour alimenter le tableau de bord.",
+        "addProduct": "Ajouter un produit",
+        "addClient": "Ajouter un client"
+      },
+      "insight": {
+        "title": "Insight",
+        "unpublished": "Vous avez des modifications non publiées prêtes à être déployées."
+      },
+      "publish": {
+        "neverPublished": "Votre site n'a pas encore été publié."
+      },
       "stats": {
         "products": "Produits",
         "clients": "Clients",
@@ -353,8 +432,14 @@
         "publish": "Statut de publication"
       },
       "activity": {
+        "name": "Nom",
+        "customer": "Client",
         "type": "Type",
-        "date": "Date"
+        "date": "Heure",
+        "value": "Valeur",
+        "status": "Statut",
+        "clientAdded": "Nouveau client",
+        "bookingReceived": "Nouvelle réservation"
       }
     },
     "onboarding": {
@@ -409,7 +494,8 @@
       "table": {
         "name": "Nom",
         "price": "Prix",
-        "status": "Statut"
+        "status": "Statut",
+        "category": "Catégorie"
       },
       "form": {
         "title": "Produit",
@@ -1266,6 +1352,212 @@
           "creative": "Créatif"
         }
       }
+    }
+  },
+  "linear": {
+    "shell": {
+      "productContext": "Marketing / Business",
+      "create": "Créer"
+    },
+    "insight": {
+      "badge": "Intelligence"
+    },
+    "dashboard": {
+      "totalRevenue": "Revenu total",
+      "revenueValue": "142 850,00 $",
+      "activeOrders": "Commandes actives",
+      "newBookings": "Nouvelles réservations",
+      "convRate": "Taux de conv.",
+      "recentActivity": "Activité client récente",
+      "viewAll": "Tout voir",
+      "aiRecommendation": "Recommandation IA",
+      "aiRecommendationDescription": "L'activité du tenant suggère une hausse de 14 % des demandes de réservation pour le T3. Envisagez de monter en charge les nœuds EU-Ouest.",
+      "visualizationTitle": "Couche de visualisation des données",
+      "visualizationDescription": "Connexion aux flux de données marketing en temps réel. Les signaux GTM prédictifs s'afficheront ici automatiquement.",
+      "fabLabel": "Ouvrir l'assistant IA"
+    },
+    "ai": {
+      "engine": "Moteur IA",
+      "activeContexts": "Contextes actifs",
+      "defaultContext": "Stratégie T4",
+      "synthesizing": "Synthèse des données concurrentes…",
+      "toneAnalysis": "Analyse du ton",
+      "matchingVoice": "Alignement sur la voix de marque…",
+      "recentThinking": "Réflexion récente",
+      "thinkingSnippet": "Corrélation identifiée entre le timing des publications concurrentes et la baisse du sentiment marché. Contre-publication suggérée mercredi matin.",
+      "askPlaceholder": "Demander à l'IA…",
+      "send": "Envoyer le message"
+    },
+    "catalog": {
+      "title": "Catalogue produits",
+      "subtitle": "Gérez les offres de services, outils logiciels et niveaux tarifaires de votre agence.",
+      "filters": "Filtres",
+      "newProduct": "Nouveau produit",
+      "totalProducts": "Total produits",
+      "activeServices": "Services actifs",
+      "avgMargin": "Marge moy.",
+      "inventoryValue": "Valeur inventaire",
+      "live": "En ligne",
+      "tabAll": "Tous les produits",
+      "tabServices": "Services",
+      "tabSoftware": "Logiciels",
+      "sortName": "Tri : Nom (A-Z)",
+      "cost": "Coût",
+      "margin": "Marge",
+      "showing": "Affichage de {{from}} à {{to}} sur {{total}} produits",
+      "insightTitle": "Signal d'optimisation GTM",
+      "insightDescription": "Notre IA a analysé votre catalogue. Envisagez de prioriser les offres à forte marge dans votre prochaine campagne.",
+      "acceptRecommendation": "Accepter la recommandation",
+      "dismiss": "Ignorer",
+      "categoryBreakdown": "Répartition par catégorie"
+    },
+    "publish": {
+      "title": "Centre de publication",
+      "publishToWebsite": "Publier sur le site",
+      "liveProduction": "Production en ligne",
+      "currentVersion": "Version actuelle",
+      "visitorsToday": "Visiteurs aujourd'hui",
+      "stagedChanges": "Modifications en attente",
+      "updatesPending": "{{count}} mises à jour en attente",
+      "modifiedBy": "Modifié par l'équipe",
+      "manifestPreview": "Aperçu du manifeste de métadonnées",
+      "pageTitle": "Titre de la page",
+      "ogDescription": "Description OG",
+      "ogDescriptionDefault": "Le centre de commande unifié pour le marketing et les stratégies GTM à enjeux élevés.",
+      "ogImage": "Aperçu de l'image OG",
+      "snapshotHistory": "Historique des snapshots",
+      "snapshotLive": "Snapshot #{{number}} (En ligne)",
+      "snapshotPrevious": "Snapshot #{{number}}",
+      "snapshotOlder": "Version précédente",
+      "viewAuditLogs": "Voir les journaux d'audit",
+      "apiConnected": "Serveur API : Connecté",
+      "cdnOptimized": "CDN des ressources : Optimisé",
+      "cluster": "Cluster : us-east-prod-01",
+      "secure": "SÉCURISÉ",
+      "statusTitle": "Statut de publication",
+      "previewLive": "Aperçu en ligne",
+      "domain": "Domaine",
+      "health": "Santé",
+      "deploySnapshot": "Déployer le snapshot",
+      "entities": {
+        "products": "Produits",
+        "services": "Services",
+        "content": "Contenu",
+        "collections": "Collections de contenu",
+        "locations": "Emplacements",
+        "testimonials": "Témoignages",
+        "business": "Profil entreprise",
+        "settings": "Paramètres"
+      }
+    },
+    "bookings": {
+      "inbox": "Boîte de réception",
+      "inquiry": "Demande",
+      "inquiryTitle": "Demande : {{service}}",
+      "assignedTo": "Assigné à votre équipe",
+      "archive": "Archiver",
+      "accept": "Accepter la réservation",
+      "projectDescription": "Description du projet",
+      "noDescription": "Aucune description fournie.",
+      "noEmail": "Aucun e-mail enregistré",
+      "gtmIntelligence": "Intelligence GTM",
+      "gtmDescription": "Prospect à forte intention basé sur les signaux d'activité récents.",
+      "requestedSlot": "Créneau demandé",
+      "reschedule": "Replanifier",
+      "leadHistory": "Historique du prospect",
+      "inquiryReceived": "Demande reçue",
+      "autoResponse": "Réponse automatique envoyée",
+      "autoResponseTime": "Peu après la demande",
+      "internalNotes": "Notes internes",
+      "notesPlaceholder": "Ajouter une note privée…",
+      "serviceRequested": "Service demandé",
+      "estimatedBudget": "Budget estimé",
+      "budgetPlaceholder": "2 400 $ – 5 000 $",
+      "archiveSuccess": "Demande archivée",
+      "acceptSuccess": "Réservation acceptée"
+    },
+    "overview": {
+      "title": "Vue d'ensemble Marketing",
+      "aiCapacity": "Capacité IA",
+      "activeRisks": "Risques actifs",
+      "gtmProgress": "Progression GTM hebdomadaire",
+      "health": "Santé",
+      "crmPipeline": "Pipeline CRM",
+      "totalPipeline": "Pipeline total",
+      "proposalSent": "Proposition envoyée",
+      "negotiation": "Négociation",
+      "discovery": "Découverte",
+      "strategicInsight": "Insight stratégique",
+      "strategicInsightDescription": "L'activité concurrentielle suggère un pivot tactique pour les projets en phase Rédaction.",
+      "clientHealth": "Santé du portefeuille clients",
+      "systemNominal": "Système nominal",
+      "budget": "Budget",
+      "liveBadge": "EN DIRECT : 12 BATTLECARDS",
+      "hotLeads": "Prospects chauds"
+    },
+    "project": {
+      "phaseLabel": "Phase {{n}}",
+      "phases": {
+        "spy": "Veille",
+        "write": "Rédaction",
+        "film": "Tournage",
+        "publish": "Publication"
+      },
+      "activeMonitoring": "Surveillance active",
+      "draftsPending": "{{count}} brouillons en attente",
+      "scheduledWed": "Prévu pour mercredi",
+      "calendarLocked": "Calendrier verrouillé",
+      "competitorRadar": "Radar veille concurrentielle",
+      "realtime": "Temps réel",
+      "competitorA": "Concurrent A",
+      "redditCommunity": "Communauté Reddit",
+      "radarSnippet": "Nouvelle activité de campagne détectée avec engagement en hausse.",
+      "writingQueue": "File de rédaction (généré par IA)",
+      "reviewAll": "Tout examiner",
+      "assetName": "Nom de l'actif",
+      "tone": "Ton",
+      "status": "Statut",
+      "thoughtLeader": "Leader d'opinion",
+      "socialCalendar": "Calendrier social",
+      "linkedinPost": "Publication LinkedIn",
+      "twitterSpace": "Twitter Space",
+      "publishDensity": "Densité de publication",
+      "peakEngagement": "Engagement maximal prévu mercredi matin.",
+      "workflowTab": "Workflow",
+      "analyticsTab": "Analytique",
+      "subNav": "Navigation du projet",
+      "counterStrategy": "Contre-stratégie prête",
+      "otmSignal": "Signal GTM avantage prix",
+      "weekLabel": "Semaine 42",
+      "calendarDay": "Lun 14"
+    },
+    "studio": {
+      "pendingDrafts": "Brouillons en attente",
+      "draftTitle": "Brouillon : {{title}}",
+      "reviewingAgent": "Examen de la sortie générée par l'IA",
+      "edit": "Modifier",
+      "regenerate": "Régénérer",
+      "noContent": "Aucun contenu disponible.",
+      "intelligenceContext": "Contexte d'intelligence",
+      "brandMemory": "Mémoire de marque active",
+      "brandVoiceHint": "Évitez le sensationnalisme. Utilisez un vocabulaire sophistiqué axé sur le ROI à long terme.",
+      "systemInstructions": "Instructions système",
+      "systemInstructionsPreview": "Créer du contenu GTM professionnel et dense, aligné sur la mémoire de marque.",
+      "gtmSignals": "Signaux GTM",
+      "agentLabel": "Sortie agent"
+    },
+    "crm": {
+      "createDeal": "Créer une affaire",
+      "owner": "Responsable",
+      "allAgents": "Tous les agents",
+      "date": "Date",
+      "last30Days": "30 derniers jours",
+      "searchDeals": "Rechercher des affaires…",
+      "archiveWon": "Archive · Gagné",
+      "archiveLost": "Archive · Perdu",
+      "priorityHigh": "Priorité haute",
+      "aiProbability": "Probabilité IA : {{pct}} %",
+      "dealOwner": "Agent assigné"
     }
   }
 }

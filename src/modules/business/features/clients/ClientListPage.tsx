@@ -5,6 +5,7 @@ import { Plus, Trash2, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
 import { Button } from '@/design-system/components/ui/button';
+import { Card, CardContent } from '@/design-system/components/ui/card';
 import {
   Empty,
   EmptyContent,
@@ -23,10 +24,9 @@ import {
   TableRow,
 } from '@/design-system/components/ui/table';
 import { ConfirmDialog } from '@/shared/components/crm/ConfirmDialog';
-import { FeatureListShell } from '@/shared/components/crm/FeatureListShell';
 import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
-import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { ShellPageActions } from '@/shared/components/layout/ShellPageActions';
+import { LinearPageHeader, LinearStatCard } from '@/shared/components/linear';
 import { useClients, useDeleteClient } from '@/modules/business/features/clients/use-clients';
 import { usePermissions } from '@/core/permissions/use-permissions';
 import { useTenantScope } from '@/modules/business/hooks/use-tenant-scope';
@@ -79,17 +79,15 @@ export function ClientListPage() {
 
   return (
     <CrmPageShell>
-      <PageHeader
+      <LinearPageHeader
+        title={t('pages.clients')}
         description={t('clients.subtitle')}
-        breadcrumbs={
+        metaPills={
           isWorkspace
-            ? [
-                { label: t('admin.tenants.title'), href: '/admin/tenants' },
-                { label: t('pages.clients') },
-              ]
+            ? [{ id: 'workspace', label: t('admin.tenants.title'), value: t('pages.clients') }]
             : undefined
         }
-        action={
+        actions={
           canEdit ? (
             <ShellPageActions>
               <Button asChild>
@@ -102,6 +100,10 @@ export function ClientListPage() {
           ) : undefined
         }
       />
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <LinearStatCard label={t('pages.clients')} value={items.length} icon={Users} />
+      </div>
 
       {items.length === 0 ? (
         <Empty>
@@ -121,7 +123,8 @@ export function ClientListPage() {
           )}
         </Empty>
       ) : (
-        <FeatureListShell>
+        <Card className="overflow-hidden">
+          <CardContent dense className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
@@ -158,7 +161,8 @@ export function ClientListPage() {
               ))}
             </TableBody>
           </Table>
-        </FeatureListShell>
+          </CardContent>
+        </Card>
       )}
 
       <ConfirmDialog
