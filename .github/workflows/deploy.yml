@@ -43,7 +43,7 @@ jobs:
 
       - name: Build
         env:
-          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL || 'https://business-manager-api-zoqqoutu2a-nn.a.run.app' }}
         run: |
           npm ci
           npm run build

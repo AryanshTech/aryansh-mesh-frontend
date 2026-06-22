@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-22  
 **Status:** Approved for implementation  
-**Backend:** `https://business-manager-api-446539388186.northamerica-northeast1.run.app` (monolith, single Cloud Run service)  
+**Backend:** `https://business-manager-api-zoqqoutu2a-nn.a.run.app` (monolith, single Cloud Run service)  
 **Replaces:** `aryansh-mesh-frontend/` (existing codebase — full scratch rewrite, same repo directory)
 
 ---
@@ -24,7 +24,7 @@
 
 ## 2. Backend API (monolith — single base URL)
 
-**Base:** `https://business-manager-api-446539388186.northamerica-northeast1.run.app/api/v1`  
+**Base:** `https://business-manager-api-zoqqoutu2a-nn.a.run.app/api/v1`  
 **Local dev:** `http://localhost:8080/api/v1`  
 **Vite proxy:** `/api` → `http://localhost:8080`
 
@@ -368,7 +368,7 @@ Drawer footer: **Discard** (ghost) | **Save changes** (primary).
 ## 12. Environment
 
 ```env
-VITE_API_BASE_URL=https://business-manager-api-446539388186.northamerica-northeast1.run.app
+VITE_API_BASE_URL=https://business-manager-api-zoqqoutu2a-nn.a.run.app
 # local dev:
 VITE_API_BASE_URL=http://localhost:8080
 ```
