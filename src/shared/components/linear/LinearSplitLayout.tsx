@@ -51,7 +51,7 @@ export function LinearSplitLayout({
 
   return (
     <div className={cn(layout.dashboard.splitPane, className)}>
-      <ResizablePanelGroup direction="horizontal" className="min-h-0 flex-1">
+      <ResizablePanelGroup orientation="horizontal" className="min-h-0 flex-1">
         <ResizablePanel defaultSize={leftDefaultSize} minSize={15} maxSize={35}>
           {left}
         </ResizablePanel>

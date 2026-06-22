@@ -55,7 +55,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/design-system/compon
 import { Textarea } from '@/design-system/components/ui/textarea';
 import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
 import { resolveApiV1BaseUrl } from '@/core/api/config';
-import { cn } from '@/design-system/lib/utils';
 
 const STUDIO_TABS = [
   'feed',

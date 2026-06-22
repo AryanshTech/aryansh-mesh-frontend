@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { Sparkles } from 'lucide-react';
 import { Button } from '@/design-system/components/ui/button';
 import { cn } from '@/design-system/lib/utils';

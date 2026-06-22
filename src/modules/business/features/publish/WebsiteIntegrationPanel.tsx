@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import { Badge } from '@/design-system/components/ui/badge';
 import { Button } from '@/design-system/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/design-system/components/ui/card';
-import { Input } from '@/design-system/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/design-system/components/ui/tabs';
 import { Textarea } from '@/design-system/components/ui/textarea';
 import { typographyClasses, mutedBodySm } from '@/design-system/tokens/typography';

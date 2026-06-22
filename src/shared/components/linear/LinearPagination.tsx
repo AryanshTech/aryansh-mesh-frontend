@@ -15,9 +15,6 @@ type LinearPaginationProps = {
 };
 
 export function LinearPagination({
-  from,
-  to,
-  total,
   page,
   pageCount,
   onPageChange,

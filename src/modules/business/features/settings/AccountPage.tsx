@@ -11,7 +11,7 @@ import { PageHeader } from '@/shared/components/crm/PageHeader';
 import { setLocale, getLocale } from '@/core/i18n';
 import { useAuth } from '@/core/auth/use-auth';
 import { getAuthErrorKey, isPasswordResetUserNotFound } from '@/core/auth/auth-errors';
-import { typographyClasses, mutedBodySm } from '@/design-system/tokens/typography';
+import { mutedBodySm } from '@/design-system/tokens/typography';
 
 export function AccountPage() {
   const { t } = useTranslation();

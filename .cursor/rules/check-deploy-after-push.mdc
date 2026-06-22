@@ -1,0 +1,24 @@
+---
+description: Always verify deployment status after pushing deploy-triggering changes
+alwaysApply: true
+---
+
+# Check Deployment After Push
+
+After pushing changes that can trigger CI or deployment, do not stop at `git push`.
+
+## Required workflow
+
+1. Identify the repo and branch that was pushed.
+2. Check the deployment/CI status for that exact branch or commit.
+   - For GitHub repos, use `gh` commands such as `gh run list`, `gh run watch`, `gh run view`, and `gh pr checks` when applicable.
+   - For Render, Firebase, Cloudflare, or other deploy targets, use the configured CLI/MCP/tooling for that platform when available.
+3. Wait until the relevant run reaches a clear pass/fail state unless the user explicitly asks not to wait.
+4. If deployment fails, report the failing check/deploy name, the root error from logs, and the next concrete fix.
+5. If deployment passes, explicitly say which run/deploy passed.
+
+## Notes
+
+- In split repos, run checks from the repo that was pushed, not the workspace root.
+- If auth or platform access prevents checking deployment, say that clearly and provide the exact command the user should run.
+- Do not force-push, amend, or retry deploys unless the user explicitly asks.

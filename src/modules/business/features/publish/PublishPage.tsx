@@ -81,6 +81,7 @@ export function PublishPage() {
   const draftCounts = status?.draftCounts ?? {};
   const draftTotal = Object.values(draftCounts).reduce((a, b) => a + b, 0);
   const businessName = (latest?.business as { name?: string } | undefined)?.name ?? tenantSlug ?? COMPANY_SITE_URL;
+  const breadcrumbItems = breadcrumbs ?? [];
 
   const snapshots = [
     {
@@ -118,9 +119,9 @@ export function PublishPage() {
         }
       />
 
-      {breadcrumbs.length > 0 ? (
+      {breadcrumbItems.length > 0 ? (
         <p className={typographyClasses.caption}>
-          {breadcrumbs.map((b) => b.label).join(' / ')}
+          {breadcrumbItems.map((b) => b.label).join(' / ')}
         </p>
       ) : null}
 

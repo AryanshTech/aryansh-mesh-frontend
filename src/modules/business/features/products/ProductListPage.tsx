@@ -41,6 +41,7 @@ import { useTenantScope } from '@/modules/business/hooks/use-tenant-scope';
 import type { Product } from '@/modules/business/types/tenant-api';
 import { cn } from '@/design-system/lib/utils';
 import { typographyClasses } from '@/design-system/tokens/typography';
+import { layout } from '@/design-system/tokens/layout';
 
 const CATEGORY_ICONS: Record<string, typeof Package> = {
   marketing: Megaphone,

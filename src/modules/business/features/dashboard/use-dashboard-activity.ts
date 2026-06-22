@@ -23,7 +23,7 @@ export function useDashboardActivity() {
   const items = useMemo(() => {
     const activities: DashboardActivityItem[] = [];
 
-    for (const client of clientsQuery.data?.items ?? clientsQuery.data?.content ?? []) {
+    for (const client of clientsQuery.data?.items ?? []) {
       activities.push({
         id: `client-${client.id}`,
         kind: 'client',
@@ -34,7 +34,7 @@ export function useDashboardActivity() {
       });
     }
 
-    for (const booking of bookingsQuery.data?.items ?? bookingsQuery.data?.content ?? []) {
+    for (const booking of bookingsQuery.data?.items ?? []) {
       activities.push({
         id: `booking-${booking.id}`,
         kind: 'booking',

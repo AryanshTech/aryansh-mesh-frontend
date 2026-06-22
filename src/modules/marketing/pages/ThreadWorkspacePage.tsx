@@ -217,7 +217,7 @@ export function ThreadWorkspacePage() {
         (token) => outputsApi.delete(token, projectId, deleteOutputId),
         getToken
       );
-      setOutputs((prev) => prev.filter((o) => o.id !== deleteOutputId));
+      setOutputs((prev) => prev.filter((o) => o.outputId !== deleteOutputId));
       setSelectedIds((prev) => {
         const next = new Set(prev);
         next.delete(deleteOutputId);

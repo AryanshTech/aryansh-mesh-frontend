@@ -31,7 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/design-system/components/ui/table';
-import { typographyClasses } from '@/design-system/tokens/typography';
+import { typographyClasses, mutedBodySm } from '@/design-system/tokens/typography';
 import { layout } from '@/design-system/tokens/layout';
 import { cn } from '@/design-system/lib/utils';
 

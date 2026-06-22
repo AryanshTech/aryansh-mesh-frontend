@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { Button, type ButtonProps } from '@/design-system/components/ui/button';
 import { cn } from '@/design-system/lib/utils';
 

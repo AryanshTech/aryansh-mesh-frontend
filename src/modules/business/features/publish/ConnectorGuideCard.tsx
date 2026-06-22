@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/des
 import { Textarea } from '@/design-system/components/ui/textarea';
 import { typographyClasses, mutedBodySm } from '@/design-system/tokens/typography';
 import { cn } from '@/design-system/lib/utils';
+import { buildConnectorGuide } from '@/modules/business/features/publish/build-connector-guide';
 
 interface ConnectorGuideCardProps {
   tenantName: string;
