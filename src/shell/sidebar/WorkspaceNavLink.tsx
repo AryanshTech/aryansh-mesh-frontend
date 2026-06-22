@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { layout } from '@/design-system/tokens/layout';
+import { typographyClasses } from '@/design-system/tokens/typography';
 import { cn } from '@/design-system/lib/utils';
 import { Button } from '@/design-system/components/ui/button';
 import {
@@ -42,9 +43,9 @@ export function WorkspaceNavLink({
       variant="ghost"
       asChild
       className={cn(
-        'group relative h-auto min-h-10 w-full justify-start rounded-md border border-transparent px-2 py-2',
-        isActive ? (isCollapsed ? c.itemActiveCollapsed : c.itemActive) : c.item,
-        isCollapsed && 'justify-center px-2',
+        'group relative h-auto min-h-9 w-full justify-start rounded-md border border-transparent px-3 py-1.5',
+        isActive ? c.itemActive : c.item,
+        isCollapsed && 'justify-center rounded-md px-2',
       )}
     >
       <Link
@@ -53,9 +54,6 @@ export function WorkspaceNavLink({
         aria-label={isCollapsed ? label : undefined}
         onClick={onNavigate}
       >
-        {isActive && !isCollapsed ? (
-          <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-primary" />
-        ) : null}
         <div className={cn('flex items-center gap-2.5', isCollapsed && 'justify-center')}>
           <Icon
             className={cn(
@@ -64,7 +62,7 @@ export function WorkspaceNavLink({
             )}
           />
           {!isCollapsed ? (
-            <span className={cn('text-sm font-medium', isActive && 'text-primary')}>{label}</span>
+            <span className={cn(typographyClasses.button, isActive && 'text-foreground')}>{label}</span>
           ) : null}
         </div>
       </Link>

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { layout } from '@/design-system/tokens/layout';
+import { typographyClasses } from '@/design-system/tokens/typography';
 import { cn } from '@/design-system/lib/utils';
 import { Button } from '@/design-system/components/ui/button';
 
@@ -53,7 +54,7 @@ export function SidebarContextHeader({
         </Link>
       </Button>
       <div className="min-w-0 px-2">
-        <p className="truncate text-sm font-semibold text-foreground">{title}</p>
+        <p className={cn('truncate', typographyClasses.button, 'text-foreground')}>{title}</p>
         {subtitle ? (
           <p className={cn(layout.sidebar.sectionLabel, 'mt-0.5 normal-case')}>{subtitle}</p>
         ) : null}

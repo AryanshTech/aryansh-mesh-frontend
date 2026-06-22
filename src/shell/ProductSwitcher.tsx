@@ -1,36 +1,26 @@
 import { Briefcase, Megaphone } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { layout } from '@/design-system/tokens/layout';
 import { cn } from '@/design-system/lib/utils';
 import { ToggleGroup, ToggleGroupItem } from '@/design-system/components/ui/toggle-group';
-import { usePermissions } from '@/core/permissions/use-permissions';
-
-type ProductId = 'business' | 'marketing';
+import { useProductZone } from '@/shell/use-product-zone';
+import type { ProductZone } from '@/shell/navigation';
 
 type ProductSwitcherProps = {
   isCollapsed: boolean;
 };
 
-function resolveActiveProduct(pathname: string): ProductId {
-  return pathname.startsWith('/marketing') ? 'marketing' : 'business';
-}
-
 export function ProductSwitcher({ isCollapsed }: ProductSwitcherProps) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const { canAccessBusiness, canAccessMarketing, isPlatformAdmin, isSuperAdmin } = usePermissions();
+  const { zone, showProductSwitcher, navigateToZone } = useProductZone();
 
-  if (!canAccessBusiness || !canAccessMarketing || isPlatformAdmin || isSuperAdmin) {
+  if (!showProductSwitcher) {
     return null;
   }
 
-  const active = resolveActiveProduct(pathname);
-
-  const products: { id: ProductId; icon: typeof Briefcase; labelKey: string; path: string }[] = [
-    { id: 'business', icon: Briefcase, labelKey: 'shell.productSwitcher.business', path: '/dashboard' },
-    { id: 'marketing', icon: Megaphone, labelKey: 'shell.productSwitcher.marketing', path: '/marketing' },
+  const products: { id: ProductZone; icon: typeof Briefcase; labelKey: string }[] = [
+    { id: 'business', icon: Briefcase, labelKey: 'shell.productSwitcher.business' },
+    { id: 'marketing', icon: Megaphone, labelKey: 'shell.productSwitcher.marketing' },
   ];
 
   return (
@@ -45,11 +35,10 @@ export function ProductSwitcher({ isCollapsed }: ProductSwitcherProps) {
       ) : null}
       <ToggleGroup
         type="single"
-        value={active}
+        value={zone}
         onValueChange={(value) => {
           if (!value) return;
-          const product = products.find((p) => p.id === value);
-          if (product && product.id !== active) navigate(product.path);
+          navigateToZone(value as ProductZone);
         }}
         variant="outline"
         className={cn(
@@ -69,7 +58,7 @@ export function ProductSwitcher({ isCollapsed }: ProductSwitcherProps) {
               className={cn(
                 'flex flex-1 items-center justify-center gap-1.5 text-xs min-h-10',
                 isCollapsed && 'size-10 flex-none p-0',
-                'data-[state=on]:bg-primary/10 data-[state=on]:text-primary',
+                'data-[state=on]:border data-[state=on]:border-border/50 data-[state=on]:bg-card data-[state=on]:font-medium data-[state=on]:text-foreground data-[state=on]:shadow-none',
               )}
             >
               <Icon className="size-3.5 shrink-0" />

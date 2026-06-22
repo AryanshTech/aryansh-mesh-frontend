@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { PanelLeftClose, PanelLeftOpen, Search } from 'lucide-react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Bell, PanelLeftClose, PanelLeftOpen, Plus, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { typographyClasses } from '@/design-system/tokens/typography';
 import { layout } from '@/design-system/tokens/layout';
 import { cn } from '@/design-system/lib/utils';
 import { Button } from '@/design-system/components/ui/button';
@@ -13,7 +14,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandShortcut,
 } from '@/design-system/components/ui/command';
 import {
   useHeaderActionsList,
@@ -21,11 +21,12 @@ import {
   useShellSearchSlot,
 } from '@/shell/HeaderActionsContext';
 import { useFilteredNavSections } from '@/shell/use-filtered-nav';
-import { buildProjectNavPath, MARKETING_PROJECT_NAV } from '@/shell/navigation';
+import { buildProjectNavPath, MARKETING_PROJECT_SECTIONS } from '@/shell/navigation';
 import { usePermissions } from '@/core/permissions/use-permissions';
 import { UserMenu } from '@/shell/UserMenu';
 import { ShellIconButton } from '@/shared/components/layout/ShellIconButton';
 import { ShellUtilityActions } from '@/shared/components/layout/ShellUtilityActions';
+import { ShellProductToggle } from '@/shared/components/layout/ShellProductToggle';
 import {
   Tooltip,
   TooltipContent,
@@ -36,8 +37,6 @@ type ShellHeaderProps = {
   isCollapsed: boolean;
   isMobileNav?: boolean;
   mobileNavOpen?: boolean;
-  pageTitle: string;
-  pageSubtitle?: string;
   commandOpen: boolean;
   onToggleSidebar: () => void;
   onOpenCommand: () => void;
@@ -48,8 +47,6 @@ export function ShellHeader({
   isCollapsed,
   isMobileNav = false,
   mobileNavOpen = false,
-  pageTitle,
-  pageSubtitle,
   commandOpen,
   onToggleSidebar,
   onOpenCommand,
@@ -63,7 +60,6 @@ export function ShellHeader({
   const shellSearch = useShellSearchSlot();
   const setShellToolbarHost = useSetShellToolbarHost();
   const navSections = useFilteredNavSections();
-  const sh = layout.shellHeader;
 
   const sidebarToggleLabel = isMobileNav
     ? mobileNavOpen
@@ -96,11 +92,13 @@ export function ShellHeader({
       sections.push({
         id: 'project',
         heading: t('nav.sections.project'),
-        items: MARKETING_PROJECT_NAV.map((item) => ({
-          to: buildProjectNavPath(projectId, item.path),
-          label: t(item.labelKey),
-          description: t(`${item.labelKey}Description`, { defaultValue: item.path }),
-        })),
+        items: MARKETING_PROJECT_SECTIONS.flatMap((section) =>
+          section.items.map((item) => ({
+            to: buildProjectNavPath(projectId, item.path),
+            label: `${t(section.labelKey)} · ${t(item.labelKey)}`,
+            description: t(`${item.labelKey}Description`, { defaultValue: item.path }),
+          })),
+        ),
       });
     }
 
@@ -110,66 +108,60 @@ export function ShellHeader({
   return (
     <>
       <header className="shell-header">
-        <div className={sh.colLeft}>
+        <div className="shell-header__left">
           <ShellIconButton
             onClick={onToggleSidebar}
             aria-label={sidebarToggleLabel}
             aria-expanded={isMobileNav ? mobileNavOpen : undefined}
+            className="md:hidden"
           >
             <SidebarToggleIcon />
           </ShellIconButton>
-          <div className="min-w-0">
-            <h1 className={sh.title}>{pageTitle}</h1>
-            {pageSubtitle ? <p className={sh.subtitle}>{pageSubtitle}</p> : null}
-          </div>
+          <Link to="/" className="shell-header__brand shrink-0">
+            {t('common.appName')}
+          </Link>
+          <ShellProductToggle />
         </div>
 
-        <div className={sh.colCenter}>
+        <div className="shell-header__center">
           {shellSearch ? (
-            <div className={sh.searchCluster}>
-              <div className={sh.searchFieldWrap}>
-                <Search className={sh.searchIcon} />
-                <Input
-                  value={shellSearch.value}
-                  onChange={(e) => shellSearch.onChange(e.target.value)}
-                  placeholder={shellSearch.placeholder}
-                  aria-label={shellSearch.ariaLabel ?? shellSearch.placeholder}
-                  disabled={shellSearch.disabled}
-                  className="pl-9"
-                />
-              </div>
+            <div className={layout.shellHeader.searchFieldWrap}>
+              <Search className={layout.shellHeader.searchIcon} />
+              <Input
+                value={shellSearch.value}
+                onChange={(e) => shellSearch.onChange(e.target.value)}
+                placeholder={shellSearch.placeholder}
+                aria-label={shellSearch.ariaLabel ?? shellSearch.placeholder}
+                disabled={shellSearch.disabled}
+                className={cn('h-9 border-border bg-card pl-9', typographyClasses.bodySm)}
+              />
             </div>
           ) : (
-            <div className={sh.searchCluster}>
-              <div className={cn(sh.searchFieldWrap, 'w-full')}>
-                <Search className={sh.searchIcon} />
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-10 w-full justify-start pl-9 pr-3 text-muted-foreground hover:text-foreground"
-                  onClick={onOpenCommand}
-                  aria-label={t('shell.commandPalette.open')}
-                >
-                  <span className="flex-1 truncate text-left text-sm">
-                    {t('shell.commandPalette.placeholder')}
-                  </span>
-                  <CommandShortcut className="hidden sm:inline-flex">⌘K</CommandShortcut>
-                </Button>
-              </div>
-              <div ref={setShellToolbarHost} className={sh.toolbarHost} />
+            <div className={layout.shellHeader.searchFieldWrap}>
+              <Search className={layout.shellHeader.searchIcon} />
+              <Input
+                readOnly
+                onClick={onOpenCommand}
+                onFocus={onOpenCommand}
+                placeholder={t('shell.commandPalette.placeholder')}
+                aria-label={t('shell.commandPalette.open')}
+                className={cn('h-9 cursor-pointer border-border bg-card pl-9 placeholder:text-muted-foreground', typographyClasses.bodySm)}
+              />
             </div>
           )}
         </div>
 
-        <div className={sh.colRight}>
-          {isMobileNav && !shellSearch ? (
-            <ShellIconButton
-              onClick={onOpenCommand}
-              aria-label={t('shell.commandPalette.open')}
-            >
-              <Search className="size-4" />
-            </ShellIconButton>
-          ) : null}
+        <div className="shell-header__right">
+          <div ref={setShellToolbarHost} className={layout.shellHeader.toolbarHost} />
+          <Button
+            size="sm"
+            className="hidden h-8 gap-1.5 sm:inline-flex"
+            onClick={onOpenCommand}
+          >
+            <Plus className="size-4" />
+            {t('linear.shell.create')}
+          </Button>
+          <div className="hidden h-4 w-px bg-border sm:block" aria-hidden />
           {pageActions.map((action) => {
             const Icon = action.icon;
             return (
@@ -179,7 +171,7 @@ export function ShellHeader({
                     onClick={action.onSelect}
                     aria-label={action.label}
                     aria-pressed={action.pressed ? true : undefined}
-                    className={cn(action.pressed && 'bg-primary/10 text-primary')}
+                    className={cn(action.pressed && 'bg-card text-primary')}
                   >
                     <Icon className="size-4" />
                   </ShellIconButton>
@@ -188,8 +180,16 @@ export function ShellHeader({
               </Tooltip>
             );
           })}
+          <ShellIconButton aria-label={t('shell.notifications')} className="hidden sm:inline-flex">
+            <Bell className="size-4" />
+          </ShellIconButton>
           <UserMenu />
           <ShellUtilityActions />
+          {isMobileNav && !shellSearch ? (
+            <ShellIconButton onClick={onOpenCommand} aria-label={t('shell.commandPalette.open')}>
+              <Search className="size-4" />
+            </ShellIconButton>
+          ) : null}
         </div>
       </header>
 

@@ -1,17 +1,15 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Plus } from 'lucide-react';
+import { LayoutDashboard, Plus } from 'lucide-react';
 import { layout } from '@/design-system/tokens/layout';
 import { cn } from '@/design-system/lib/utils';
 import { Button } from '@/design-system/components/ui/button';
-import { Skeleton } from '@/design-system/components/ui/skeleton';
 import { usePermissions } from '@/core/permissions/use-permissions';
-import { useTenants } from '@/modules/business/features/admin/use-tenants';
 import { useSidebarNavContext } from '@/modules/marketing/contexts/sidebar-nav-context';
 import { companyDisplayName } from '@/modules/marketing/hooks/company-display';
+import { useTenants } from '@/modules/business/features/admin/use-tenants';
 import { ADMIN_NAV, MARKETING_NAV, SETTINGS_NAV } from '@/shell/navigation';
-
-const HUB_TENANT_PAGE_SIZE = 100;
+import { getRecentTenantPath, readRecentCompanies, readRecentTenants } from '@/shell/recent-workspaces';
 
 type AdminHubNavProps = {
   isCollapsed: boolean;
@@ -105,22 +103,54 @@ function HubNavLink({
 export function AdminHubNav({ isCollapsed, pathname, onNavigate }: AdminHubNavProps) {
   const { t } = useTranslation();
   const { canManageTeam } = usePermissions();
-  const { data: tenantsData, isLoading: tenantsLoading } = useTenants(0, HUB_TENANT_PAGE_SIZE);
-  const { companies, loading: companiesLoading } = useSidebarNavContext();
-  const tenants = tenantsData?.items ?? [];
+  const { data: tenantsData } = useTenants(0, 100);
+  const { companies } = useSidebarNavContext();
+
+  const recentTenants = readRecentTenants();
+  const recentCompanies = readRecentCompanies();
+  const tenantNameById = new Map((tenantsData?.items ?? []).map((tenant) => [tenant.id, tenant.name]));
+
+  const resolvedRecentTenants = recentTenants.map((entry) => ({
+    ...entry,
+    name: tenantNameById.get(entry.id) ?? entry.name,
+  }));
 
   const activeTenantId = pathname.match(/^\/admin\/tenants\/([^/]+)/)?.[1] ?? null;
   const activeCompanyId = pathname.match(/^\/marketing\/companies\/([^/]+)/)?.[1] ?? null;
+  const isHubHome =
+    pathname === '/admin/tenants' ||
+    pathname === '/admin/tenants/new' ||
+    (pathname.startsWith('/admin/tenants/') && !pathname.includes('/workspace'));
 
   const settingsItems = SETTINGS_NAV.filter(
     (item) => !item.requires?.includes('manage_team') || canManageTeam,
   );
 
+  const recentCompanyEntries = recentCompanies.map((entry) => {
+    const company = companies.find((c) => c.companyId === entry.id);
+    return {
+      id: entry.id,
+      name: company ? companyDisplayName(company) : entry.name,
+    };
+  });
+
   return (
     <div className="flex flex-col gap-3">
       <section className="flex flex-col gap-0.5">
+        <HubSectionLabel label={t('shell.zone.platform')} isCollapsed={isCollapsed} />
+        <HubNavLink
+          path="/admin/tenants"
+          labelKey="shell.adminHub.hubHome"
+          icon={LayoutDashboard}
+          pathname={pathname}
+          isCollapsed={isCollapsed}
+          onNavigate={onNavigate}
+        />
+      </section>
+
+      <section className="flex flex-col gap-0.5 border-t border-border pt-3">
         <div className="flex items-center justify-between gap-2 px-2">
-          <HubSectionLabel label={t('shell.adminHub.businesses')} isCollapsed={isCollapsed} />
+          <HubSectionLabel label={t('shell.adminHub.recentBusinesses')} isCollapsed={isCollapsed} />
           {!isCollapsed ? (
             <Button
               variant="ghost"
@@ -135,27 +165,26 @@ export function AdminHubNav({ isCollapsed, pathname, onNavigate }: AdminHubNavPr
             </Button>
           ) : null}
         </div>
-        {!isCollapsed && !tenantsLoading && tenants.length === 0 ? (
-          <p className="px-2 py-1 text-xs text-muted-foreground">{t('shell.adminHub.noBusinesses')}</p>
+        {!isCollapsed && resolvedRecentTenants.length === 0 ? (
+          <p className="px-2 py-1 text-xs text-muted-foreground">{t('shell.adminHub.noRecentBusinesses')}</p>
         ) : null}
-        {tenantsLoading ? (
-          <Skeleton className="mx-2 h-8 rounded-md" />
-        ) : (
-          tenants.map((tenant) => (
-            <HubEntityButton
-              key={tenant.id}
-              to={`/admin/tenants/${tenant.id}/workspace/dashboard`}
-              label={tenant.name}
-              isActive={
-                activeTenantId === tenant.id &&
-                (pathname.includes(`/admin/tenants/${tenant.id}/workspace`) ||
-                  pathname === `/admin/tenants/${tenant.id}`)
-              }
-              isCollapsed={isCollapsed}
-              onNavigate={onNavigate}
-            />
-          ))
-        )}
+        {resolvedRecentTenants.map((tenant) => (
+          <HubEntityButton
+            key={tenant.id}
+            to={getRecentTenantPath(tenant.id)}
+            label={tenant.name}
+            isActive={activeTenantId === tenant.id && !isHubHome}
+            isCollapsed={isCollapsed}
+            onNavigate={onNavigate}
+          />
+        ))}
+        {!isCollapsed ? (
+          <Button variant="ghost" asChild className="h-auto justify-start px-2 py-1.5 text-xs text-primary">
+            <Link to="/admin/tenants" onClick={onNavigate}>
+              {t('shell.adminHub.viewAllBusinesses')}
+            </Link>
+          </Button>
+        ) : null}
       </section>
 
       <section className="flex flex-col gap-0.5 border-t border-border pt-3">
@@ -168,22 +197,25 @@ export function AdminHubNav({ isCollapsed, pathname, onNavigate }: AdminHubNavPr
           isCollapsed={isCollapsed}
           onNavigate={onNavigate}
         />
-        {companiesLoading ? (
-          <Skeleton className="mx-2 h-8 rounded-md" />
-        ) : (
-          companies.map((company) => (
-            <HubEntityButton
-              key={company.companyId}
-              to={`/marketing/companies/${company.companyId}`}
-              label={companyDisplayName(company)}
-              isActive={activeCompanyId === company.companyId}
-              isCollapsed={isCollapsed}
-              onNavigate={onNavigate}
-            />
-          ))
-        )}
-        {!isCollapsed && !companiesLoading && companies.length === 0 ? (
-          <p className="px-2 py-1 text-xs text-muted-foreground">{t('shell.adminHub.noCompanies')}</p>
+        {!isCollapsed && recentCompanyEntries.length === 0 ? (
+          <p className="px-2 py-1 text-xs text-muted-foreground">{t('shell.adminHub.noRecentCompanies')}</p>
+        ) : null}
+        {recentCompanyEntries.map((company) => (
+          <HubEntityButton
+            key={company.id}
+            to={`/marketing/companies/${company.id}`}
+            label={company.name}
+            isActive={activeCompanyId === company.id}
+            isCollapsed={isCollapsed}
+            onNavigate={onNavigate}
+          />
+        ))}
+        {!isCollapsed ? (
+          <Button variant="ghost" asChild className="h-auto justify-start px-2 py-1.5 text-xs text-primary">
+            <Link to="/marketing/companies" onClick={onNavigate}>
+              {t('nav.companies')}
+            </Link>
+          </Button>
         ) : null}
       </section>
 

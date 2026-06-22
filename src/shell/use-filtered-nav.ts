@@ -2,8 +2,16 @@ import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { usePermissions } from '@/core/permissions/use-permissions';
 import { useAuth } from '@/core/auth/use-auth';
-import type { NavItemDef, NavRequirement, NavSectionDef } from '@/shell/navigation';
-import { buildProjectNavPath, MARKETING_PROJECT_NAV, NAV_SECTIONS } from '@/shell/navigation';
+import type { NavItemDef, NavRequirement, NavSectionDef, ProductZone } from '@/shell/navigation';
+import {
+  buildProjectNavPath,
+  MARKETING_PROJECT_SECTIONS,
+  NAV_SECTIONS,
+  PLATFORM_HUB_NAV,
+  ADMIN_NAV,
+  SETTINGS_NAV,
+} from '@/shell/navigation';
+import { useProductZone } from '@/shell/use-product-zone';
 
 function meetsRequirement(
   req: NavRequirement,
@@ -47,9 +55,21 @@ function filterNavItem(item: NavItemDef, flags: ReturnType<typeof usePermissions
   return ok ? item : null;
 }
 
+const BUSINESS_SECTION_IDS = new Set(['overview', 'catalog', 'operations', 'website']);
+
+function shouldIncludeSection(section: NavSectionDef, zone: ProductZone, isDualService: boolean): boolean {
+  if (!isDualService) return true;
+  if (section.id === 'settings' || section.id === 'admin') return true;
+  if (zone === 'business' && BUSINESS_SECTION_IDS.has(section.id)) return true;
+  if (zone === 'marketing' && section.id === 'marketing') return true;
+  if (zone === 'platform') return section.id === 'admin';
+  return false;
+}
+
 export function useFilteredNavSections(): NavSectionDef[] {
   const permissions = usePermissions();
   const { profile } = useAuth();
+  const { zone, isDualService } = useProductZone();
 
   return useMemo(() => {
     const flags = {
@@ -61,6 +81,8 @@ export function useFilteredNavSections(): NavSectionDef[] {
     };
 
     return NAV_SECTIONS.map((section) => {
+      if (!shouldIncludeSection(section, zone, isDualService)) return null;
+
       if (section.requires?.length) {
         const sectionOk = section.requires.every((r) => meetsRequirement(r, flags));
         if (!sectionOk) return null;
@@ -77,13 +99,13 @@ export function useFilteredNavSections(): NavSectionDef[] {
       if (items.length === 0) return null;
       return { ...section, items };
     }).filter((s): s is NavSectionDef => s !== null);
-  }, [permissions, profile?.accessLevel]);
+  }, [permissions, profile?.accessLevel, zone, isDualService]);
 }
 
 export function useCommandNavLinks(): { labelKey: string; descriptionKey: string; to: string }[] {
   const sections = useFilteredNavSections();
   const { projectId } = useParams();
-  const { canAccessMarketing } = usePermissions();
+  const { canAccessMarketing, isPlatformOperator } = usePermissions();
 
   return useMemo(() => {
     const topLevel = sections.flatMap((section) =>
@@ -94,16 +116,38 @@ export function useCommandNavLinks(): { labelKey: string; descriptionKey: string
       })),
     );
 
+    const platformLinks = isPlatformOperator
+      ? [
+          ...PLATFORM_HUB_NAV.filter((item) => item.id === 'hub-home').map((item) => ({
+            labelKey: item.labelKey,
+            descriptionKey: `${item.labelKey}Description`,
+            to: item.path,
+          })),
+          ...ADMIN_NAV.map((item) => ({
+            labelKey: item.labelKey,
+            descriptionKey: `${item.labelKey}Description`,
+            to: item.path,
+          })),
+          ...SETTINGS_NAV.map((item) => ({
+            labelKey: item.labelKey,
+            descriptionKey: `${item.labelKey}Description`,
+            to: item.path,
+          })),
+        ]
+      : [];
+
     if (!projectId || !canAccessMarketing) {
-      return topLevel;
+      return [...topLevel, ...platformLinks];
     }
 
-    const projectLinks = MARKETING_PROJECT_NAV.map((item) => ({
-      labelKey: item.labelKey,
-      descriptionKey: `${item.labelKey}Description`,
-      to: buildProjectNavPath(projectId, item.path),
-    }));
+    const projectLinks = MARKETING_PROJECT_SECTIONS.flatMap((section) =>
+      section.items.map((item) => ({
+        labelKey: item.labelKey,
+        descriptionKey: `${item.labelKey}Description`,
+        to: buildProjectNavPath(projectId, item.path),
+      })),
+    );
 
-    return [...topLevel, ...projectLinks];
-  }, [sections, projectId, canAccessMarketing]);
+    return [...topLevel, ...projectLinks, ...platformLinks];
+  }, [sections, projectId, canAccessMarketing, isPlatformOperator]);
 }
