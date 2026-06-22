@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AryanshMesh Agent Studio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=Geist:wght@400;500&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .linear-surface-1 {
+            background-color: #0f1011;
+            border: 1px solid #23252a;
+        }
+        .linear-surface-2 {
+            background-color: #141516;
+            border: 1px solid #34343a;
+        }
+        .linear-hairline {
+            border-color: #23252a;
+        }
+        .linear-hairline-strong {
+            border-color: #34343a;
+        }
+        .tracking-display-xl {
+            letter-spacing: -3.0px;
+        }
+        .tracking-display-lg {
+            letter-spacing: -1.8px;
+        }
+        .tracking-headline {
+            letter-spacing: -0.6px;
+        }
+        .glass-panel {
+            background: #0f1011;
+            border: 1px solid #23252a;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #010102;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #23252a;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #34343a;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#5e6ad2",
+                        "on-primary": "#ffffff",
+                        "primary-hover": "#828fff",
+                        "primary-focus": "#5e69d1",
+                        "ink": "#f7f8f8",
+                        "ink-muted": "#d0d6e0",
+                        "ink-subtle": "#8a8f98",
+                        "ink-tertiary": "#62666d",
+                        "background": "#010102",
+                        "surface": "#0f1011",
+                        "surface-container": "#141516",
+                        "outline": "#23252a",
+                        "outline-variant": "#34343a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "sm": "6px",
+                        "md": "8px",
+                        "lg": "12px",
+                        "xl": "16px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "container-padding": "24px"
+                    },
+                    "fontFamily": {
+                        "body": ["Inter", "SF Pro Display", "sans-serif"],
+                        "display": ["Inter", "SF Pro Display", "sans-serif"],
+                        "mono": ["JetBrains Mono", "ui-monospace", "monospace"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                        "caption": ["12px", {"lineHeight": "1.4", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-ink font-body selection:bg-primary/30 min-h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-background border-r border-outline flex flex-col py-gutter px-2 z-50">
+<div class="px-4 mb-8">
+<h1 class="font-display text-lg font-semibold text-ink tracking-tight">AryanshMesh</h1>
+<p class="text-caption text-ink-subtle">Marketing / Business</p>
+</div>
+<nav class="flex-1 space-y-0.5">
+<a class="flex items-center gap-3 px-3 py-1.5 rounded-md text-ink-muted hover:bg-surface hover:text-ink transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[18px]">dashboard</span>
+<span class="text-label-md">Overview</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-1.5 rounded-md text-ink-muted hover:bg-surface hover:text-ink transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[18px]">business</span>
+<span class="text-label-md">Companies</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-1.5 rounded-md text-ink-muted hover:bg-surface hover:text-ink transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[18px]">groups</span>
+<span class="text-label-md">CRM</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-1.5 rounded-md text-ink-muted hover:bg-surface hover:text-ink transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[18px]">account_circle</span>
+<span class="text-label-md">Profile</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-1.5 rounded-md text-primary bg-primary/10 border border-primary/20 relative" href="#">
+<span class="material-symbols-outlined text-[18px]">menu_book</span>
+<span class="text-label-md font-medium">Catalog</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-1.5 rounded-md text-ink-muted hover:bg-surface hover:text-ink transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="text-label-md">Bookings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-1.5 rounded-md text-ink-muted hover:bg-surface hover:text-ink transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[18px]">send</span>
+<span class="text-label-md">Publish</span>
+</a>
+</nav>
+<div class="mt-auto pt-gutter border-t border-outline space-y-0.5">
+<button class="w-full flex items-center justify-between px-3 py-1.5 bg-surface border border-outline rounded-md text-ink-muted hover:text-ink transition-all mb-4 group">
+<span class="text-caption">Command Palette</span>
+<span class="text-[10px] bg-outline-variant px-1.5 py-0.5 rounded border border-outline group-hover:border-primary/50 transition-colors">⌘K</span>
+</button>
+<a class="flex items-center gap-3 px-3 py-1.5 rounded-md text-ink-muted hover:bg-surface hover:text-ink transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+<span class="text-label-md">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-1.5 rounded-md text-ink-muted hover:bg-surface hover:text-ink transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[18px]">notifications</span>
+<span class="text-label-md">Notifications</span>
+</a>
+</div>
+</aside>
+<!-- Top AppBar -->
+<header class="fixed top-0 right-0 left-64 h-14 bg-background/80 backdrop-blur-xl border-b border-outline flex items-center justify-between px-gutter z-40">
+<div class="flex items-center gap-gutter">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-ink-tertiary text-sm">search</span>
+<input class="bg-surface border border-outline rounded-md pl-9 pr-4 py-1.5 text-body-sm focus:outline-none focus:ring-2 focus:ring-primary/50 w-64 transition-all placeholder:text-ink-tertiary" placeholder="Search across agents..." type="text"/>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-label-md text-primary font-medium border-b-2 border-primary pb-3 mt-3" href="#">Marketing</a>
+<a class="text-label-md text-ink-muted hover:text-ink transition-all" href="#">Business</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-primary text-on-primary px-3.5 py-1.5 rounded-md text-label-md font-medium hover:bg-primary-hover active:bg-primary-focus transition-all">Create</button>
+<div class="flex items-center gap-2 text-ink-muted">
+<span class="material-symbols-outlined p-1.5 hover:bg-surface rounded-md cursor-pointer transition-colors">notifications</span>
+<span class="material-symbols-outlined p-1.5 hover:bg-surface rounded-md cursor-pointer transition-colors">dark_mode</span>
+<div class="w-7 h-7 rounded-full bg-surface overflow-hidden border border-outline">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsTQ53V3-F9VOD-10Hb5ypJHdnX2BF60UWS7ERRDAsUgKSm6jzgSXgO0JWbo0NlmRQBIGmEeruIbpdlgFhuK8QG2P2Wb3rHHt9sJPfbYXv1PUaJP2K1InNNDfijEyEOOQ7YYVmh64qnBVbxRUem9EXdFtT-PrMSDpnHD9GmkRBLUSYpfvtN4JXFoQGgWxnlgrQsrXIEO_CfSQ5PLOfyKnP18aqY9IjqZCeQXBah54iI2uJB5oqR9al8sA1jaYe22S4M3t0BNoHiEY"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-64 pt-14 h-screen flex overflow-hidden">
+<!-- Queue Sidebar -->
+<aside class="w-72 bg-background border-r border-outline flex flex-col">
+<div class="p-4 border-b border-outline flex justify-between items-center">
+<h2 class="text-caption text-ink-subtle uppercase tracking-widest font-semibold">Pending Drafts</h2>
+<span class="bg-surface border border-outline text-ink-muted px-2 py-0.5 rounded text-[10px] font-bold">14</span>
+</div>
+<div class="flex-1 overflow-y-auto p-2 space-y-1">
+<!-- Queue Item Active -->
+<div class="bg-surface border border-outline-variant p-3 rounded-md cursor-pointer border-l-[3px] border-l-primary">
+<div class="flex justify-between items-start mb-1">
+<span class="text-[10px] font-mono text-primary uppercase">Blog Post</span>
+<span class="text-[10px] text-ink-tertiary">2m ago</span>
+</div>
+<p class="text-body-sm font-medium text-ink line-clamp-1">The Future of Generative AI in SaaS Marketing</p>
+<p class="text-[11px] text-ink-subtle mt-1">Agent: Stratos-4</p>
+</div>
+<!-- Queue Items -->
+<div class="p-3 rounded-md hover:bg-surface/50 cursor-pointer border border-transparent transition-all">
+<div class="flex justify-between items-start mb-1">
+<span class="text-[10px] font-mono text-ink-muted uppercase">X-Thread</span>
+<span class="text-[10px] text-ink-tertiary">15m ago</span>
+</div>
+<p class="text-body-sm font-medium text-ink-muted line-clamp-1">10 Hooks for Q4 Sales Growth</p>
+<p class="text-[11px] text-ink-tertiary mt-1">Agent: ViralGen-X</p>
+</div>
+<div class="p-3 rounded-md hover:bg-surface/50 cursor-pointer border border-transparent transition-all">
+<div class="flex justify-between items-start mb-1">
+<span class="text-[10px] font-mono text-ink-muted uppercase">Article</span>
+<span class="text-[10px] text-ink-tertiary">1h ago</span>
+</div>
+<p class="text-body-sm font-medium text-ink-muted line-clamp-1">Brand Identity in the Era of Automation</p>
+<p class="text-[11px] text-ink-tertiary mt-1">Agent: Stratos-4</p>
+</div>
+</div>
+</aside>
+<!-- Two-Pane Layout -->
+<section class="flex-1 flex overflow-hidden bg-surface">
+<!-- Left Pane: Content Draft -->
+<div class="flex-1 flex flex-col overflow-hidden relative">
+<div class="px-8 py-6 border-b border-outline flex justify-between items-center z-10 bg-surface/80 backdrop-blur-md">
+<div>
+<h3 class="font-display text-2xl font-semibold text-ink tracking-headline">Draft: The Future of Generative AI</h3>
+<p class="text-ink-subtle text-body-sm mt-1">Reviewing output from <span class="text-primary font-mono text-xs">Stratos-4</span></p>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface border border-outline rounded-md hover:border-outline-variant transition-all text-label-md text-ink">
+<span class="material-symbols-outlined text-sm">edit</span> Edit
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-surface border border-outline rounded-md hover:border-outline-variant transition-all text-label-md text-ink">
+<span class="material-symbols-outlined text-sm">refresh</span> Regenerate
+                    </button>
+<button class="flex items-center gap-2 px-6 py-2 bg-primary text-on-primary rounded-md text-label-md font-medium hover:bg-primary-hover active:bg-primary-focus transition-all">
+<span class="material-symbols-outlined text-sm">check_circle</span> Approve
+                    </button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-12 max-w-4xl mx-auto w-full z-10">
+<div class="bg-background border border-outline rounded-xl p-12">
+<article class="prose prose-invert max-w-none">
+<h1 class="font-display text-5xl font-semibold text-ink mb-8 leading-[1.1] tracking-display-lg">The Future of Generative AI in SaaS Marketing: From Creation to Orchestration</h1>
+<div class="w-full h-[400px] rounded-lg bg-cover bg-center mb-10 border border-outline overflow-hidden" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCCNPLKNIfJjXgM_M6uZGkrS6B1NB5sMs7CGbfR0aNuQg6VzQw1dElR1je9vpycns_NWJsbFbBXhq0z9jeeo4ItoCdPSCrGv2Y_BMedl2NW6w7nTPukUoSLeEXNiq-fZG6TJ0iwUZ4rAJXoxIDZ2YDia5dS_Uv2ug9JrRXplESXuJjcN1HXORfvE2OwwD6cPGGqa1R2m1D2-Y1mWxUtweFv332vJrbxBt--G9kaBZxC1bIBwkLRaU7mlg2pE0BuBaXPypGIluN03Co')"></div>
+<p class="text-body-md text-ink-muted mb-6 leading-relaxed">
+                            Generative AI is no longer a peripheral novelty in the SaaS marketing stack. As we head into 2024, the focus is shifting from simple content generation to complex GTM orchestration. Marketing leads at top-tier agencies are leveraging "Agentic Workflows" to automate the tedious aspects of brand consistency while maintaining human-in-the-loop oversight.
+                        </p>
+<h2 class="text-ink font-semibold text-2xl mt-12 mb-6 tracking-headline">1. The Shift to Deep Personalization</h2>
+<p class="text-body-md text-ink-muted mb-6 leading-relaxed">
+                            Static whitepapers are dead. The modern agent can analyze a prospect's LinkedIn profile, company financial reports, and previous CRM interactions to generate a bespoke value proposition in seconds. This isn't just mail merging; it's dynamic strategic alignment at scale.
+                        </p>
+<div class="bg-surface-container border-l-2 border-primary p-6 rounded-r-md my-8 italic text-ink-muted text-lg">
+                            "The successful agency of the future doesn't sell content; they sell the intelligence infrastructure that produces it." — AryanshMesh GTM Insights
+                        </div>
+<p class="text-body-md text-ink-muted mb-6 leading-relaxed">
+                            Integrating these agents into your core business logic requires a "Brand Memory" — a centralized repository of your unique voice, past successes, and non-negotiable brand guidelines. Without it, your AI output is just noise.
+                        </p>
+</article>
+</div>
+</div>
+</div>
+<!-- Right Pane: Context & Memory -->
+<div class="w-96 bg-background border-l border-outline flex flex-col overflow-hidden">
+<div class="p-4 border-b border-outline">
+<h3 class="text-caption text-ink font-semibold uppercase tracking-widest flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1;">neurology</span>
+                    Intelligence Context
+                </h3>
+</div>
+<div class="flex-1 overflow-y-auto">
+<div class="p-4 space-y-6">
+<section>
+<h4 class="text-[11px] font-mono text-primary uppercase mb-3">Brand Memory Active</h4>
+<div class="space-y-3">
+<div class="bg-surface p-3 rounded-md border border-outline">
+<div class="flex items-center gap-2 mb-1 text-ink">
+<span class="material-symbols-outlined text-xs">voice_chat</span>
+<span class="text-xs font-semibold">Voice: "Calm Authority"</span>
+</div>
+<p class="text-[12px] text-ink-subtle">Avoid hype. Use sophisticated vocabulary. Focus on long-term ROI over short-term growth hacks.</p>
+</div>
+<div class="bg-surface p-3 rounded-md border border-outline">
+<div class="flex items-center gap-2 mb-1 text-ink">
+<span class="material-symbols-outlined text-xs">dataset</span>
+<span class="text-xs font-semibold">Knowledge: Q3 Reports</span>
+</div>
+<p class="text-[12px] text-ink-subtle">Referencing latest market shift towards "Vertical SaaS" as requested in campaign brief.</p>
+</div>
+</div>
+</section>
+<section>
+<h4 class="text-[11px] font-mono text-ink-muted uppercase mb-3">System Instructions</h4>
+<div class="bg-surface p-4 rounded-md font-mono text-[13px] text-ink border border-outline relative">
+<div class="absolute top-3 right-3 flex gap-1">
+<div class="w-1.5 h-1.5 rounded-full bg-outline-variant"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-outline-variant"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-outline-variant"></div>
+</div>
+<p class="space-y-1">
+<span class="text-ink-tertiary"># ROLE:</span> <span class="text-primary">GTM Strategist Agent</span><br/>
+<span class="text-ink-tertiary"># GOAL:</span> Create 800-word post.<br/>
+<span class="text-ink-tertiary"># STYLE:</span> High-density, professional.
+                            </p>
+<div class="mt-4 pt-4 border-t border-outline flex items-center justify-between">
+<span class="text-[10px] text-ink-tertiary">1,402 Tokens</span>
+<button class="text-primary hover:underline text-[10px] flex items-center gap-1">
+                                    Modify <span class="material-symbols-outlined text-xs">open_in_new</span>
+</button>
+</div>
+</div>
+</section>
+<section>
+<h4 class="text-[11px] font-mono text-ink-muted uppercase mb-3 tracking-tighter">AI Reasoning Path</h4>
+<div class="p-3 border border-outline-variant rounded-md border-dashed space-y-3">
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-primary text-sm">query_stats</span>
+<p class="text-[11px] text-ink-muted">Analyzed content gap in "Agentic Orchestration".</p>
+</div>
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-primary text-sm">history_edu</span>
+<p class="text-[11px] text-ink-muted">Applied signature tone: 98% confidence.</p>
+</div>
+</div>
+</section>
+<section>
+<h4 class="text-[11px] font-mono text-ink-muted uppercase mb-3">GTM Signals</h4>
+<div class="flex flex-wrap gap-2">
+<span class="bg-surface border border-outline px-2 py-1 rounded text-[10px] flex items-center gap-1 text-ink-muted">
+<span class="material-symbols-outlined text-[10px] text-primary" style="font-variation-settings: 'FILL' 1;">trending_up</span> SaaS
+                            </span>
+<span class="bg-surface border border-outline px-2 py-1 rounded text-[10px] flex items-center gap-1 text-ink-muted">
+<span class="material-symbols-outlined text-[10px] text-primary" style="font-variation-settings: 'FILL' 1;">bolt</span> Agentic
+                            </span>
+</div>
+</section>
+</div>
+</div>
+<div class="p-4 bg-background border-t border-outline">
+<button class="w-full py-2 bg-surface border border-outline rounded-md text-label-md text-ink-muted hover:text-ink transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">history</span> History
+                </button>
+</div>
+</div>
+</section>
+</main>
+<div class="hidden absolute z-[100] bg-surface-container border border-outline-variant rounded-md px-3 py-1.5 shadow-2xl flex items-center gap-3 transition-all scale-95" id="selection-popover">
+<button class="text-ink hover:text-primary transition-colors flex items-center gap-1 text-xs">
+<span class="material-symbols-outlined text-sm">edit_square</span> Improve
+    </button>
+<div class="w-px h-3 bg-outline"></div>
+<button class="text-ink hover:text-primary transition-colors flex items-center gap-1 text-xs">
+<span class="material-symbols-outlined text-sm">short_text</span> Shorten
+    </button>
+</div>
+<script>
+    const article = document.querySelector('article');
+    const popover = document.getElementById('selection-popover');
+
+    article.addEventListener('mouseup', (e) => {
+        const selection = window.getSelection();
+        if (selection.toString().length > 0) {
+            const range = selection.getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+            
+            popover.style.left = `${rect.left + (rect.width / 2) - (popover.offsetWidth / 2)}px`;
+            popover.style.top = `${rect.top - 50 + window.scrollY}px`;
+            popover.classList.remove('hidden');
+            setTimeout(() => popover.classList.remove('scale-95'), 10);
+        } else {
+            popover.classList.add('hidden');
+            popover.classList.add('scale-95');
+        }
+    });
+
+    document.addEventListener('mousedown', (e) => {
+        if (!popover.contains(e.target)) {
+            popover.classList.add('hidden');
+            popover.classList.add('scale-95');
+        }
+    });
+</script>
+</body></html>

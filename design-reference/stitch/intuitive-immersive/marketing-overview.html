@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AryanshMesh | Marketing Overview</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #010102;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #23252a;
+            border-radius: 10px;
+        }
+        .tracking-tight-aggressive {
+            letter-spacing: -0.04em;
+        }
+        .hairline-border {
+            border: 1px solid #23252a;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#5e6ad2",
+                        "on-primary": "#ffffff",
+                        "primary-hover": "#828fff",
+                        "background": "#010102",
+                        "canvas": "#010102",
+                        "surface": "#0f1011",
+                        "surface-1": "#0f1011",
+                        "surface-2": "#141516",
+                        "surface-3": "#18191a",
+                        "surface-4": "#191a1b",
+                        "outline": "#23252a",
+                        "outline-variant": "#23252a",
+                        "on-surface": "#f7f8f8",
+                        "on-surface-variant": "#8a8f98",
+                        "ink-muted": "#d0d6e0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "sm": "6px",
+                        "md": "8px",
+                        "lg": "12px",
+                        "xl": "16px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "container-padding": "24px",
+                        "unit": "4px",
+                        "component-gap-sm": "8px",
+                        "component-gap-md": "12px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "mono": ["ui-monospace", "SF Mono", "Menlo"]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body overflow-hidden selection:bg-primary/30 text-[14px]">
+<!-- Sidebar Navigation Shell -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-canvas border-r border-outline flex flex-col py-gutter px-component-gap-sm z-40">
+<div class="mb-8 px-4">
+<h1 class="text-[20px] font-semibold tracking-tight-aggressive text-primary">AryanshMesh</h1>
+<p class="text-[12px] text-on-surface-variant font-medium">Marketing / Business</p>
+</div>
+<nav class="flex-1 space-y-0.5">
+<a class="flex items-center gap-3 px-4 py-2 text-primary font-medium bg-surface-1 hairline-border rounded-md" href="#">
+<span class="material-symbols-outlined text-[18px]">dashboard</span>
+<span>Overview</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-1 transition-colors rounded-md" href="#">
+<span class="material-symbols-outlined text-[18px]">business</span>
+<span>Companies</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-1 transition-colors rounded-md" href="#">
+<span class="material-symbols-outlined text-[18px]">groups</span>
+<span>CRM</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-1 transition-colors rounded-md" href="#">
+<span class="material-symbols-outlined text-[18px]">account_circle</span>
+<span>Profile</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-1 transition-colors rounded-md" href="#">
+<span class="material-symbols-outlined text-[18px]">menu_book</span>
+<span>Catalog</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-1 transition-colors rounded-md" href="#">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span>Bookings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-1 transition-colors rounded-md" href="#">
+<span class="material-symbols-outlined text-[18px]">send</span>
+<span>Publish</span>
+</a>
+</nav>
+<div class="mt-auto space-y-1">
+<button class="w-full mb-6 py-1.5 px-4 bg-surface-1 text-on-surface-variant hairline-border flex items-center justify-between rounded-md hover:bg-surface-2 transition-colors">
+<span class="text-[12px] uppercase tracking-wider font-medium">Command Palette</span>
+<span class="text-[10px] bg-surface-3 px-1.5 py-0.5 rounded hairline-border">⌘K</span>
+</button>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">notifications</span>
+<span>Notifications</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+<span>Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 min-h-screen flex flex-col bg-background">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-50 flex justify-between items-center w-full px-gutter py-unit h-14 bg-background border-b border-outline">
+<div class="flex items-center gap-gutter">
+<div class="flex gap-4">
+<a class="text-primary font-medium border-b-2 border-primary pb-1 text-[13px]" href="#">Marketing</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-all text-[13px]" href="#">Business</a>
+</div>
+<div class="h-4 w-[1px] bg-outline"></div>
+<div class="flex items-center bg-surface-1 hairline-border rounded-md px-3 py-1 gap-2 w-64">
+<span class="material-symbols-outlined text-on-surface-variant text-[16px]">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-[13px] w-full p-0 placeholder:text-on-surface-variant/40" placeholder="Search clients..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-primary hover:bg-primary-hover text-on-primary px-4 py-1.5 rounded-md text-[13px] font-medium transition-colors">Create</button>
+<div class="flex items-center gap-2">
+<button class="text-on-surface-variant hover:text-on-surface transition-all material-symbols-outlined p-1 text-[20px]">notifications</button>
+<button class="text-on-surface-variant hover:text-on-surface transition-all material-symbols-outlined p-1 text-[20px]">dark_mode</button>
+<div class="w-7 h-7 rounded-full hairline-border bg-surface-1 overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcIXYCmCopnSaFb66FLXZlCqewxhpanNSQQddSOq1_0E__4V-jfq0OgIKbvvNo2n0EaPhcB45xSMrVyxA4hCU4F7SjfGcDkRjZ431noHernUuGThWWUkrhvobOSKHGKMBMs6-dKTmZo_BQzG0AHRFQLAiIQGqqbsnoDCCEvdoqC-lcBoib_SF93UivW2JF4DnVszSVRYk2q0S7qg6c5E8WIpH8hFbaChVb12yyMWZcaGJ1MnzJK3ytZGnhsdIZPosnCnxgsuCxcHM"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<div class="flex-1 p-gutter overflow-y-auto">
+<div class="max-w-[1280px] mx-auto">
+<!-- Header Stats -->
+<div class="flex justify-between items-end mb-8">
+<div>
+<h2 class="text-[32px] font-semibold text-on-surface tracking-tight-aggressive">Marketing Overview</h2>
+<p class="text-on-surface-variant text-[16px] mt-1 font-normal">Intelligence-driven GTM command center.</p>
+</div>
+<div class="flex gap-3">
+<div class="bg-surface-1 hairline-border px-4 py-2 rounded-lg flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]">auto_awesome</span>
+<div>
+<p class="text-[10px] font-medium text-on-surface-variant uppercase tracking-wider">AI Capacity</p>
+<p class="font-mono text-[13px]">84% Utilized</p>
+</div>
+</div>
+<div class="bg-surface-1 hairline-border px-4 py-2 rounded-lg flex items-center gap-3">
+<span class="material-symbols-outlined text-[#ffb2b7] text-[20px]">priority_high</span>
+<div>
+<p class="text-[10px] font-medium text-on-surface-variant uppercase tracking-wider">Active Risks</p>
+<p class="font-mono text-[13px]">2 Projects</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Bento Grid Dashboard -->
+<div class="bento-grid">
+<!-- Main Pipeline Overview -->
+<div class="col-span-12 lg:col-span-8 bg-surface-1 hairline-border rounded-xl p-6 relative overflow-hidden">
+<div class="flex justify-between items-start mb-6">
+<h3 class="text-[20px] font-semibold tracking-tight-aggressive">Weekly GTM Progress</h3>
+<div class="flex gap-2">
+<span class="bg-surface-2 text-on-surface-variant px-2 py-0.5 rounded text-[11px] font-medium hairline-border">LIVE: 12 BATTLECARDS</span>
+</div>
+</div>
+<div class="space-y-8">
+<!-- Company Row: EcoStream -->
+<div class="group">
+<div class="flex justify-between items-center mb-3">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-2 hairline-border flex items-center justify-center overflow-hidden p-1.5">
+<img class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSITrM_kgkxeT-RcWkRily97E8MNWdGdj8wNGDAGQwOtoSy9rYXBfLjw95zwLzEAzAenDOJOwVvuJsyWeIV3aeVnITwJFel6knrbuzXOI01lBSFkjyxceg82MYLCbihlixIg_AXtX-kkZBmVwRVQABvQVBKMDn5b4EGoG-eps8uo9fowuQMthoD6cOD_3XBtyrHT244SRAo0-IdyfX4mBe1plAOrfMWqEW0uPTBNFlHttUWHt5aFryUisBtXoK4NZ2mXIUKQHUXUQ"/>
+</div>
+<div>
+<p class="font-semibold text-on-surface">EcoStream</p>
+<p class="text-[11px] text-on-surface-variant uppercase tracking-wider font-medium">Renewable GTM v2</p>
+</div>
+</div>
+<div class="flex items-center gap-8 text-on-surface-variant text-[11px] font-mono">
+<div class="flex flex-col items-end">
+<span>HEALTH</span>
+<span class="text-primary font-medium">98.4%</span>
+</div>
+<div class="flex flex-col items-end">
+<span>BUDGET</span>
+<span class="text-ink-muted">$42.5k / $50k</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-4 gap-3">
+<div class="h-10 bg-surface-3 hairline-border rounded-md flex items-center justify-center relative hover:bg-surface-4 transition-colors">
+<span class="text-[10px] uppercase font-semibold text-primary">Spy</span>
+<div class="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-primary rounded-full"></div>
+</div>
+<div class="h-10 bg-surface-3 hairline-border rounded-md flex items-center justify-center relative hover:bg-surface-4 transition-colors">
+<span class="text-[10px] uppercase font-semibold text-primary">Write</span>
+<div class="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-primary rounded-full"></div>
+</div>
+<div class="h-10 bg-surface-2 hairline-border rounded-md flex flex-col items-center justify-center relative overflow-hidden">
+<span class="text-[10px] uppercase font-semibold text-on-surface-variant">Film</span>
+<div class="absolute bottom-0 left-0 h-[2px] bg-primary w-2/3"></div>
+</div>
+<div class="h-10 bg-surface-1 hairline-border rounded-md flex items-center justify-center opacity-40">
+<span class="text-[10px] uppercase font-semibold text-on-surface-variant">Publish</span>
+</div>
+</div>
+</div>
+<!-- Company Row: Lumino Tech -->
+<div class="group">
+<div class="flex justify-between items-center mb-3">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-2 hairline-border flex items-center justify-center overflow-hidden p-1.5">
+<img class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDl0jbEWFd2ZGMfk4WqqBCC79bDPHuo5oYZ_FxX16puMzpnrWzPX5qE7QgHGOjB38yYIQWSwmwjbzIafg6IW4iR1WWMhbeheRGXbFGjou6oG9lP70z4EWYaQ5SsdKCWxPIzwE9XIsCXZgnC_O2zw2T4yXylymkO9ONGOjbw7O8jEuLzhV1PZ5gVDF4fIVsDtJw2f59-4mCof-LV0os23Sy7Uxoqg7XO_6TCa6rU2tKyI3sgxvcNHOyNZWVDDgvMAWu7ydN8yXiLdXc"/>
+</div>
+<div>
+<p class="font-semibold text-on-surface">Lumino Tech</p>
+<p class="text-[11px] text-on-surface-variant uppercase tracking-wider font-medium">Enterprise Launch</p>
+</div>
+</div>
+<div class="flex items-center gap-8 text-on-surface-variant text-[11px] font-mono">
+<div class="flex flex-col items-end">
+<span>HEALTH</span>
+<span class="text-[#ffb2b7] font-medium">72.1%</span>
+</div>
+<div class="flex flex-col items-end">
+<span>BUDGET</span>
+<span class="text-ink-muted">$12.8k / $25k</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-4 gap-3">
+<div class="h-10 bg-surface-3 hairline-border rounded-md flex items-center justify-center relative hover:bg-surface-4 transition-colors">
+<span class="text-[10px] uppercase font-semibold text-primary">Spy</span>
+<div class="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-primary rounded-full"></div>
+</div>
+<div class="h-10 bg-surface-2 hairline-border rounded-md flex flex-col items-center justify-center relative overflow-hidden">
+<span class="text-[10px] uppercase font-semibold text-on-surface-variant">Write</span>
+<div class="absolute bottom-0 left-0 h-[2px] bg-[#ffb2b7] w-1/4"></div>
+</div>
+<div class="h-10 bg-surface-1 hairline-border rounded-md flex items-center justify-center opacity-40">
+<span class="text-[10px] uppercase font-semibold text-on-surface-variant">Film</span>
+</div>
+<div class="h-10 bg-surface-1 hairline-border rounded-md flex items-center justify-center opacity-40">
+<span class="text-[10px] uppercase font-semibold text-on-surface-variant">Publish</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- CRM Pipeline -->
+<div class="col-span-12 lg:col-span-4 bg-surface-1 hairline-border rounded-xl p-6 flex flex-col">
+<h3 class="text-[20px] font-semibold tracking-tight-aggressive mb-6">CRM Pipeline</h3>
+<div class="flex-1 flex flex-col gap-6">
+<div class="bg-surface-2 p-4 rounded-lg hairline-border flex items-center justify-between">
+<div>
+<p class="font-medium text-on-surface-variant text-[12px] uppercase tracking-wider mb-1">Total Pipeline</p>
+<p class="text-on-surface text-[24px] font-semibold tracking-tight-aggressive">$1.24M</p>
+</div>
+<div class="text-right">
+<p class="text-[10px] text-on-surface-variant uppercase font-medium">Win Rate</p>
+<p class="font-mono text-[14px]">34%</p>
+</div>
+</div>
+<div class="space-y-5">
+<div>
+<div class="flex justify-between text-[11px] mb-2 font-medium">
+<span class="text-on-surface-variant uppercase tracking-wide">Proposal Sent</span>
+<span class="text-on-surface">$450k</span>
+</div>
+<div class="h-1.5 bg-surface-3 rounded-full overflow-hidden hairline-border">
+<div class="h-full bg-primary" style="width: 65%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[11px] mb-2 font-medium">
+<span class="text-on-surface-variant uppercase tracking-wide">Negotiation</span>
+<span class="text-on-surface">$210k</span>
+</div>
+<div class="h-1.5 bg-surface-3 rounded-full overflow-hidden hairline-border">
+<div class="h-full bg-primary" style="width: 30%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[11px] mb-2 font-medium">
+<span class="text-on-surface-variant uppercase tracking-wide">Discovery</span>
+<span class="text-on-surface">$580k</span>
+</div>
+<div class="h-1.5 bg-surface-3 rounded-full overflow-hidden hairline-border">
+<div class="h-full bg-primary" style="width: 85%;"></div>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-6 border-t border-outline">
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mb-3 font-medium">Hot Leads</p>
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full hairline-border bg-surface-2 overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEz15Th4YDxUnzII4pDPGZmOF_dDUgXg_r63KvWteizdm5CnoqXQXKF5h7-K2O5TeBa78qJsWdC8Ow5wPR6tMEbfKtWRpubsfJM9Ay58sRwE-ZLKRQA6L_xy-K2_XUAVnvHIYwt8_vka-hCa5G6X0xk7OPHk5akf0JZ5G090-2UJJBrDaZCJPNHp4OAY55XmIZ_T3g6PmMY-0y1CUiXG2R7-IXZd3VqtyfL1MamCaWW94h5kRTlCBl_jJbG9Sx7L3D7wAb9jAZrMI"/>
+</div>
+<div class="w-8 h-8 rounded-full hairline-border bg-surface-2 overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7-LMQqMiq0gfIdjceXC61AmolfNWUlP4TOjzxwPe-_s6Kxteff_dlSo3JSI_NUZfpNctRwPyyEuR-_BCmqNXzHCFeP-C1WUAQm-Qd0mxO5Klm_XA-6Ud-AxSl92zdM00XbI2kXW7rqDKzznMlU51pFxh-qr8ciLctRnoWcijx3SvV7u-sOFhfQvB1q2meQ_jUhf_R1gN7seRU38_CUcr0zTDbev8UqMso6jdjxZ0zn5Z347869ElgndqZBlOMG5Bjno_qILTGEk4"/>
+</div>
+<div class="w-8 h-8 rounded-full hairline-border bg-surface-2 overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAo8pz6YNQnkmYctzSd9HmuavPY7GacAQ6gtpZLrzB-KWXLSnOnnZNmxpil7N4DS185BfS2W_jz9Pe7vzkTb932tpwgDctSosvFvM5N_inseEi8souSo0WY2BTDPYTeZ3CQDzk5Me29EhbzE2ETDj7CfcE6aAg7wP6ullfQ8SgkKPyOzPYWrzLDK6h8f1t9tY5mcGURhUCpTvuD1Ds9G9W6fpkw6Gdz-cojmcjYM1YI3_4Fu1MKsNxYL5S-71ZmUwD8UZ-EnLy8dT8"/>
+</div>
+<div class="w-8 h-8 rounded-full hairline-border bg-surface-3 flex items-center justify-center text-[10px] text-on-surface-variant font-medium">+5</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Intelligence Panel -->
+<div class="mt-4 bg-surface-1 hairline-border rounded-xl p-5 flex flex-col lg:flex-row items-center gap-6">
+<div class="flex items-center gap-4 flex-1">
+<div class="w-12 h-12 bg-surface-2 hairline-border flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined text-primary text-[28px]" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<div>
+<h4 class="font-semibold text-on-surface">Strategic Insight</h4>
+<p class="text-on-surface-variant text-[14px]">Competitor "StreamVibe" just increased ad spend by 40% on LinkedIn. Recommended tactical pivot for EcoStream's 'Write' stage.</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-1.5 bg-surface-2 hover:bg-surface-3 text-on-surface hairline-border rounded-md text-[13px] font-medium transition-colors">Dismiss</button>
+<button class="px-4 py-1.5 bg-primary hover:bg-primary-hover text-on-primary font-medium rounded-md text-[13px] transition-colors">Apply Recommendation</button>
+</div>
+</div>
+<!-- Client Health Heatmap -->
+<div class="mt-4 bg-surface-1 hairline-border rounded-xl p-6">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-[20px] font-semibold tracking-tight-aggressive">Client Portfolio Health</h3>
+<div class="flex gap-4">
+<div class="flex items-center gap-2 text-[10px] font-medium text-on-surface-variant uppercase tracking-wider">
+<span class="w-2 h-2 rounded-full bg-primary"></span> ACTIVE
+                        </div>
+<div class="flex items-center gap-2 text-[10px] font-medium text-on-surface-variant uppercase tracking-wider">
+<span class="w-2 h-2 rounded-full bg-[#ffb2b7]"></span> AT RISK
+                        </div>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+<!-- Heatmap Cell -->
+<div class="p-4 bg-surface-2 hairline-border rounded-lg hover:border-primary transition-colors cursor-pointer group">
+<p class="font-semibold text-[14px] mb-1 group-hover:text-primary transition-colors">Nebula Core</p>
+<div class="h-0.5 w-full bg-primary mb-3"></div>
+<div class="flex justify-between text-[11px] text-on-surface-variant font-mono">
+<span>$140k</span>
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+</div>
+</div>
+<div class="p-4 bg-surface-2 hairline-border rounded-lg hover:border-primary transition-colors cursor-pointer group">
+<p class="font-semibold text-[14px] mb-1 group-hover:text-primary transition-colors">Apex Data</p>
+<div class="h-0.5 w-full bg-primary mb-3"></div>
+<div class="flex justify-between text-[11px] text-on-surface-variant font-mono">
+<span>$88k</span>
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+</div>
+</div>
+<div class="p-4 bg-surface-2 hairline-border rounded-lg hover:border-[#ffb2b7] transition-colors cursor-pointer group">
+<p class="font-semibold text-[14px] mb-1 group-hover:text-[#ffb2b7] transition-colors">Orbit Pay</p>
+<div class="h-0.5 w-full bg-[#ffb2b7] mb-3"></div>
+<div class="flex justify-between text-[11px] text-on-surface-variant font-mono">
+<span>$210k</span>
+<span class="material-symbols-outlined text-[14px] text-[#ffb2b7]">warning</span>
+</div>
+</div>
+<div class="p-4 bg-surface-2 hairline-border rounded-lg hover:border-primary transition-colors cursor-pointer group">
+<p class="font-semibold text-[14px] mb-1 group-hover:text-primary transition-colors">Zenith AI</p>
+<div class="h-0.5 w-full bg-primary mb-3"></div>
+<div class="flex justify-between text-[11px] text-on-surface-variant font-mono">
+<span>$34k</span>
+<span class="material-symbols-outlined text-[14px]">trending_flat</span>
+</div>
+</div>
+<div class="p-4 bg-surface-2 hairline-border rounded-lg hover:border-primary transition-colors cursor-pointer group">
+<p class="font-semibold text-[14px] mb-1 group-hover:text-primary transition-colors">BioSynth</p>
+<div class="h-0.5 w-full bg-primary opacity-40 mb-3"></div>
+<div class="flex justify-between text-[11px] text-on-surface-variant font-mono">
+<span>$12k</span>
+<span class="material-symbols-outlined text-[14px]">new_releases</span>
+</div>
+</div>
+<div class="p-4 bg-surface-2 hairline-border rounded-lg hover:border-primary transition-colors cursor-pointer group">
+<p class="font-semibold text-[14px] mb-1 group-hover:text-primary transition-colors">Quant Co</p>
+<div class="h-0.5 w-full bg-primary mb-3"></div>
+<div class="flex justify-between text-[11px] text-on-surface-variant font-mono">
+<span>$445k</span>
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="h-10 border-t border-outline bg-background flex items-center px-gutter justify-between">
+<div class="flex items-center gap-6 text-[11px] font-medium text-on-surface-variant">
+<span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-primary rounded-full"></span> SYSTEM NOMINAL</span>
+<span>UPDATED: 4M AGO</span>
+</div>
+<div class="flex items-center gap-4 text-[11px] font-mono text-on-surface-variant">
+<span class="bg-surface-2 px-2 py-0.5 rounded hairline-border">v2.4.0-STABLE</span>
+</div>
+</footer>
+</main>
+<script>
+    // Command Palette Simulation
+    window.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            e.preventDefault();
+            console.log('Command Palette Triggered');
+        }
+    });
+</script>
+</body></html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bookings Inbox | AryanshMesh Business Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#5e6ad2",
+                    "on-primary": "#ffffff",
+                    "canvas": "#010102",
+                    "surface-1": "#0f1011",
+                    "surface-2": "#141516",
+                    "surface-3": "#18191a",
+                    "surface-4": "#191a1b",
+                    "hairline": "#23252a",
+                    "ink": "#f7f8f8",
+                    "ink-muted": "#d0d6e0",
+                    "ink-subtle": "#8a8f98",
+                    "ink-tertiary": "#62666d",
+                    "semantic-success": "#27a644"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "sm": "6px",
+                    "md": "8px",
+                    "lg": "12px",
+                    "xl": "16px",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "component-gap-sm": "8px",
+                    "gutter": "16px",
+                    "component-gap-md": "12px",
+                    "container-padding": "24px"
+            },
+            "fontFamily": {
+                    "sans": ["Inter", "sans-serif"],
+            },
+            "fontSize": {
+                    "display-xl": ["80px", {"lineHeight": "1.05", "letterSpacing": "-3.0px", "fontWeight": "600"}],
+                    "headline": ["28px", {"lineHeight": "1.20", "letterSpacing": "-0.6px", "fontWeight": "600"}],
+                    "card-title": ["22px", {"lineHeight": "1.25", "letterSpacing": "-0.4px", "fontWeight": "500"}],
+                    "body": ["16px", {"lineHeight": "1.50", "letterSpacing": "-0.05px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "1.50", "letterSpacing": "0", "fontWeight": "400"}],
+                    "caption": ["12px", {"lineHeight": "1.40", "letterSpacing": "0", "fontWeight": "400"}],
+                    "button": ["14px", {"lineHeight": "1.20", "letterSpacing": "0", "fontWeight": "500"}],
+                    "eyebrow": ["13px", {"lineHeight": "1.30", "letterSpacing": "0.4px", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #010102;
+            color: #f7f8f8;
+            -webkit-font-smoothing: antialiased;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+            vertical-align: middle;
+            font-size: 20px;
+        }
+        .active-booking {
+            background-color: #141516;
+            box-shadow: inset 2px 0 0 0 #5e6ad2;
+        }
+        .hairline-border {
+            border: 1px solid #23252a;
+        }
+    </style>
+</head>
+<body class="font-sans overflow-hidden">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 flex justify-between items-center w-full px-gutter h-14 bg-canvas border-b border-hairline">
+<div class="flex items-center gap-6">
+<span class="text-xl font-bold tracking-tight text-ink">AryanshMesh</span>
+<nav class="hidden md:flex gap-6">
+<a class="text-ink-subtle text-body-sm hover:text-ink transition-colors" href="#">Marketing</a>
+<a class="text-ink text-body-sm font-medium border-b border-primary pb-4 mt-4" href="#">Business</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-ink-tertiary">search</span>
+<input class="bg-surface-1 border border-hairline rounded-md pl-10 pr-4 py-1 text-body-sm text-ink focus:border-ink-subtle outline-none w-64 transition-all" placeholder="Search inquiries..." type="text"/>
+</div>
+<button class="flex items-center gap-2 px-3.5 py-2 bg-surface-1 text-ink rounded-md text-button border border-hairline hover:bg-surface-2 transition-colors">
+<span class="material-symbols-outlined">add</span>
+                Create
+            </button>
+<div class="flex items-center gap-1">
+<button class="p-2 text-ink-subtle hover:text-ink transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-ink-subtle hover:text-ink transition-colors">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+</div>
+<div class="h-7 w-7 rounded-full overflow-hidden border border-hairline ml-2">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATCyAOALBDNJ5mB87vcuU2Jvqr1IEay_yt2nS2C8IHXMDgV44QfAOb9fzj3Q_3UFdIaUyIdRJmSmPlFzHFn1vbxqI8XgTqm0rInB6OCEWtkmIti8QVn96G6RuLg88plQJTZp9n6o_5alsTfCZOeXCuGlwm9jzZZ4am4vb3Xg32UeowbPV9fFW_L43NTMhzFJJ0V9vbDnaNGzmtVQg8ob9DAuC9afbSesoShuxsNP-z7a66ZbAjKfVgKpqzYKALxLHaCzBeTiGHsGw"/>
+</div>
+</div>
+</header>
+<div class="flex h-[calc(100vh-56px)] overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-60 bg-canvas border-r border-hairline hidden xl:flex flex-col py-6 px-3 z-40">
+<div class="space-y-1 mb-gutter">
+<div class="flex items-center gap-3 px-3 py-1.5 text-ink-subtle hover:bg-surface-1 hover:text-ink rounded-md transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-ink-tertiary group-hover:text-ink">dashboard</span>
+<span class="text-body-sm font-medium">Overview</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-1.5 text-ink-subtle hover:bg-surface-1 hover:text-ink rounded-md transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-ink-tertiary group-hover:text-ink">business</span>
+<span class="text-body-sm font-medium">Companies</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-1.5 text-ink-subtle hover:bg-surface-1 hover:text-ink rounded-md transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-ink-tertiary group-hover:text-ink">groups</span>
+<span class="text-body-sm font-medium">CRM</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-1.5 text-ink bg-surface-1 rounded-md cursor-pointer border border-hairline shadow-sm">
+<span class="material-symbols-outlined text-primary">calendar_today</span>
+<span class="text-body-sm font-medium">Bookings</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-1.5 text-ink-subtle hover:bg-surface-1 hover:text-ink rounded-md transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-ink-tertiary group-hover:text-ink">menu_book</span>
+<span class="text-body-sm font-medium">Catalog</span>
+</div>
+</div>
+<div class="mt-auto pt-6 border-t border-hairline">
+<div class="flex items-center gap-3 px-3 py-1.5 text-ink-subtle hover:bg-surface-1 hover:text-ink rounded-md transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-ink-tertiary">settings</span>
+<span class="text-body-sm font-medium">Settings</span>
+</div>
+<div class="mt-4 px-3 py-1.5 bg-surface-1 rounded-md border border-hairline flex items-center justify-between group cursor-pointer">
+<span class="text-caption text-ink-subtle">Command Menu</span>
+<span class="text-[10px] text-ink-tertiary border border-hairline px-1 rounded bg-canvas">⌘K</span>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex overflow-hidden bg-canvas">
+<!-- Inquiry List -->
+<section class="w-full md:w-[320px] lg:w-[380px] border-r border-hairline flex flex-col h-full bg-surface-1">
+<div class="px-5 py-4 border-b border-hairline flex justify-between items-center bg-surface-2">
+<h2 class="text-body-sm font-semibold text-ink">Inbox</h2>
+<span class="bg-surface-3 border border-hairline text-ink-muted px-2 py-0.5 rounded-full text-[11px] font-medium">12 new</span>
+</div>
+<div class="flex-1 overflow-y-auto scrollbar-hide">
+<!-- Cards -->
+<div class="px-5 py-4 border-b border-hairline cursor-pointer active-booking transition-colors">
+<div class="flex justify-between items-start mb-1">
+<span class="text-caption font-medium text-primary tracking-tight">SEO Consultation</span>
+<span class="text-[11px] text-ink-tertiary">2m</span>
+</div>
+<h3 class="font-medium text-ink mb-1 text-body-sm">Marcus Thorne</h3>
+<p class="text-body-sm text-ink-subtle line-clamp-2 opacity-80 leading-snug">"Looking to scale our e-commerce platform's organic reach. Would like to discuss..."</p>
+</div>
+<div class="px-5 py-4 border-b border-hairline cursor-pointer hover:bg-surface-2 transition-colors">
+<div class="flex justify-between items-start mb-1">
+<span class="text-caption font-medium text-ink-subtle tracking-tight">Brand Identity Refresh</span>
+<span class="text-[11px] text-ink-tertiary">1h</span>
+</div>
+<h3 class="font-medium text-ink mb-1 text-body-sm">Elena Rodriguez</h3>
+<p class="text-body-sm text-ink-subtle line-clamp-2 opacity-80 leading-snug">"Our SaaS product needs a visual overhaul to match our new market position."</p>
+</div>
+<div class="px-5 py-4 border-b border-hairline cursor-pointer hover:bg-surface-2 transition-colors">
+<div class="flex justify-between items-start mb-1">
+<span class="text-caption font-medium text-ink-subtle tracking-tight">PPC Audit</span>
+<span class="text-[11px] text-ink-tertiary">3h</span>
+</div>
+<h3 class="font-medium text-ink mb-1 text-body-sm">Jameson Dynamics</h3>
+<p class="text-body-sm text-ink-subtle line-clamp-2 opacity-80 leading-snug">"Current agency underperforming. Need a deep dive into Google Ads spend."</p>
+</div>
+</div>
+</section>
+<!-- Booking Details -->
+<section class="hidden md:flex flex-1 flex-col h-full bg-canvas overflow-y-auto scrollbar-hide">
+<div class="px-8 py-5 border-b border-hairline bg-canvas sticky top-0 z-10 flex justify-between items-center">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<h1 class="text-body font-semibold text-ink tracking-tight">Inquiry: SEO Consultation</h1>
+</div>
+<p class="text-ink-subtle text-caption">Assigned to <span class="text-ink">Aryansh</span></p>
+</div>
+<div class="flex gap-2">
+<button class="px-3.5 py-1.5 bg-surface-1 border border-hairline rounded-md text-button text-ink hover:bg-surface-2 transition-colors">Archive</button>
+<button class="px-3.5 py-1.5 bg-primary text-on-primary rounded-md text-button font-medium hover:opacity-90 transition-all shadow-sm">Accept Booking</button>
+</div>
+</div>
+<div class="px-8 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl">
+<div class="lg:col-span-8 space-y-8">
+<!-- Profile Panel -->
+<div class="bg-surface-1 border border-hairline rounded-lg p-6">
+<div class="flex items-start gap-6 mb-6">
+<div class="h-16 w-16 rounded-lg overflow-hidden border border-hairline">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDynQwhLpGHB3C6L__Subi5YfzBJBH0eEa9rSlOS558rRQKFBygu4w_8AN_NcRLp5vfabuNkV3bEkxiq58HrKmeyvlk7nTEDN4bFiP3eTJ-Lb9zOMFRVqZrXtBxqtI5GG8WGmyGK4lhXGBrVJKYF00dAp7oUWR2CPP2nAwp7KgGS5VrM2eJXGhKgNijWyzuBPMDh4IV3nSMxgdOMnRisk8a473plFoHef-ra-k3fwg67VTf5LGf4Xt_i27EENdXIdXRVhY4WRJOya4"/>
+</div>
+<div class="flex-1">
+<h2 class="text-xl font-semibold text-ink mb-0.5 tracking-tight">Marcus Thorne</h2>
+<p class="text-ink-subtle text-caption font-medium tracking-wide mb-4">Managing Director, Thorne Logistics</p>
+<div class="flex flex-wrap gap-x-6 gap-y-2">
+<div class="flex items-center gap-2 text-caption text-ink-subtle">
+<span class="material-symbols-outlined text-ink-tertiary">mail</span>
+                                            m.thorne@thornelogistics.com
+                                        </div>
+<div class="flex items-center gap-2 text-caption text-ink-subtle">
+<span class="material-symbols-outlined text-ink-tertiary">call</span>
+                                            +44 20 7946 0958
+                                        </div>
+</div>
+</div>
+</div>
+<div class="pt-6 border-t border-hairline">
+<h3 class="text-eyebrow text-ink-muted mb-3 uppercase tracking-wider font-semibold">Project Description</h3>
+<p class="text-body-sm text-ink-muted leading-relaxed">
+                                    "We are launching our new e-commerce division in Q1 2024 and need a comprehensive SEO strategy that covers technical site audits, backlink profiling, and competitive keyword mapping. We've seen AryanshMesh's work with logistics startups and want that level of precision for our GTM strategy."
+                                </p>
+</div>
+</div>
+<!-- Insight -->
+<div class="bg-surface-2 border border-hairline p-5 rounded-lg flex items-start gap-4">
+<span class="material-symbols-outlined text-primary">bolt</span>
+<div>
+<span class="text-eyebrow text-ink font-semibold uppercase tracking-wider">GTM Intelligence</span>
+<p class="text-body-sm text-ink-subtle mt-1 leading-relaxed">
+                                    Marcus Thorne recently closed a Series B funding round. High probability of increased marketing budget and long-term retainer potential.
+                                </p>
+</div>
+</div>
+<!-- Meta Cards -->
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-1 border border-hairline p-4 rounded-lg">
+<span class="text-ink-tertiary text-caption font-medium block mb-1">Service Requested</span>
+<span class="font-medium text-ink block text-body-sm">Enterprise SEO Strategy</span>
+</div>
+<div class="bg-surface-1 border border-hairline p-4 rounded-lg">
+<span class="text-ink-tertiary text-caption font-medium block mb-1">Estimated Budget</span>
+<span class="font-medium text-ink block text-body-sm">$15k - $25k / Month</span>
+</div>
+</div>
+</div>
+<!-- Side Panel -->
+<div class="lg:col-span-4 space-y-6">
+<!-- Date/Time -->
+<div class="bg-surface-2 border border-hairline p-5 rounded-lg">
+<h3 class="text-eyebrow text-ink-subtle font-semibold mb-4 uppercase tracking-wider">Requested Slot</h3>
+<div class="flex items-center gap-4 mb-4">
+<div class="bg-surface-3 w-11 h-11 rounded-md flex flex-col items-center justify-center border border-hairline">
+<span class="text-[9px] font-bold text-ink-tertiary">OCT</span>
+<span class="text-body font-bold text-primary">24</span>
+</div>
+<div>
+<p class="font-medium text-ink text-body-sm">Tuesday, Oct 24</p>
+<p class="text-caption text-ink-subtle">10:00 AM - 11:00 AM GMT</p>
+</div>
+</div>
+<button class="w-full py-1.5 bg-surface-3 text-ink-muted border border-hairline rounded-md text-button hover:bg-surface-4 transition-colors">Reschedule</button>
+</div>
+<!-- Lead History (Linear Style) -->
+<div class="bg-surface-1 border border-hairline p-5 rounded-lg">
+<h3 class="text-eyebrow text-ink-subtle font-semibold mb-6 uppercase tracking-wider">Lead History</h3>
+<div class="space-y-6 relative">
+<div class="absolute left-[5px] top-1.5 bottom-1.5 w-px bg-hairline"></div>
+<div class="relative pl-6 flex flex-col gap-0.5">
+<div class="absolute left-0 top-1 w-2.5 h-2.5 bg-primary rounded-full border-2 border-surface-1 z-10"></div>
+<p class="text-body-sm text-ink font-medium">Inquiry Received</p>
+<p class="text-caption text-ink-tertiary">Today, 2:45 PM</p>
+</div>
+<div class="relative pl-6 flex flex-col gap-0.5">
+<div class="absolute left-0 top-1 w-2.5 h-2.5 bg-ink-tertiary rounded-full border-2 border-surface-1 z-10"></div>
+<p class="text-body-sm text-ink-muted">Auto-Response Sent</p>
+<p class="text-caption text-ink-tertiary">Today, 2:46 PM</p>
+</div>
+<div class="relative pl-6 flex flex-col gap-0.5">
+<div class="absolute left-0 top-1 w-2.5 h-2.5 bg-ink-tertiary rounded-full border-2 border-surface-1 z-10"></div>
+<p class="text-body-sm text-ink-muted">Segmented: High Intent</p>
+<p class="text-caption text-ink-tertiary">Today, 2:47 PM</p>
+</div>
+</div>
+</div>
+<!-- Notes -->
+<div class="bg-surface-1 border border-hairline p-5 rounded-lg">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-eyebrow text-ink-subtle font-semibold uppercase tracking-wider">Internal Notes</h3>
+<span class="material-symbols-outlined text-ink-tertiary cursor-pointer hover:text-primary transition-colors">edit</span>
+</div>
+<textarea class="w-full bg-surface-2 border border-hairline rounded-md p-3 text-body-sm text-ink-muted min-h-[100px] outline-none focus:border-primary/50 transition-all placeholder:text-ink-tertiary" placeholder="Add a private note..."></textarea>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+<script>
+        // List selection interaction
+        document.querySelectorAll('section > div > div').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('section > div > div').forEach(c => {
+                    c.classList.remove('active-booking');
+                    c.classList.add('hover:bg-surface-2');
+                });
+                card.classList.add('active-booking');
+                card.classList.remove('hover:bg-surface-2');
+            });
+        });
+    </script>
+</body></html>

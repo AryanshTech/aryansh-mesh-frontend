@@ -3,16 +3,16 @@
 > How to evolve the current Geist + shadcn system from "correct and consistent" into a product that feels cohesive, responsive, and immersive — without abandoning the design language already in place.
 
 **Status:** Complete (Phases 0–3 implemented)
-**Baseline:** Tailwind v4 + shadcn (new-york) + Geist tokens, Vercel blue `#0070f3` primary
+**Baseline:** Tailwind v4 + shadcn (new-york) + Linear lavender tokens (`#5e6ad2` primary), dense hairline surfaces
 **Related:** [DESIGN.md](./DESIGN.md) · [docs/aryansh-mesh/UI-REQUIREMENTS.md](../docs/aryansh-mesh/UI-REQUIREMENTS.md) · [docs/aryansh-mesh/UI_HCI_AUDIT.md](../docs/aryansh-mesh/UI_HCI_AUDIT.md)
 
-> Note: The older [UI_HCI_AUDIT.md](../docs/aryansh-mesh/UI_HCI_AUDIT.md) describes a "Linear-inspired lavender" identity that predates the Geist migration. Where the two disagree, this doc reflects the current `#0070f3` Geist system. The old audit is not edited here.
+> **Primary identity (2026):** Linear-inspired lavender dark aesthetic. Canonical token values live in [docs/aryansh-mesh/DESIGN.md](../docs/aryansh-mesh/DESIGN.md). Older references to Geist blue `#0070f3` in this doc are historical.
 
 ---
 
 ## 1. Executive summary
 
-AryanshMesh has a solid, intentional foundation: a single Tailwind v4 vocabulary, Geist-inspired CSS variables in [tokens.css](src/design-system/styles/tokens.css), a shadcn primitive library (35 components), and centralized layout bundles in [layout.ts](src/design-system/tokens/layout.ts). The shell is well-architected — an auth shell for guests and an app shell with a sticky header, permission-aware sidebar, and scrollable content region.
+AryanshMesh has a solid, intentional foundation: a single Tailwind v4 vocabulary, Linear-inspired CSS variables in [globals.css](src/design-system/styles/globals.css), a shadcn primitive library, and centralized layout bundles in [layout.ts](src/design-system/tokens/layout.ts). The shell is well-architected — an auth shell for guests and an app shell with a sticky header, permission-aware sidebar, and scrollable content region.
 
 The product is **correct** in most places but not yet **immersive**. Two things hold it back:
 
@@ -96,8 +96,8 @@ Marketing pages fetch with `try/finally` and no `isError` handling, so network f
 Cohesion is the first pillar of immersion; these are the things that make the system feel unfinished.
 
 ### 4.1 Dead / duplicate layers
-- [colors.ts](src/design-system/tokens/colors.ts) and `appColors` (in [layout.ts](src/design-system/tokens/layout.ts)) are `@deprecated` re-export barrels with **zero app imports**.
-- Legacy CSS aliases in [tokens.css](src/design-system/styles/tokens.css) never bridged to Tailwind and unused: `--rgb-surface-1..4`, `--rgb-ink-muted/subtle/tertiary`.
+- Deprecated token barrels and legacy aliases have been removed; [globals.css](src/design-system/styles/globals.css) is the runtime token source.
+- Legacy CSS aliases in [globals.css](src/design-system/styles/globals.css) are guarded by [check-design-tokens.sh](scripts/check-design-tokens.sh) so dead token paths do not return.
 - `--hover` and link tokens (`--rgb-link`, `--rgb-link-deep`, `--rgb-link-soft`) defined but not exposed as utilities; links just use `text-primary`.
 - The `@theme` spacing scale (`--spacing-xxs`…`--spacing-section`) is defined but unused — the app uses default Tailwind spacing.
 - `layout.text.secondary` and `layout.text.muted` are identical strings.
@@ -150,7 +150,7 @@ The core of "make it immersive." Each item lists the technique and where to appl
 Ordered so correctness and cohesion land before choreography.
 
 ### Phase 0 — Hygiene (foundation)
-- Remove dead layers: [colors.ts](src/design-system/tokens/colors.ts), `appColors`, legacy `--rgb-surface-*` / `--rgb-ink-*`, unused spacing tokens.
+- Remove dead layers: legacy token aliases, unused layout exports, and obsolete component wrappers.
 - Fix font loading in [index.html](index.html) (load Inter/Geist Mono fallbacks or trim the stack to what's loaded).
 - Add a 3-way theme control (light / dark / system) in [ShellUtilityActions.tsx](src/shared/components/layout/ShellUtilityActions.tsx).
 - Make Sonner theme-aware in [sonner.tsx](src/design-system/components/ui/sonner.tsx).
@@ -181,7 +181,7 @@ Ordered so correctness and cohesion land before choreography.
 
 Per-phase "done" checks:
 
-- **Phase 0:** No imports of `colors.ts`/`appColors`; no unused legacy CSS vars remain; theme menu offers system; toasts respect dark mode; font stack matches loaded fonts.
+- **Phase 0:** No stale token-file references or unused legacy CSS vars remain; theme menu offers system; toasts respect dark mode; font stack matches loaded fonts.
 - **Phase 1:** No `window.prompt`/`confirm` in the codebase; every marketing page renders a loading, empty, and error state; every mutation fires a toast; all icon-only controls have labels; clickable rows are keyboard-operable; single radius + shadow scale documented.
 - **Phase 2:** Route changes animate; lists stagger; skeletons crossfade; everything disables under reduced-motion (verified by toggling the OS setting).
 - **Phase 3:** Primary actions reachable from the sticky header on all breakpoints; split-pane pages fill the viewport; streaming shows a live cursor; contrast meets WCAG AA in both themes.
@@ -196,11 +196,11 @@ Suggested signals to watch: time-to-first-meaningful-paint per route, perceived 
 
 | Area | Path |
 |---|---|
-| Color/value tokens | [src/design-system/styles/tokens.css](src/design-system/styles/tokens.css) |
+| Color/value tokens | [src/design-system/styles/globals.css](src/design-system/styles/globals.css) |
 | Tailwind theme + utilities | [src/design-system/styles/globals.css](src/design-system/styles/globals.css) |
 | Layout class bundles | [src/design-system/tokens/layout.ts](src/design-system/tokens/layout.ts) |
 | Typography bundles | [src/design-system/tokens/typography.ts](src/design-system/tokens/typography.ts) |
-| Deprecated barrels | [src/design-system/tokens/colors.ts](src/design-system/tokens/colors.ts) |
+| Token guard | [scripts/check-design-tokens.sh](scripts/check-design-tokens.sh) |
 | App shell | [src/shell/AppShell.tsx](src/shell/AppShell.tsx) |
 | Header (+ unused action APIs) | [src/shell/ShellHeader.tsx](src/shell/ShellHeader.tsx) |
 | Sidebar | [src/shell/ShellSidebar.tsx](src/shell/ShellSidebar.tsx) |
@@ -216,13 +216,13 @@ Suggested signals to watch: time-to-first-meaningful-paint per route, perceived 
 
 | Token / item | Location | Action |
 |---|---|---|
-| `--rgb-surface-1..4` | [tokens.css](src/design-system/styles/tokens.css) | Remove (unused) |
-| `--rgb-ink-muted/subtle/tertiary` | [tokens.css](src/design-system/styles/tokens.css) | Remove (unused) |
-| `--hover` | [tokens.css](src/design-system/styles/tokens.css) | Bridge to `@theme` or remove |
-| `--rgb-link*` | [tokens.css](src/design-system/styles/tokens.css) | Bridge to a `link` utility or remove |
-| `--radius-xl` (== `lg`) | [tokens.css](src/design-system/styles/tokens.css) | Differentiate or drop |
+| `--rgb-surface-*` legacy aliases | [globals.css](src/design-system/styles/globals.css) | Keep only surfaced runtime tokens |
+| `--rgb-ink-*` legacy aliases | [globals.css](src/design-system/styles/globals.css) | Keep only surfaced runtime tokens |
+| `--hover` | [globals.css](src/design-system/styles/globals.css) | Removed if unused |
+| `--rgb-link*` | [globals.css](src/design-system/styles/globals.css) | Removed if unused |
+| radius scale | [globals.css](src/design-system/styles/globals.css) | Cards consume `--radius-card` |
 | `--spacing-*` scale | [globals.css](src/design-system/styles/globals.css) | Adopt or remove |
-| `colors.ts`, `appColors` | tokens dir / [layout.ts](src/design-system/tokens/layout.ts) | Delete after confirming no imports |
+| obsolete layout exports | [layout.ts](src/design-system/tokens/layout.ts) | Delete after confirming no imports |
 | `shadow-sm/md/lg` usages | primitives | Map onto `shadow-whisper`/`shadow-floating` |
 | Inter / JetBrains Mono | [globals.css](src/design-system/styles/globals.css) font stack | Load fonts or trim stack |
 

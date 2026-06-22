@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AryanshMesh | Publishing Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Geist+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+            font-size: 20px;
+        }
+        
+        body {
+            background-color: #010102;
+            color: #f7f8f8;
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .hairline {
+            border: 1px solid #23252a;
+        }
+        
+        .hairline-strong {
+            border: 1px solid #34343a;
+        }
+
+        .surface-1 { background-color: #0f1011; }
+        .surface-2 { background-color: #141516; }
+        .surface-3 { background-color: #18191a; }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #010102;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #23252a;
+            border-radius: 2px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #34343a;
+        }
+
+        .linear-display {
+            letter-spacing: -0.02em;
+        }
+        
+        .linear-display-xl {
+            font-size: 36px;
+            font-weight: 600;
+            line-height: 1.15;
+            letter-spacing: -1px;
+        }
+
+        .btn-primary {
+            background-color: #5e6ad2;
+            color: #ffffff;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #828fff;
+        }
+
+        .btn-secondary {
+            background-color: #0f1011;
+            border: 1px solid #23252a;
+            color: #f7f8f8;
+        }
+        .btn-secondary:hover {
+            border-color: #34343a;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#5e6ad2",
+                        "on-primary": "#ffffff",
+                        "canvas": "#010102",
+                        "surface-1": "#0f1011",
+                        "surface-2": "#141516",
+                        "ink": "#f7f8f8",
+                        "ink-muted": "#d0d6e0",
+                        "ink-subtle": "#8a8f98",
+                        "hairline": "#23252a",
+                        "semantic-success": "#27a644"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "8px",
+                        "sm": "6px",
+                        "md": "8px",
+                        "lg": "12px",
+                        "xl": "16px"
+                    },
+                    fontFamily: {
+                        "mono": ["Geist Mono", "ui-monospace", "monospace"]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="selection:bg-primary/30">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 flex justify-between items-center w-full px-6 h-14 bg-canvas/80 backdrop-blur-xl border-b border-hairline">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-ink">AryanshMesh</span>
+<nav class="hidden md:flex gap-6">
+<a class="text-ink-subtle hover:text-ink transition-colors text-[13px] font-medium" href="#">Marketing</a>
+<a class="text-ink-subtle hover:text-ink transition-colors text-[13px] font-medium" href="#">Business</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="bg-surface-1 border border-hairline rounded-md px-3 py-1.5 flex items-center gap-2 group focus-within:border-ink-subtle transition-all">
+<span class="material-symbols-outlined text-ink-subtle !text-[16px]">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-[13px] w-40 p-0 placeholder:text-ink-subtle" placeholder="Search..." type="text"/>
+<span class="text-[10px] font-mono text-ink-subtle border border-hairline px-1 rounded">⌘K</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="material-symbols-outlined text-ink-subtle hover:text-ink p-2 transition-colors">notifications</button>
+<div class="h-6 w-6 rounded-full overflow-hidden ml-2 border border-hairline">
+<img class="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0HufikmBBPuxSoZAG3LUIPj7PRPkJ4AHlOelkoyeWK9RdermovalOZJCMEuYMBB0YkVw7GKUGsAwOgw5dNdbEutow4evZhfloVCfoCaYXtbilvnWKueOy7HyWiFjKAH1y6JZZHXtGcKjZztFzpoMX7ReJBqmDvH_fFoa3E6ajgz8dMixyY_-uBHMutfvHg3N8u0jnSQJ7blUs0CAfS5EWojPvdSS9hal9MZmlB21kzs75hfJWpZmanb44kIplVK_xbMVRiOTG0F0"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex h-[calc(100vh-56px)] overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-14 h-[calc(100vh-56px)] w-56 bg-canvas border-r border-hairline py-6 px-3 flex flex-col hidden md:flex">
+<div class="space-y-1 flex-1">
+<a class="flex items-center gap-3 px-3 py-2 text-ink-subtle hover:bg-surface-1 hover:text-ink transition-colors rounded-md group" href="#">
+<span class="material-symbols-outlined !text-[18px]">dashboard</span>
+<span class="text-[13px] font-medium">Overview</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-ink-subtle hover:bg-surface-1 hover:text-ink transition-colors rounded-md" href="#">
+<span class="material-symbols-outlined !text-[18px]">business</span>
+<span class="text-[13px] font-medium">Companies</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-ink-subtle hover:bg-surface-1 hover:text-ink transition-colors rounded-md" href="#">
+<span class="material-symbols-outlined !text-[18px]">groups</span>
+<span class="text-[13px] font-medium">CRM</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-ink-subtle hover:bg-surface-1 hover:text-ink transition-colors rounded-md" href="#">
+<span class="material-symbols-outlined !text-[18px]">account_circle</span>
+<span class="text-[13px] font-medium">Profile</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-ink-subtle hover:bg-surface-1 hover:text-ink transition-colors rounded-md" href="#">
+<span class="material-symbols-outlined !text-[18px]">menu_book</span>
+<span class="text-[13px] font-medium">Catalog</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-primary font-medium bg-primary/5 border border-primary/20 rounded-md" href="#">
+<span class="material-symbols-outlined !text-[18px]" style="font-variation-settings: 'FILL' 1;">send</span>
+<span class="text-[13px]">Publish</span>
+</a>
+</div>
+<div class="mt-auto space-y-1 pt-4 border-t border-hairline">
+<a class="flex items-center gap-3 px-3 py-1.5 text-ink-subtle hover:text-ink transition-colors" href="#">
+<span class="material-symbols-outlined !text-[18px]">settings</span>
+<span class="text-[13px]">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-1.5 text-ink-subtle hover:text-ink transition-colors" href="#">
+<span class="material-symbols-outlined !text-[18px]">info</span>
+<span class="text-[13px]">Support</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-0 md:ml-56 overflow-y-auto bg-canvas p-8">
+<div class="max-w-6xl mx-auto space-y-10">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+<div>
+<h1 class="linear-display-xl text-ink">Publishing Center</h1>
+<p class="text-ink-muted text-[14px] mt-1">Deploy staged changes to your production environment.</p>
+</div>
+<button class="btn-primary px-5 py-2 rounded-md font-medium text-[14px] flex items-center gap-2 shadow-xl shadow-primary/10">
+<span>Publish to Website</span>
+<span class="material-symbols-outlined !text-[16px]">rocket_launch</span>
+</button>
+</div>
+<!-- Dashboard Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Current Live Version Card -->
+<div class="md:col-span-5 surface-1 border border-hairline rounded-lg p-6 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start">
+<div>
+<span class="bg-surface-2 border border-hairline text-ink-muted px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">Live Production</span>
+<h2 class="text-xl font-semibold mt-4 text-ink">Current Version</h2>
+</div>
+<div class="text-right">
+<p class="font-mono text-[13px] text-primary">v2.4.8-release</p>
+<p class="text-ink-subtle text-[11px]">4h ago</p>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4 mt-8 pt-6 border-t border-hairline">
+<div class="h-12 w-12 bg-surface-2 rounded-lg overflow-hidden border border-hairline flex-shrink-0">
+<img class="w-full h-full object-cover opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGD57EpJtqKu4ULWVRqkt0H-jrfRSx0D5l_Xk9hmUAt7Zya8ovX8LgFr798jwbNxtFAYq-776sVfiodmdI8D8FLRF6HdlZwB3Lrx2JebvcwcRLqRLNqUPHoOIHZkrgFgl0S3K_u4lmVrU8IJXXj2Q2UsStvW1Gh6XSh7oIz6bkBkehmXdsEosK5yvm1E2tt67q3680A-DIZO4bWsNfxj57DzCPSuCYNMwD3epexUzOimIYHJSn-e9gaP1PKQiTHu-2mHpVPypSr6A"/>
+</div>
+<div class="min-w-0">
+<p class="text-ink text-[14px] font-medium truncate">marketing.aryanshmesh.ai</p>
+<p class="text-ink-subtle text-[12px]">14,202 visitors today</p>
+</div>
+</div>
+</div>
+<!-- Staged Changes List Card -->
+<div class="md:col-span-7 surface-1 border border-hairline rounded-lg overflow-hidden flex flex-col">
+<div class="px-6 py-4 border-b border-hairline flex justify-between items-center bg-surface-2/30">
+<h2 class="text-[14px] font-semibold text-ink">Staged Changes</h2>
+<span class="text-ink-subtle text-[11px] font-medium uppercase tracking-wider">12 Updates Pending</span>
+</div>
+<div class="divide-y divide-hairline">
+<div class="p-4 hover:bg-surface-2/50 transition-colors flex items-center justify-between group">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-semantic-success !text-[18px]">check_circle</span>
+<div>
+<p class="text-[13px] font-medium text-ink">Homepage Metadata Update</p>
+<p class="text-ink-subtle text-[11px]">Modified by @aryansh_admin</p>
+</div>
+</div>
+<span class="text-[10px] text-ink-subtle border border-hairline px-1.5 py-0.5 rounded">SEO</span>
+</div>
+<div class="p-4 hover:bg-surface-2/50 transition-colors flex items-center justify-between group">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-semantic-success !text-[18px]">check_circle</span>
+<div>
+<p class="text-[13px] font-medium text-ink">New Case Study: "GTM Alpha"</p>
+<p class="text-ink-subtle text-[11px]">Asset upload complete</p>
+</div>
+</div>
+<span class="text-[10px] text-ink-subtle border border-hairline px-1.5 py-0.5 rounded">CONTENT</span>
+</div>
+<div class="p-4 bg-surface-2/20 flex items-center justify-center">
+<button class="text-[12px] text-ink-subtle hover:text-ink transition-colors font-medium">View all 12 changes</button>
+</div>
+</div>
+</div>
+<!-- Metadata Manifest Card -->
+<div class="md:col-span-8 surface-1 border border-hairline rounded-lg p-6">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-ink-subtle !text-[18px]">terminal</span>
+<h3 class="text-[11px] font-bold text-ink-subtle uppercase tracking-[0.05em]">Metadata Manifest Preview</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-6">
+<div>
+<label class="text-[10px] text-ink-subtle uppercase font-bold tracking-wider mb-2 block">Page Title</label>
+<div class="bg-canvas border border-hairline p-3 rounded font-mono text-[12px] text-ink leading-snug">
+                                    AryanshMesh | Strategic Business Hub &amp; Marketing Suite
+                                </div>
+</div>
+<div>
+<label class="text-[10px] text-ink-subtle uppercase font-bold tracking-wider mb-2 block">OG Description</label>
+<p class="text-ink-muted text-[13px] leading-relaxed">
+                                    The unified command center for high-stakes marketing and GTM strategies. Connect your business intelligence with powerful publishing tools.
+                                </p>
+</div>
+</div>
+<div>
+<label class="text-[10px] text-ink-subtle uppercase font-bold tracking-wider mb-2 block">OG:Image Preview</label>
+<div class="aspect-video rounded-md overflow-hidden border border-hairline relative group">
+<img class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtK9g0J0Np6z5AYfExEqBwO9c5lUq9-9EoQWo8vL268F1OBSSWVqM9lv8blipqIitRwWMgirZSiqTfBZMqnfaksa05MunqfqNdFhLrL5jlCrCxmO4iXVFyUov06y2FWqCSgaGGyljJgkB70H0chjC07m-IqjjpIVS_7WXCgJ9BRu7NFUFc_aUrvnBqlIzG60XSLXnzy_1nzydl2fVEgFH8GqNCBYrccatnLMnN2dON5hOvjOmuoAuXgWIvHZIx431WW29Dku5F2TI"/>
+<div class="absolute inset-0 bg-canvas/40 pointer-events-none"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Snapshot History Card -->
+<div class="md:col-span-4 surface-1 border border-hairline rounded-lg flex flex-col">
+<div class="px-6 py-4 border-b border-hairline flex justify-between items-center">
+<h3 class="text-[11px] font-bold text-ink-subtle uppercase tracking-wider">Snapshot History</h3>
+<span class="material-symbols-outlined text-ink-subtle !text-[16px]">history</span>
+</div>
+<div class="p-6 space-y-6 flex-1">
+<div class="flex gap-4 relative">
+<div class="absolute left-[7px] top-[18px] bottom-[-24px] w-[1px] bg-hairline"></div>
+<div class="h-4 w-4 rounded-full bg-primary flex items-center justify-center z-10 ring-4 ring-canvas">
+<span class="material-symbols-outlined !text-[10px] text-white">check</span>
+</div>
+<div class="-mt-0.5">
+<p class="text-[13px] font-semibold text-ink">Snapshot #281 (Live)</p>
+<p class="text-[11px] text-ink-subtle mt-0.5">v2.4.8 • Oct 24, 14:02</p>
+</div>
+</div>
+<div class="flex gap-4 relative">
+<div class="absolute left-[7px] top-[18px] bottom-[-24px] w-[1px] bg-hairline"></div>
+<div class="h-4 w-4 rounded-full bg-surface-2 border border-hairline z-10 ring-4 ring-canvas"></div>
+<div class="-mt-0.5">
+<p class="text-[13px] font-medium text-ink-muted">Snapshot #280</p>
+<p class="text-[11px] text-ink-subtle mt-0.5">v2.4.7 • Oct 22, 09:45</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="h-4 w-4 rounded-full bg-surface-2 border border-hairline z-10 ring-4 ring-canvas"></div>
+<div class="-mt-0.5">
+<p class="text-[13px] font-medium text-ink-muted">Snapshot #279</p>
+<p class="text-[11px] text-ink-subtle mt-0.5">v2.4.6 • Oct 20, 11:12</p>
+</div>
+</div>
+</div>
+<button class="w-full py-3 text-[12px] font-medium text-ink-subtle hover:text-ink hover:bg-surface-2 transition-colors border-t border-hairline">
+                        View Audit Logs
+                    </button>
+</div>
+</div>
+<!-- Footer -->
+<footer class="pt-8 border-t border-hairline flex flex-wrap justify-between items-center gap-6">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<div class="h-1.5 w-1.5 rounded-full bg-semantic-success shadow-[0_0_8px_rgba(39,166,68,0.5)]"></div>
+<span class="text-[11px] font-mono text-ink-subtle">API Server: Connected</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="h-1.5 w-1.5 rounded-full bg-semantic-success shadow-[0_0_8px_rgba(39,166,68,0.5)]"></div>
+<span class="text-[11px] font-mono text-ink-subtle">Assets CDN: Optimized</span>
+</div>
+</div>
+<div class="flex items-center gap-4 text-[11px] font-mono text-ink-subtle">
+<span>Cluster: us-east-prod-01</span>
+<div class="bg-surface-1 border border-hairline px-2 py-0.5 rounded flex items-center gap-1.5">
+<span class="material-symbols-outlined !text-[12px] text-primary">verified_user</span>
+<span class="font-bold">SECURE</span>
+</div>
+</div>
+</footer>
+</div>
+</main>
+</div>
+<!-- Command Palette (Hidden) -->
+<div class="fixed inset-0 z-[60] bg-canvas/60 backdrop-blur-sm flex items-center justify-center pointer-events-none opacity-0 transition-all duration-200" id="command-palette">
+<div class="w-full max-w-xl bg-surface-1 border border-hairline-strong rounded-xl shadow-2xl p-2 scale-95 transition-all duration-200">
+<div class="flex items-center gap-3 px-4 py-3 border-b border-hairline mb-1">
+<span class="material-symbols-outlined text-primary">terminal</span>
+<input class="bg-transparent border-none focus:ring-0 text-[15px] w-full text-ink placeholder:text-ink-subtle" placeholder="Command or search..." type="text"/>
+</div>
+<div class="p-1 space-y-1">
+<div class="px-3 py-2.5 hover:bg-surface-2 rounded-lg flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-ink-subtle !text-[18px]">rocket_launch</span>
+<span class="text-[13px] text-ink">Publish to Production</span>
+</div>
+<span class="text-[11px] font-mono text-ink-subtle bg-canvas border border-hairline px-1 rounded">Enter</span>
+</div>
+<div class="px-3 py-2.5 hover:bg-surface-2 rounded-lg flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-ink-subtle !text-[18px]">history</span>
+<span class="text-[13px] text-ink">View Rollback History</span>
+</div>
+<span class="text-[11px] font-mono text-ink-subtle bg-canvas border border-hairline px-1 rounded">H</span>
+</div>
+</div>
+</div>
+</div>
+<script>
+    document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            e.preventDefault();
+            const palette = document.getElementById('command-palette');
+            palette.classList.toggle('opacity-0');
+            palette.classList.toggle('pointer-events-none');
+            palette.querySelector('div').classList.toggle('scale-95');
+            if(!palette.classList.contains('opacity-0')) {
+                palette.querySelector('input').focus();
+            }
+        }
+        if (e.key === 'Escape') {
+            const palette = document.getElementById('command-palette');
+            palette.classList.add('opacity-0');
+            palette.classList.add('pointer-events-none');
+            palette.querySelector('div').classList.add('scale-95');
+        }
+    });
+</script>
+</body></html>

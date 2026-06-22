@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AryanshMesh | Business Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        :root {
+            --canvas: #010102;
+            --surface-1: #0f1011;
+            --surface-2: #141516;
+            --surface-3: #18191a;
+            --surface-4: #191a1b;
+            --hairline: #23252a;
+            --primary: #5e6ad2;
+            --primary-hover: #828fff;
+            --ink: #f7f8f8;
+            --ink-muted: #d0d6e0;
+            --ink-subtle: #8a8f98;
+        }
+
+        body {
+            background-color: var(--canvas);
+            color: var(--ink);
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .headline-tracking {
+            letter-spacing: -1.0px;
+        }
+
+        .display-tracking {
+            letter-spacing: -1.8px;
+        }
+
+        .hairline-border {
+            border: 1px solid var(--hairline);
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--canvas);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--surface-3);
+        }
+        
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+            font-size: 20px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#5e6ad2",
+                        "on-primary": "#ffffff",
+                        canvas: "#010102",
+                        "surface-1": "#0f1011",
+                        "surface-2": "#141516",
+                        "surface-3": "#18191a",
+                        "surface-4": "#191a1b",
+                        hairline: "#23252a",
+                        ink: "#f7f8f8",
+                        "ink-muted": "#d0d6e0",
+                        "ink-subtle": "#8a8f98",
+                    },
+                    spacing: {
+                        gutter: "16px",
+                        "container-padding": "24px",
+                        unit: "4px",
+                    },
+                    borderRadius: {
+                        DEFAULT: "4px",
+                        sm: "6px",
+                        md: "8px",
+                        lg: "12px",
+                        xl: "16px",
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-canvas text-ink">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-50 flex justify-between items-center w-full px-6 h-14 bg-canvas border-b border-hairline">
+<div class="flex items-center gap-8">
+<span class="text-lg font-semibold display-tracking text-primary">AryanshMesh</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-ink-subtle hover:text-ink transition-colors text-[13px] font-medium" href="#">Marketing</a>
+<a class="text-ink transition-colors text-[13px] font-medium border-b border-primary pb-0.5" href="#">Business</a>
+</nav>
+</div>
+<div class="flex-1 max-w-sm mx-8 hidden lg:block">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-subtle scale-75">search</span>
+<input class="w-full bg-surface-1 border border-hairline rounded-md pl-9 pr-4 py-1.5 text-[13px] text-ink placeholder-ink-subtle focus:outline-none focus:border-primary/50 transition-all" placeholder="Search signals..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="bg-primary hover:bg-[#828fff] text-on-primary px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined !text-[16px]">add</span>
+                Create
+            </button>
+<div class="w-px h-4 bg-hairline"></div>
+<button class="p-1.5 text-ink-subtle hover:text-ink transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<img class="w-7 h-7 rounded-full border border-hairline object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6u52ygtP9m0SJFTvvszBsYq8C6OPCTteOtXX9_47bsL4Fl6sae9bDm7NxYNw0ePDDVa21EIUKESGmoc3MN5L3436PUqnFmbKrQgOxms7nxTDkdwCeQRrO9srJL_0gA7o0hkXS1LR0lg1tvK3zZO82OYwcNyF_iH_txfszCPfYAVwHuaLAYpyDTnHAgCnlDIR2Zl1fS5_1cusRcOH16j5huMhyM-w601Os75-seck2yxYPTnzqiCVXdIjJdRT_saXUntOMje7_YGo"/>
+</div>
+</header>
+<div class="flex min-h-[calc(100vh-56px)]">
+<!-- Sidebar -->
+<aside class="fixed left-0 top-14 h-[calc(100vh-56px)] w-60 bg-canvas border-r border-hairline flex flex-col py-6 px-3">
+<div class="mb-6 px-3">
+<p class="text-[11px] font-semibold text-ink-subtle uppercase tracking-wider">Command Center</p>
+</div>
+<nav class="flex-1 space-y-0.5">
+<a class="flex items-center gap-2.5 px-3 py-1.5 rounded-md text-ink-subtle hover:text-ink hover:bg-surface-1 transition-colors text-[13px]" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Overview</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-1.5 rounded-md text-ink-subtle hover:text-ink hover:bg-surface-1 transition-colors text-[13px]" href="#">
+<span class="material-symbols-outlined">business</span>
+<span>Companies</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-1.5 rounded-md text-ink bg-surface-1 border border-hairline/50 text-[13px] font-medium" href="#">
+<span class="material-symbols-outlined text-primary">groups</span>
+<span>CRM</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-1.5 rounded-md text-ink-subtle hover:text-ink hover:bg-surface-1 transition-colors text-[13px]" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span>Profile</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-1.5 rounded-md text-ink-subtle hover:text-ink hover:bg-surface-1 transition-colors text-[13px]" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span>Catalog</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 space-y-0.5 border-t border-hairline">
+<button class="w-full flex items-center justify-between px-3 py-2 rounded-md bg-surface-1 border border-hairline mb-4 group hover:border-hairline-strong transition-all">
+<span class="text-[12px] text-ink-subtle group-hover:text-ink">Search...</span>
+<span class="text-[10px] bg-surface-2 border border-hairline px-1.5 py-0.5 rounded text-ink-subtle">⌘K</span>
+</button>
+<a class="flex items-center gap-2.5 px-3 py-1.5 rounded-md text-ink-subtle hover:text-ink transition-colors text-[13px]" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 ml-60 p-8 space-y-8 max-w-7xl">
+<!-- Header Section -->
+<section class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+<div>
+<h1 class="text-2xl font-semibold headline-tracking text-ink mb-1">Business Hub Overview</h1>
+<p class="text-[14px] text-ink-subtle">Monitoring SMB tenant activity and real-time revenue signals.</p>
+</div>
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-2 bg-surface-1 text-[12px] px-3 py-1 rounded-full border border-hairline text-ink-muted">
+<span class="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(94,106,210,0.5)]"></span>
+                        Live Signals
+                    </span>
+<button class="bg-surface-1 hover:bg-surface-2 text-ink px-4 py-1.5 rounded-md text-[13px] font-medium border border-hairline transition-colors">Export Report</button>
+</div>
+</section>
+<!-- Stats Grid -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="bg-surface-1 hairline-border p-5 rounded-lg flex flex-col justify-between hover:bg-surface-2 transition-colors">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-primary">payments</span>
+<span class="text-[11px] font-semibold text-primary">+12.4%</span>
+</div>
+<div>
+<p class="text-[12px] text-ink-subtle mb-1">Total Revenue</p>
+<p class="text-xl font-semibold headline-tracking">$142,850.00</p>
+</div>
+</div>
+<div class="bg-surface-1 hairline-border p-5 rounded-lg flex flex-col justify-between hover:bg-surface-2 transition-colors">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-ink-subtle">shopping_cart</span>
+<span class="text-[11px] font-semibold text-ink-muted">+5.2%</span>
+</div>
+<div>
+<p class="text-[12px] text-ink-subtle mb-1">Active Orders</p>
+<p class="text-xl font-semibold headline-tracking">1,204</p>
+</div>
+</div>
+<div class="bg-surface-1 hairline-border p-5 rounded-lg flex flex-col justify-between hover:bg-surface-2 transition-colors">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-ink-subtle">event_available</span>
+<span class="text-[11px] font-semibold text-ink-muted">+22.1%</span>
+</div>
+<div>
+<p class="text-[12px] text-ink-subtle mb-1">New Bookings</p>
+<p class="text-xl font-semibold headline-tracking">482</p>
+</div>
+</div>
+<div class="bg-surface-1 hairline-border p-5 rounded-lg flex flex-col justify-between hover:bg-surface-2 transition-colors">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-ink-subtle">trending_up</span>
+<span class="text-[11px] font-semibold text-red-400">-1.4%</span>
+</div>
+<div>
+<p class="text-[12px] text-ink-subtle mb-1">Conv. Rate</p>
+<p class="text-xl font-semibold headline-tracking">3.82%</p>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Activity Feed -->
+<div class="lg:col-span-2 bg-surface-1 hairline-border rounded-lg flex flex-col overflow-hidden">
+<div class="px-6 py-4 border-b border-hairline flex justify-between items-center">
+<h2 class="text-[14px] font-semibold headline-tracking">Recent Customer Activity</h2>
+<button class="text-primary text-[12px] font-medium hover:underline">View All</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-[11px] text-ink-subtle uppercase tracking-wider border-b border-hairline/30">
+<th class="px-6 py-3 font-medium">Customer</th>
+<th class="px-6 py-3 font-medium">Action</th>
+<th class="px-6 py-3 font-medium">Value</th>
+<th class="px-6 py-3 font-medium text-right">Status</th>
+</tr>
+</thead>
+<tbody class="text-[13px] divide-y divide-hairline/20">
+<tr class="hover:bg-surface-2 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-surface-3 flex items-center justify-center text-[11px] font-semibold text-ink">JD</div>
+<div>
+<p class="font-medium text-ink">Jameson D.</p>
+<p class="text-[11px] text-ink-subtle">jameson@globalcorp.io</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-ink-muted">Annual Subscription</td>
+<td class="px-6 py-4 text-ink-subtle font-mono">$2,400.00</td>
+<td class="px-6 py-4 text-right">
+<span class="text-[11px] px-2 py-0.5 rounded-full bg-surface-3 text-ink-muted border border-hairline">Success</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-2 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-surface-3 flex items-center justify-center text-[11px] font-semibold text-ink">AM</div>
+<div>
+<p class="font-medium text-ink">Aria Markov</p>
+<p class="text-[11px] text-ink-subtle">aria@design.studio</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-ink-muted">Service Booking</td>
+<td class="px-6 py-4 text-ink-subtle font-mono">$450.00</td>
+<td class="px-6 py-4 text-right">
+<span class="text-[11px] px-2 py-0.5 rounded-full bg-surface-3 text-ink-muted border border-hairline">Pending</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-2 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-surface-3 flex items-center justify-center text-[11px] font-semibold text-ink">KL</div>
+<div>
+<p class="font-medium text-ink">Kaelen L.</p>
+<p class="text-[11px] text-ink-subtle">kae@venture.tech</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-ink-muted">Ad Campaign</td>
+<td class="px-6 py-4 text-ink-subtle font-mono">$12,000.00</td>
+<td class="px-6 py-4 text-right">
+<span class="text-[11px] px-2 py-0.5 rounded-full bg-surface-3 text-ink-muted border border-hairline">Success</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Right Column Widget -->
+<div class="space-y-6">
+<div class="bg-surface-1 hairline-border rounded-lg p-6">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-[14px] font-semibold headline-tracking">Publish Status</h3>
+<span class="material-symbols-outlined text-primary">cloud_done</span>
+</div>
+<div class="aspect-video bg-surface-3 hairline-border rounded-md mb-6 overflow-hidden group relative cursor-pointer">
+<img class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFKTrBk95moNVBNKZiEeQgKCBry_oujIhOtx-gpVS4x9smxjtAfUYLIeDRVT-FQ7mFqAXygGbWcMbrdj5NSGkjqTZylTWoSIH75G9-MRPxu8pl1zXRAe8y-9vJwnhxdcgb2ahs6EUIwscD6gc5K_BOr9qM9J13gomCWwPtiiN1VXW1AspGIPZ3XXu11lVQYawaIFw_mdYEbpTS1g2DY0JKjZW8_JibjOHx8O2eJx2EA31g1Le9wkqBQzaFhsQIzw5DmxqZBp8CAtA"/>
+<div class="absolute inset-0 bg-canvas/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[2px]">
+<span class="bg-primary text-on-primary px-3 py-1.5 rounded-md text-[12px] font-medium">Preview Live</span>
+</div>
+</div>
+<div class="space-y-3 text-[13px]">
+<div class="flex justify-between text-ink-subtle"><span class="text-ink-muted">Domain</span> <span class="font-mono text-[12px]">hub.aryanshmesh.ai</span></div>
+<div class="flex justify-between text-ink-subtle"><span class="text-ink-muted">Health</span> <span class="text-emerald-500">100%</span></div>
+<button class="w-full bg-primary hover:bg-[#828fff] text-on-primary py-2 rounded-md text-[13px] font-medium mt-2 transition-colors">Deploy Snapshot</button>
+</div>
+</div>
+<div class="bg-surface-1 border border-primary/20 rounded-lg p-5">
+<div class="flex items-center gap-2 text-primary mb-3">
+<span class="material-symbols-outlined !text-[18px]">psychology</span>
+<span class="text-[11px] font-bold uppercase tracking-wider">AI Recommendation</span>
+</div>
+<p class="text-[13px] text-ink-muted leading-relaxed">
+                            Tenant activity suggests a <span class="text-primary font-medium">14% uptick</span> in booking requests for Q3. Consider scaling EU-West nodes.
+                        </p>
+</div>
+</div>
+</div>
+<!-- Visual Layer Placeholder -->
+<section class="bg-surface-1 hairline-border rounded-lg p-12 text-center">
+<div class="max-w-md mx-auto">
+<span class="material-symbols-outlined !text-3xl text-ink-subtle mb-4">analytics</span>
+<h3 class="text-lg font-medium headline-tracking mb-2">Data Visualization Layer</h3>
+<p class="text-[14px] text-ink-subtle">Connecting to real-time marketing data streams. Predictive GTM signals will populate here automatically.</p>
+</div>
+</section>
+</main>
+</div>
+<!-- FAB -->
+<button class="fixed bottom-8 right-8 w-12 h-12 bg-primary hover:bg-[#828fff] text-on-primary rounded-full shadow-lg flex items-center justify-center transition-all active:scale-95 group z-50">
+<span class="material-symbols-outlined !text-2xl group-hover:rotate-12 transition-transform">auto_awesome</span>
+</button>
+<script>
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                console.log('Search command palette opened');
+            }
+        });
+    </script>
+</body></html>

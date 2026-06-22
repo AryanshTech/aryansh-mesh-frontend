@@ -1,0 +1,95 @@
+{
+  "projectId": "4566503762483749210",
+  "projectTitle": "Intuitive Immersive Product Design",
+  "fetchedAt": "2026-06-21T17:54:48.835Z",
+  "screens": [
+    {
+      "slug": "business-dashboard",
+      "screenId": "c1a2a4645fad4b65b7c546301cfee4ba",
+      "route": "/t/:slug/dashboard",
+      "title": "Business Dashboard (Linear Style)",
+      "width": "2560",
+      "height": "2298",
+      "htmlFile": "business-dashboard.html",
+      "pngFile": "business-dashboard.png",
+      "metaFile": "business-dashboard.meta.json"
+    },
+    {
+      "slug": "product-catalog",
+      "screenId": "11f1338fb5944ee4b98a93bb0b85902e",
+      "route": "/t/:slug/products",
+      "title": "Product Catalog (Linear Style)",
+      "width": "2560",
+      "height": "2048",
+      "htmlFile": "product-catalog.html",
+      "pngFile": "product-catalog.png",
+      "metaFile": "product-catalog.meta.json"
+    },
+    {
+      "slug": "publishing-center",
+      "screenId": "98e7c01e1f7649938bf111a6392c56b4",
+      "route": "/t/:slug/publish",
+      "title": "Publishing Center (Linear Style)",
+      "width": "2560",
+      "height": "2048",
+      "htmlFile": "publishing-center.html",
+      "pngFile": "publishing-center.png",
+      "metaFile": "publishing-center.meta.json"
+    },
+    {
+      "slug": "bookings-inbox",
+      "screenId": "60983790c03f453194b8353561a1633c",
+      "route": "/t/:slug/bookings",
+      "title": "Bookings Inbox (Linear Style)",
+      "width": "2560",
+      "height": "2048",
+      "htmlFile": "bookings-inbox.html",
+      "pngFile": "bookings-inbox.png",
+      "metaFile": "bookings-inbox.meta.json"
+    },
+    {
+      "slug": "marketing-overview",
+      "screenId": "5a288ef67fa5488488269443b1286fd6",
+      "route": "/marketing",
+      "title": "Marketing Overview (Linear Style)",
+      "width": "2560",
+      "height": "2052",
+      "htmlFile": "marketing-overview.html",
+      "pngFile": "marketing-overview.png",
+      "metaFile": "marketing-overview.meta.json"
+    },
+    {
+      "slug": "project-workspace",
+      "screenId": "f5e42aff73b44963bb179ae75585d374",
+      "route": "/marketing/projects/:id",
+      "title": "Project Workspace (Linear Style)",
+      "width": "2560",
+      "height": "2048",
+      "htmlFile": "project-workspace.html",
+      "pngFile": "project-workspace.png",
+      "metaFile": "project-workspace.meta.json"
+    },
+    {
+      "slug": "agent-studio",
+      "screenId": "9eb961b0af3f451c8eabfaf99dc6f1f4",
+      "route": "/marketing/projects/:id/content",
+      "title": "Agent Studio (Linear Style)",
+      "width": "2560",
+      "height": "2048",
+      "htmlFile": "agent-studio.html",
+      "pngFile": "agent-studio.png",
+      "metaFile": "agent-studio.meta.json"
+    },
+    {
+      "slug": "crm-pipeline",
+      "screenId": "94b511a1c0e74718ac359f3c450c6265",
+      "route": "/marketing/projects/:id/crm",
+      "title": "CRM Pipeline (Linear Style)",
+      "width": "2560",
+      "height": "2048",
+      "htmlFile": "crm-pipeline.html",
+      "pngFile": "crm-pipeline.png",
+      "metaFile": "crm-pipeline.meta.json"
+    }
+  ]
+}
