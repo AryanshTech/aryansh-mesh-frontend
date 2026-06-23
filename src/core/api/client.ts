@@ -1,125 +1,146 @@
-import { ApiError, type ApiErrorBody } from '@/core/api/types';
-import { resolveApiV1BaseUrl } from '@/core/api/config';
+/**
+ * API client — fetch wrapper for the monolith backend.
+ * Base: VITE_API_BASE_URL + /api/v1
+ * Bearer token injected from token storage.
+ */
+import { getAccessToken, getRefreshToken, clearTokens, setTokens } from '@/core/auth/token-storage';
+import type { ApiError, ErrorEnvelope } from './types';
 
-type TokenGetter = (forceRefresh?: boolean) => Promise<string | null>;
-type UnauthorizedHandler = () => void;
+const RAW_BASE =
+  (import.meta.env.VITE_API_BASE_URL as string | undefined) ??
+  'http://localhost:8080';
 
-let getToken: TokenGetter = async () => null;
-let onUnauthorized: UnauthorizedHandler = () => undefined;
+export const API_BASE = `${RAW_BASE.replace(/\/$/, '')}/api/v1`;
 
-export function configureApiClient(options: {
-  getToken: TokenGetter;
-  onUnauthorized: UnauthorizedHandler;
-}) {
-  getToken = options.getToken;
-  onUnauthorized = options.onUnauthorized;
+type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+
+export interface RequestOptions {
+  method?: Method;
+  body?: unknown;
+  query?: Record<string, string | number | boolean | undefined | null>;
+  signal?: AbortSignal;
+  headers?: Record<string, string>;
+  skipAuth?: boolean;
+  /** form-data; body is FormData */
+  multipart?: boolean;
 }
 
-const baseUrl = resolveApiV1BaseUrl();
-
-export function getApiBaseUrl(): string {
-  return baseUrl;
+function buildUrl(path: string, query?: RequestOptions['query']): string {
+  const url = new URL(API_BASE + (path.startsWith('/') ? path : `/${path}`));
+  if (query) {
+    for (const [k, v] of Object.entries(query)) {
+      if (v === undefined || v === null) continue;
+      url.searchParams.append(k, String(v));
+    }
+  }
+  return url.toString();
 }
 
-export { resolveGatewayOrigin, resolveApiV1BaseUrl } from '@/core/api/config';
+class ApiErrorImpl extends Error implements ApiError {
+  status: number;
+  code?: string;
+  details?: unknown;
 
-async function parseError(response: Response): Promise<ApiError> {
+  constructor(message: string, status: number, code?: string, details?: unknown) {
+    super(message);
+    this.status = status;
+    this.code = code;
+    this.details = details;
+  }
+}
+
+async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return null;
+
   try {
-    const body = (await response.json()) as ApiErrorBody;
-    return new ApiError(response.status, body);
-  } catch {
-    return new ApiError(response.status, {
-      code: 'UNKNOWN',
-      message: response.statusText || 'Request failed',
+    const res = await fetch(buildUrl('/auth/refresh'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
     });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { idToken?: string; refreshToken?: string };
+    if (data.idToken) {
+      setTokens({ accessToken: data.idToken, refreshToken: data.refreshToken });
+      return data.idToken;
+    }
+  } catch {
+    /* swallow */
   }
+  return null;
 }
 
-async function request<T>(
-  method: string,
-  path: string,
-  body?: unknown,
-  retried = false,
-): Promise<T> {
-  const token = await getToken(false);
-  const headers: Record<string, string> = {
-    Accept: 'application/json',
+export async function apiRequest<T>(path: string, opts: RequestOptions = {}): Promise<T> {
+  const { method = 'GET', body, query, signal, headers = {}, skipAuth, multipart } = opts;
+
+  const doFetch = async (token: string | null): Promise<Response> => {
+    const finalHeaders: Record<string, string> = { Accept: 'application/json', ...headers };
+    if (!multipart && body !== undefined) finalHeaders['Content-Type'] = 'application/json';
+    if (token && !skipAuth) finalHeaders.Authorization = `Bearer ${token}`;
+
+    return fetch(buildUrl(path, query), {
+      method,
+      headers: finalHeaders,
+      body: multipart
+        ? (body as FormData)
+        : body !== undefined
+          ? JSON.stringify(body)
+          : undefined,
+      signal,
+    });
   };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
-  if (body !== undefined) {
-    headers['Content-Type'] = 'application/json';
-  }
 
-  const response = await fetch(`${baseUrl}${path}`, {
-    method,
-    headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
+  let token = skipAuth ? null : getAccessToken();
+  let res = await doFetch(token);
 
-  if (response.status === 401 && !retried) {
-    const freshToken = await getToken(true);
-    if (freshToken) {
-      return request<T>(method, path, body, true);
+  if (res.status === 401 && !skipAuth) {
+    const newToken = await refreshAccessToken();
+    if (newToken) {
+      res = await doFetch(newToken);
+    } else {
+      clearTokens();
     }
-    onUnauthorized();
-    throw await parseError(response);
   }
 
-  if (!response.ok) {
-    throw await parseError(response);
-  }
+  if (res.status === 204) return undefined as T;
 
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return (await response.json()) as T;
-}
-
-async function uploadRequest<T>(path: string, formData: FormData, retried = false): Promise<T> {
-  const token = await getToken(false);
-  const headers: Record<string, string> = {
-    Accept: 'application/json',
-  };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
-
-  const response = await fetch(`${baseUrl}${path}`, {
-    method: 'POST',
-    headers,
-    body: formData,
-  });
-
-  if (response.status === 401 && !retried) {
-    const freshToken = await getToken(true);
-    if (freshToken) {
-      return uploadRequest<T>(path, formData, true);
+  const text = await res.text();
+  let parsed: unknown = undefined;
+  if (text) {
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      parsed = text;
     }
-    onUnauthorized();
-    throw await parseError(response);
   }
 
-  if (!response.ok) {
-    throw await parseError(response);
+  if (!res.ok) {
+    const env = parsed as ErrorEnvelope | undefined;
+    throw new ApiErrorImpl(
+      env?.message ?? res.statusText ?? 'Request failed',
+      res.status,
+      env?.code,
+      env?.details
+    );
   }
 
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return (await response.json()) as T;
+  return parsed as T;
 }
 
 export const api = {
-  get: <T>(path: string) => request<T>('GET', path),
-  post: <T>(path: string, body?: unknown) => request<T>('POST', path, body),
-  put: <T>(path: string, body?: unknown) => request<T>('PUT', path, body),
-  patch: <T>(path: string, body?: unknown) => request<T>('PATCH', path, body),
-  delete: <T>(path: string) => request<T>('DELETE', path),
-  upload: <T>(path: string, formData: FormData) => uploadRequest<T>(path, formData),
+  get: <T,>(path: string, opts?: Omit<RequestOptions, 'method' | 'body'>) =>
+    apiRequest<T>(path, { ...opts, method: 'GET' }),
+  post: <T,>(path: string, body?: unknown, opts?: Omit<RequestOptions, 'method' | 'body'>) =>
+    apiRequest<T>(path, { ...opts, method: 'POST', body }),
+  put: <T,>(path: string, body?: unknown, opts?: Omit<RequestOptions, 'method' | 'body'>) =>
+    apiRequest<T>(path, { ...opts, method: 'PUT', body }),
+  patch: <T,>(path: string, body?: unknown, opts?: Omit<RequestOptions, 'method' | 'body'>) =>
+    apiRequest<T>(path, { ...opts, method: 'PATCH', body }),
+  delete: <T,>(path: string, opts?: Omit<RequestOptions, 'method' | 'body'>) =>
+    apiRequest<T>(path, { ...opts, method: 'DELETE' }),
+  upload: <T,>(path: string, form: FormData, opts?: Omit<RequestOptions, 'method' | 'body' | 'multipart'>) =>
+    apiRequest<T>(path, { ...opts, method: 'POST', body: form, multipart: true }),
 };
 
-export { ApiError };
+export { ApiErrorImpl as ApiError };

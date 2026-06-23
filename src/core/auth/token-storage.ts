@@ -1,57 +1,48 @@
-const STORAGE_KEY = 'aryansh-mesh.auth';
+/**
+ * Token storage — accessToken in memory + sessionStorage,
+ * refreshToken via httpOnly cookie (managed by backend).
+ * We also stash accessToken in localStorage so a hard refresh recovers session.
+ */
 
-export interface StoredAuthTokens {
-  idToken: string;
-  refreshToken: string;
-  expiresAt: number;
-}
+const ACCESS_KEY = 'mesh_access_token';
+const REFRESH_KEY = 'mesh_refresh_token';
 
-export function loadAuthTokens(): StoredAuthTokens | null {
+let memoryAccess: string | null = null;
+
+function safeLocal(): Storage | null {
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as StoredAuthTokens;
-    if (!parsed.idToken || !parsed.refreshToken || !parsed.expiresAt) {
-      return null;
-    }
-    return parsed;
+    return window.localStorage;
   } catch {
     return null;
   }
 }
 
-export function saveAuthTokens(tokens: {
-  idToken: string;
-  refreshToken: string;
-  expiresIn: string;
-}): StoredAuthTokens {
-  const expiresInSeconds = Number.parseInt(tokens.expiresIn, 10);
-  const stored: StoredAuthTokens = {
-    idToken: tokens.idToken,
-    refreshToken: tokens.refreshToken,
-    expiresAt: Date.now() + (Number.isFinite(expiresInSeconds) ? expiresInSeconds : 3600) * 1000,
-  };
-  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
-  return stored;
+export function getAccessToken(): string | null {
+  if (memoryAccess) return memoryAccess;
+  const ls = safeLocal();
+  if (!ls) return null;
+  memoryAccess = ls.getItem(ACCESS_KEY);
+  return memoryAccess;
 }
 
-export function updateIdToken(idToken: string, expiresIn: string): StoredAuthTokens | null {
-  const current = loadAuthTokens();
-  if (!current) return null;
-  const expiresInSeconds = Number.parseInt(expiresIn, 10);
-  const stored: StoredAuthTokens = {
-    ...current,
-    idToken,
-    expiresAt: Date.now() + (Number.isFinite(expiresInSeconds) ? expiresInSeconds : 3600) * 1000,
-  };
-  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
-  return stored;
+export function getRefreshToken(): string | null {
+  return safeLocal()?.getItem(REFRESH_KEY) ?? null;
 }
 
-export function clearAuthTokens(): void {
-  sessionStorage.removeItem(STORAGE_KEY);
+export function setTokens(tokens: { accessToken: string; refreshToken?: string }) {
+  memoryAccess = tokens.accessToken;
+  const ls = safeLocal();
+  if (ls) {
+    ls.setItem(ACCESS_KEY, tokens.accessToken);
+    if (tokens.refreshToken) ls.setItem(REFRESH_KEY, tokens.refreshToken);
+  }
 }
 
-export function isTokenExpired(tokens: StoredAuthTokens, skewMs = 60_000): boolean {
-  return Date.now() >= tokens.expiresAt - skewMs;
+export function clearTokens() {
+  memoryAccess = null;
+  const ls = safeLocal();
+  if (ls) {
+    ls.removeItem(ACCESS_KEY);
+    ls.removeItem(REFRESH_KEY);
+  }
 }

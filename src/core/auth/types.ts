@@ -1,39 +1,28 @@
-export type Role =
-  | 'platform_super_admin'
-  | 'tenant_owner'
-  | 'tenant_admin'
-  | 'tenant_editor'
-  | 'tenant_viewer';
+export type UserRole = 'OWNER' | 'ADMIN' | 'MEMBER' | 'PLATFORM_ADMIN';
 
-export type MarketingRole = 'ADMIN' | 'MEMBER' | 'VIEWER';
-
-export interface SessionResponse {
-  uid: string;
+export interface User {
+  id: string;
   email: string;
-  displayName: string | null;
-  accessLevel?: string;
-  businessRole?: string | null;
-  role: Role;
+  name: string;
+  role: UserRole;
   tenantId: string | null;
-  tenantName: string | null;
-  tenantSlug: string | null;
-  onboardingComplete: boolean;
-  services?: string[];
+  avatarUrl?: string | null;
 }
 
-export interface MeResponse {
-  uid: string;
-  email: string;
-  displayName?: string;
-  accessLevel?: string;
-  role: Role | null;
-  tenantId: string | null;
+export interface Session {
+  user: User;
+  accessToken: string;
+  refreshToken?: string;
 }
 
-export interface InvitePreviewResponse {
+export interface LoginRequest {
   email: string;
-  tenantName: string;
-  role: Role;
-  expiresAt: string;
-  status: string;
+  password: string;
+}
+
+export interface SignUpRequest {
+  email: string;
+  password: string;
+  name: string;
+  businessName?: string;
 }

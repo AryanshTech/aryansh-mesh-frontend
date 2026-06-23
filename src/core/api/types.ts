@@ -1,33 +1,18 @@
-export interface ApiErrorDetail {
-  field: string;
+export interface ErrorEnvelope {
+  code?: string;
   message: string;
+  details?: unknown;
 }
 
-export interface ApiErrorBody {
-  code: string;
-  message: string;
-  details?: ApiErrorDetail[];
-  requestId?: string;
+export interface ApiError extends Error {
+  status: number;
+  code?: string;
+  details?: unknown;
 }
 
-export class ApiError extends Error {
-  readonly code: string;
-  readonly status: number;
-  readonly details: ApiErrorDetail[];
-
-  constructor(status: number, body: ApiErrorBody) {
-    super(body.message);
-    this.name = 'ApiError';
-    this.code = body.code;
-    this.status = status;
-    this.details = body.details ?? [];
-  }
-}
-
-export interface PaginatedResponse<T> {
+export interface Page<T> {
   items: T[];
-  page: number;
-  size: number;
   total: number;
-  totalPages: number;
+  page?: number;
+  pageSize?: number;
 }
