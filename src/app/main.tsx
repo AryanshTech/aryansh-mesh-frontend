@@ -1,13 +1,14 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import '@/design-system/styles/globals.css';
-import { Providers } from '@/app/providers';
-import { App } from '@/app/App';
+import '@/core/i18n';
+import App from './App';
 
-createRoot(document.getElementById('root')!).render(
+const container = document.getElementById('root');
+if (!container) throw new Error('Root element #root not found');
+
+createRoot(container).render(
   <StrictMode>
-    <Providers>
-      <App />
-    </Providers>
+    <App />
   </StrictMode>,
 );
