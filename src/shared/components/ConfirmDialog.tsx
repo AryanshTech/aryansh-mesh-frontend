@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,10 +13,11 @@ interface ConfirmDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
-  description: string;
+  description?: string;
   confirmLabel?: string;
-  onConfirm: () => void;
-  loading?: boolean;
+  cancelLabel?: string;
+  variant?: 'default' | 'destructive';
+  onConfirm: () => void | Promise<void>;
 }
 
 export function ConfirmDialog({
@@ -25,30 +25,31 @@ export function ConfirmDialog({
   onOpenChange,
   title,
   description,
-  confirmLabel,
+  confirmLabel = 'Confirm',
+  cancelLabel = 'Cancel',
+  variant = 'default',
   onConfirm,
-  loading = false,
 }: ConfirmDialogProps) {
-  const { t } = useTranslation();
-
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          {description ? (
+            <AlertDialogDescription>{description}</AlertDialogDescription>
+          ) : null}
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={loading}>{t('common.cancel')}</AlertDialogCancel>
+          <AlertDialogCancel>{cancelLabel}</AlertDialogCancel>
           <AlertDialogAction
-            disabled={loading}
-            onClick={(event) => {
-              event.preventDefault();
-              onConfirm();
-            }}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            onClick={() => void onConfirm()}
+            className={
+              variant === 'destructive'
+                ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                : ''
+            }
           >
-            {loading ? t('common.loading') : (confirmLabel ?? t('common.delete'))}
+            {confirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
