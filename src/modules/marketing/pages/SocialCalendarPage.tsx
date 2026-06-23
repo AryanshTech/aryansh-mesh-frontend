@@ -1,166 +1,183 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { CalendarIcon } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { socialPostsApi } from '@/modules/marketing/api/endpoints';
-import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
-import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
-import { PageAsyncShell } from '@/shared/components/crm/PageAsyncShell';
-import { LinearPageHeader } from '@/shared/components/linear';
-import { t } from '@/core/i18n';
-import type { SocialPostResponse } from '@/modules/marketing/types/api';
-import { Badge } from '@/design-system/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/design-system/components/ui/card';
+import { toast } from 'sonner';
+import { Plus, CalendarDays } from 'lucide-react';
+import { PageShell } from '@/shared/components/PageShell';
+import { PageHeader } from '@/shared/components/PageHeader';
+import { EmptyState } from '@/shared/components/EmptyState';
+import { ErrorState } from '@/shared/components/ErrorState';
+import { CardGridSkeleton } from '@/shared/components/Skeletons';
+import { StatusBadge } from '@/shared/components/StatusBadge';
+import { DetailDrawer } from '@/shared/components/DetailDrawer';
+import { Button } from '@/design-system/components/ui/button';
+import { Input } from '@/design-system/components/ui/input';
+import { Label } from '@/design-system/components/ui/label';
+import { Textarea } from '@/design-system/components/ui/textarea';
 import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from '@/design-system/components/ui/empty';
-import { Skeleton } from '@/design-system/components/ui/skeleton';
+  useSocialPosts,
+  useCreateSocialPost,
+  useApproveSocialPost,
+  useRejectSocialPost,
+  type SocialPost,
+  type SocialPostInput,
+} from '@/modules/marketing/api/use-social-posts';
 
-const WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as const;
-
-function getMonday(date: Date): Date {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
-  d.setDate(d.getDate() + diff);
-  d.setHours(0, 0, 0, 0);
-  return d;
+function postTone(status: SocialPost['status']) {
+  if (status === 'APPROVED') return 'success' as const;
+  if (status === 'SCHEDULED') return 'info' as const;
+  if (status === 'REJECTED') return 'warning' as const;
+  return 'default' as const;
 }
 
-function addDays(date: Date, days: number): Date {
-  const d = new Date(date);
-  d.setDate(d.getDate() + days);
-  return d;
-}
+const NEW_POST: SocialPostInput = { content: '', platform: '', scheduledAt: '' };
 
-function toDateKey(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
+export default function SocialCalendarPage() {
+  const { t } = useTranslation();
+  const { projectId } = useParams<{ projectId: string }>();
 
-export function SocialCalendarPage() {
-  const { projectId = '' } = useParams();
-  const { getToken } = useAuth();
-  const [posts, setPosts] = useState<SocialPostResponse[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, isError, refetch } = useSocialPosts(projectId);
+  const createMutation = useCreateSocialPost(projectId ?? '');
+  const approveMutation = useApproveSocialPost(projectId ?? '');
+  const rejectMutation = useRejectSocialPost(projectId ?? '');
 
-  const weekStart = useMemo(() => getMonday(new Date()), []);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [draft, setDraft] = useState<SocialPostInput>({ ...NEW_POST });
 
-  const weekDates = useMemo(
-    () => WEEKDAYS.map((_, i) => addDays(weekStart, i)),
-    [weekStart]
-  );
+  const posts = data?.items ?? [];
 
-  const postsByDate = useMemo(() => {
-    const map: Record<string, SocialPostResponse[]> = {};
-    for (const post of posts) {
-      const key = post.scheduledDate.slice(0, 10);
-      if (!map[key]) map[key] = [];
-      map[key].push(post);
-    }
-    return map;
-  }, [posts]);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const onCreate = async () => {
+    if (!draft.content.trim()) { toast.error('Content is required'); return; }
     try {
-      const res = await apiFetchWithRetry(
-        (token) => socialPostsApi.list(token, projectId),
-        getToken
-      );
-      setPosts(res);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t('errors.network'));
-    } finally {
-      setLoading(false);
+      await createMutation.mutateAsync({
+        content: draft.content.trim(),
+        platform: draft.platform?.trim() || undefined,
+        scheduledAt: draft.scheduledAt?.trim() || undefined,
+      });
+      toast.success('Post created');
+      setDrawerOpen(false);
+      setDraft({ ...NEW_POST });
+    } catch (e) {
+      toast.error((e as Error).message || 'Failed to create post');
     }
-  }, [projectId, getToken]);
+  };
 
-  useEffect(() => {
-    void load();
-  }, [load]);
+  const onApprove = async (postId: string) => {
+    try {
+      await approveMutation.mutateAsync(postId);
+      toast.success('Post approved');
+    } catch (e) {
+      toast.error((e as Error).message || 'Failed to approve');
+    }
+  };
 
-  const hasAnyPosts = posts.length > 0;
-  const skeleton = (
-    <div className="grid gap-4 md:grid-cols-[repeat(5,minmax(0,1fr))]">
-      {WEEKDAYS.map((day) => (
-        <Skeleton key={day} className="h-48 rounded-lg" />
-      ))}
+  const onReject = async (postId: string) => {
+    try {
+      await rejectMutation.mutateAsync(postId);
+      toast.success('Post rejected');
+    } catch (e) {
+      toast.error((e as Error).message || 'Failed to reject');
+    }
+  };
+
+  const masterContent = (
+    <div className="flex flex-col gap-4">
+      {isLoading ? (
+        <CardGridSkeleton />
+      ) : isError ? (
+        <ErrorState title="Failed to load posts" onRetry={() => void refetch()} />
+      ) : posts.length === 0 ? (
+        <EmptyState
+          icon={<CalendarDays />}
+          title="No posts yet"
+          description="Create social media posts for this project."
+          action={<Button onClick={() => setDrawerOpen(true)}><Plus className="size-4" />Add Post</Button>}
+        />
+      ) : (
+        <div className="flex flex-col gap-3">
+          {posts.map((post: SocialPost) => (
+            <div
+              key={post.id}
+              className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <StatusBadge label={post.status} tone={postTone(post.status)} />
+                  {post.platform ? (
+                    <span className="text-xs text-muted-foreground">{post.platform}</span>
+                  ) : null}
+                </div>
+                {post.scheduledAt ? (
+                  <span className="text-xs text-muted-foreground tabular-nums">
+                    {new Date(post.scheduledAt).toLocaleDateString()}
+                  </span>
+                ) : null}
+              </div>
+              <p className="typo-body-sm text-foreground line-clamp-4">{post.content}</p>
+              {post.status === 'DRAFT' ? (
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => void onApprove(post.id)}
+                    disabled={approveMutation.isPending && approveMutation.variables === post.id}
+                  >
+                    {t('marketing.approve')}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-destructive hover:text-destructive"
+                    onClick={() => void onReject(post.id)}
+                    disabled={rejectMutation.isPending && rejectMutation.variables === post.id}
+                  >
+                    {t('marketing.reject')}
+                  </Button>
+                </div>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 
   return (
-    <CrmPageShell>
-      <LinearPageHeader title={t('social.title')} description={t('social.subtitle')} />
-      <PageAsyncShell
-        loading={loading}
-        error={error}
-        errorDescription={error ?? undefined}
-        onRetry={() => void load()}
-        skeleton={skeleton}
-      >
-        {!hasAnyPosts ? (
-          <Empty className="rounded-lg border border-dashed py-12">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <CalendarIcon />
-              </EmptyMedia>
-              <EmptyTitle>{t('social.emptyWeekTitle')}</EmptyTitle>
-              <EmptyDescription>{t('social.emptyWeekDescription')}</EmptyDescription>
-            </EmptyHeader>
-          </Empty>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-[repeat(5,minmax(0,1fr))]">
-            {WEEKDAYS.map((day, index) => {
-              const date = weekDates[index];
-              const dateKey = toDateKey(date);
-              const dayPosts = postsByDate[dateKey] ?? [];
-
-              return (
-                <Card
-                  key={day}
-                  className="stagger-item"
-                  style={{ ['--stagger-delay' as string]: `${index * 50}ms` }}
-                >
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      {t(`social.days.${day}`)}
-                    </CardTitle>
-                    <p className="text-xs text-muted-foreground">
-                      {date.toLocaleDateString()}
-                    </p>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    {dayPosts.length === 0 ? (
-                      <p className="text-xs text-muted-foreground">{t('social.emptyDay')}</p>
-                    ) : (
-                      dayPosts.map((post) => (
-                        <Card key={post.id} className="shadow-none">
-                          <CardContent className="space-y-1 p-2 text-xs">
-                            <div className="mb-1 flex items-center justify-between gap-1">
-                              <Badge variant="outline">
-                                {t(`socialPlatforms.${post.platform}`)}
-                              </Badge>
-                              <Badge variant="secondary">
-                                {t(`socialStatus.${post.status}`)}
-                              </Badge>
-                            </div>
-                            <p className="line-clamp-3">{post.content}</p>
-                          </CardContent>
-                        </Card>
-                      ))
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })}
+    <PageShell>
+      <PageHeader
+        title={t('marketing.socialCalendarTitle')}
+        description={t('marketing.socialCalendarSubtitle')}
+        actions={<Button onClick={() => setDrawerOpen(true)}><Plus className="size-4" />Add Post</Button>}
+      />
+      <DetailDrawer
+        open={drawerOpen}
+        onOpenChange={(o) => { setDrawerOpen(o); if (!o) setDraft({ ...NEW_POST }); }}
+        title="New Social Post"
+        master={masterContent}
+        footer={
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="outline" onClick={() => { setDrawerOpen(false); setDraft({ ...NEW_POST }); }}>Cancel</Button>
+            <Button onClick={() => void onCreate()} disabled={createMutation.isPending}>
+              {createMutation.isPending ? 'Creating…' : 'Create'}
+            </Button>
           </div>
-        )}
-      </PageAsyncShell>
-    </CrmPageShell>
+        }
+      >
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="sp-content">Content *</Label>
+            <Textarea id="sp-content" rows={5} value={draft.content} onChange={(e) => setDraft((d) => ({ ...d, content: e.target.value }))} />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="sp-platform">Platform</Label>
+            <Input id="sp-platform" placeholder="Instagram, Twitter, LinkedIn…" value={draft.platform ?? ''} onChange={(e) => setDraft((d) => ({ ...d, platform: e.target.value }))} />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="sp-date">Schedule Date</Label>
+            <Input id="sp-date" type="date" value={draft.scheduledAt ?? ''} onChange={(e) => setDraft((d) => ({ ...d, scheduledAt: e.target.value }))} />
+          </div>
+        </div>
+      </DetailDrawer>
+    </PageShell>
   );
 }

@@ -1,350 +1,128 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { FileTextIcon } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import {
-  downloadBlob,
-  exportFilename,
-  messagesApi,
-  outputsApi,
-  projectsApi,
-  streamChat,
-  threadsApi,
-} from '@/modules/marketing/api/endpoints';
-import { apiFetchWithRetry, useAuth } from '@/core/auth/auth-context';
-import { BriefEditor } from '@/modules/marketing/components/brief/BriefEditor';
-import { ChatComposer } from '@/modules/marketing/components/chat/ChatComposer';
-import { MessageList } from '@/modules/marketing/components/chat/MessageList';
-import { OutputsPanel } from '@/modules/marketing/components/outputs/OutputsPanel';
-import { ConfirmDialog } from '@/shared/components/crm/ConfirmDialog';
-import { ShellPageActions } from '@/shared/components/layout/ShellPageActions';
-import { layout } from '@/design-system/tokens/layout';
-import { useSidebarNavContext } from '@/modules/marketing/contexts/sidebar-nav-context';
-import { t } from '@/core/i18n';
-import type {
-  ChatCommandResponse,
-  MessageResponse,
-  OutputResponse,
-  OutputType,
-  SseMessageEndEvent,
-} from '@/modules/marketing/types/api';
-import { Alert, AlertDescription } from '@/design-system/components/ui/alert';
+import { Send } from 'lucide-react';
+import { PageShell } from '@/shared/components/PageShell';
+import { PageHeader } from '@/shared/components/PageHeader';
+import { ErrorState } from '@/shared/components/ErrorState';
 import { Button } from '@/design-system/components/ui/button';
-import { LinearPageHeader } from '@/shared/components/linear';
-import { CrmPageShell } from '@/shared/components/crm/CrmPageShell';
-import { Spinner } from '@/design-system/components/ui/spinner';
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from '@/design-system/components/ui/resizable';
+import { Textarea } from '@/design-system/components/ui/textarea';
+import { Skeleton } from '@/design-system/components/ui/skeleton';
+import { cn } from '@/design-system/lib/utils';
+import { useMessages, useSendMessage, type Message } from '@/modules/marketing/api/use-threads';
 
-type FilterType = OutputType | 'ALL';
+export default function ThreadWorkspacePage() {
+  const { t } = useTranslation();
+  const { threadId } = useParams<{ projectId: string; threadId: string }>();
 
-export function ThreadWorkspacePage() {
-  const { projectId = '' } = useParams();
-  const { getToken, canWrite } = useAuth();
-  const { expandCompany } = useSidebarNavContext();
+  const { data, isLoading, isError, refetch } = useMessages(threadId);
+  const sendMutation = useSendMessage(threadId ?? '');
 
-  const [threadId, setThreadId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<MessageResponse[]>([]);
-  const [commands, setCommands] = useState<ChatCommandResponse | null>(null);
-  const [outputs, setOutputs] = useState<OutputResponse[]>([]);
-  const [filter, setFilter] = useState<FilterType>('ALL');
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [briefOpen, setBriefOpen] = useState(false);
-  const [streaming, setStreaming] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [pendingInsert, setPendingInsert] = useState<string | null>(null);
-  const [deleteOutputId, setDeleteOutputId] = useState<string | null>(null);
-  const [deletingOutput, setDeletingOutput] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [text, setText] = useState('');
+  const bottomRef = useRef<HTMLDivElement>(null);
 
-  const loadOutputs = useCallback(
-    async (type?: OutputType) => {
-      const res = await apiFetchWithRetry(
-        (token) => outputsApi.list(token, projectId, type),
-        getToken
-      );
-      setOutputs(res.items);
-    },
-    [projectId, getToken]
-  );
+  const messages = data?.items ?? [];
 
-  const loadCommands = useCallback(
-    async (tid: string) => {
-      const res = await apiFetchWithRetry(
-        (token) => messagesApi.chatCommands(token, tid),
-        getToken
-      );
-      setCommands(res);
-    },
-    [getToken]
-  );
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages.length]);
 
-  const loadWorkspace = useCallback(async () => {
-    setLoading(true);
+  const onSend = async () => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    setText('');
     try {
-      const project = await apiFetchWithRetry(
-        (token) => projectsApi.get(token, projectId),
-        getToken
-      );
-      expandCompany(project.companyId);
-
-      let threads = await apiFetchWithRetry(
-        (token) => threadsApi.listByProject(token, projectId),
-        getToken
-      );
-
-      if (threads.length === 0 && canWrite) {
-        const created = await apiFetchWithRetry(
-          (token) =>
-            threadsApi.create(token, projectId, { title: t('workspace.mainThread') }),
-          getToken
-        );
-        threads = [created];
-      }
-
-      const tid = threads[0]?.threadId;
-      if (!tid) return;
-
-      setThreadId(tid);
-
-      const [msgRes] = await Promise.all([
-        apiFetchWithRetry(
-          (token) => messagesApi.list(token, tid),
-          getToken
-        ),
-        loadCommands(tid),
-        loadOutputs(),
-      ]);
-      setMessages(msgRes.items);
-    } finally {
-      setLoading(false);
-    }
-  }, [projectId, getToken, canWrite, loadCommands, loadOutputs, expandCompany]);
-
-  useEffect(() => {
-    void loadWorkspace();
-  }, [loadWorkspace]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
-  }, [messages, streaming]);
-
-  useEffect(() => {
-    const type = filter === 'ALL' ? undefined : filter;
-    void loadOutputs(type);
-  }, [filter, loadOutputs]);
-
-  const handleSend = async (content: string, attachmentIds: string[]) => {
-    if (!threadId) return;
-    const token = await getToken();
-    if (!token) return;
-
-    const optimisticUser: MessageResponse = {
-      messageId: `temp-user-${Date.now()}`,
-      role: 'USER',
-      content,
-      attachmentIds,
-      incomplete: false,
-      createdAt: new Date().toISOString(),
-    };
-    setMessages((prev) => [...prev, optimisticUser]);
-    setStreaming(true);
-
-    let assistantId = '';
-    let assistantContent = '';
-
-    try {
-      await streamChat(threadId, token, { content, attachmentIds }, (event, data) => {
-        if (event === 'message_start') {
-          const start = data as { messageId: string };
-          assistantId = start.messageId;
-          setMessages((prev) => [
-            ...prev,
-            {
-              messageId: assistantId,
-              role: 'ASSISTANT',
-              content: '',
-              attachmentIds: [],
-              incomplete: true,
-              createdAt: new Date().toISOString(),
-            },
-          ]);
-        }
-
-        if (event === 'token') {
-          const tokenEvent = data as { text: string };
-          assistantContent += tokenEvent.text;
-          setMessages((prev) =>
-            prev.map((m) =>
-              m.messageId === assistantId ? { ...m, content: assistantContent } : m
-            )
-          );
-        }
-
-        if (event === 'message_end') {
-          const end = data as SseMessageEndEvent;
-          setMessages((prev) =>
-            prev.map((m) =>
-              m.messageId === end.messageId ? { ...m, incomplete: false } : m
-            )
-          );
-
-          if (end.action === 'SAVED' && end.savedLabel) {
-            toast.success(t('workspace.savedAs', { label: end.savedLabel }));
-            void loadOutputs(filter === 'ALL' ? undefined : filter);
-            if (threadId) void loadCommands(threadId);
-          }
-        }
-
-        if (event === 'error') {
-          const err = data as { message: string };
-          toast.error(err.message);
-        }
-      });
-    } finally {
-      setStreaming(false);
+      await sendMutation.mutateAsync(trimmed);
+    } catch (e) {
+      toast.error((e as Error).message || 'Failed to send message');
+      setText(trimmed);
     }
   };
 
-  const handleDeleteOutput = async () => {
-    if (!canWrite || !deleteOutputId) return;
-    setDeletingOutput(true);
-    try {
-      await apiFetchWithRetry(
-        (token) => outputsApi.delete(token, projectId, deleteOutputId),
-        getToken
-      );
-      setOutputs((prev) => prev.filter((o) => o.outputId !== deleteOutputId));
-      setSelectedIds((prev) => {
-        const next = new Set(prev);
-        next.delete(deleteOutputId);
-        return next;
-      });
-      toast.success(t('workspace.deleteSuccess'));
-      setDeleteOutputId(null);
-    } catch {
-      toast.error(t('workspace.deleteError'));
-    } finally {
-      setDeletingOutput(false);
+  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      void onSend();
     }
   };
-
-  const handleExport = async (format: 'CSV' | 'XLSX') => {
-    const token = await getToken();
-    if (!token) return;
-    try {
-      const blob = await outputsApi.export(token, projectId, {
-        format,
-        outputIds: selectedIds.size > 0 ? [...selectedIds] : undefined,
-      });
-      downloadBlob(blob, exportFilename(format));
-      toast.success(t('workspace.exportXlsx'));
-    } catch {
-      toast.error(t('common.error'));
-    }
-  };
-
-  if (loading) {
-    return (
-      <CrmPageShell>
-        <div className="flex min-h-[40vh] items-center justify-center">
-          <Spinner className="size-8" />
-        </div>
-      </CrmPageShell>
-    );
-  }
 
   return (
-    <CrmPageShell className={layout.dashboard.pageViewport}>
-      <LinearPageHeader
-        title={t('nav.workspace')}
-        description={t('nav.workspaceDescription')}
-        actions={
-          canWrite ? (
-            <ShellPageActions>
-              <Button size="sm" variant="outline" onClick={() => setBriefOpen(true)}>
-                <FileTextIcon data-icon="inline-start" />
-                {t('workspace.editBrief')}
-              </Button>
-            </ShellPageActions>
-          ) : undefined
-        }
-      />
-      <ResizablePanelGroup
-        orientation="horizontal"
-        className="min-h-0 flex-1 rounded-lg border"
-      >
-        <ResizablePanel defaultSize={65} minSize={40} className="min-h-0">
-          <div className="flex h-full min-h-0 flex-col p-4">
-            {!canWrite && (
-              <Alert className="mb-4 shrink-0">
-                <AlertDescription>{t('workspace.viewerReadOnly')}</AlertDescription>
-              </Alert>
-            )}
-            <div
-              className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden"
-              aria-live="polite"
-              aria-busy={streaming}
-            >
-              <MessageList messages={messages} streaming={streaming} />
-              {streaming ? (
-                <span className="sr-only">{t('workspace.streaming')}</span>
-              ) : null}
-              <div ref={messagesEndRef} />
-            </div>
-            {threadId && (
-              <ChatComposer
-                disabled={!canWrite || streaming}
-                commands={commands}
-                threadId={threadId}
-                getToken={getToken}
-                pendingInsert={pendingInsert}
-                onPendingInsertConsumed={() => setPendingInsert(null)}
-                onSend={handleSend}
-              />
-            )}
+    <PageShell className="h-[calc(100vh-4rem)] flex flex-col gap-0 py-0 px-0 max-w-none">
+      <div className="flex-shrink-0 px-6 pt-6 md:px-8">
+        <PageHeader
+          title={t('marketing.threadsTitle')}
+          description={t('marketing.threadsSubtitle')}
+        />
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-6 py-4 md:px-8">
+        {isLoading ? (
+          <div className="flex flex-col gap-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className={cn('flex', i % 2 === 0 ? 'justify-start' : 'justify-end')}>
+                <Skeleton className="h-12 w-64 rounded-2xl" />
+              </div>
+            ))}
           </div>
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={35} minSize={25} className="min-h-0">
-          <OutputsPanel
-            outputs={outputs}
-            filter={filter}
-            onFilterChange={setFilter}
-            selectedIds={selectedIds}
-            onToggleSelect={(id) =>
-              setSelectedIds((prev) => {
-                const next = new Set(prev);
-                if (next.has(id)) next.delete(id);
-                else next.add(id);
-                return next;
-              })
-            }
-            onInsertLabel={(label) => setPendingInsert(`@${label}`)}
-            onDelete={(id) => setDeleteOutputId(id)}
-            onExport={handleExport}
-            canWrite={canWrite}
+        ) : isError ? (
+          <ErrorState title="Failed to load messages" onRetry={() => void refetch()} />
+        ) : messages.length === 0 ? (
+          <div className="flex h-full items-center justify-center">
+            <p className="typo-body-sm text-muted-foreground">No messages yet. Start the conversation below.</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3 max-w-3xl mx-auto">
+            {messages.map((msg: Message) => (
+              <div
+                key={msg.id}
+                className={cn('flex', msg.role === 'user' ? 'justify-end' : 'justify-start')}
+              >
+                <div
+                  className={cn(
+                    'max-w-[75%] rounded-2xl px-4 py-2.5 text-sm',
+                    msg.role === 'user'
+                      ? 'bg-primary text-primary-foreground rounded-br-sm'
+                      : 'bg-muted text-foreground rounded-bl-sm',
+                  )}
+                >
+                  <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                  <p className={cn(
+                    'mt-1 typo-eyebrow typo-tabular',
+                    msg.role === 'user' ? 'text-primary-foreground/60' : 'text-muted-foreground',
+                  )}>
+                    {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+              </div>
+            ))}
+            <div ref={bottomRef} />
+          </div>
+        )}
+      </div>
+
+      <div className="flex-shrink-0 border-t border-border bg-card px-6 py-3 md:px-8">
+        <div className="flex items-end gap-2 max-w-3xl mx-auto">
+          <Textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={onKeyDown}
+            placeholder={t('marketing.messagePlaceholder')}
+            rows={1}
+            className="flex-1 resize-none min-h-[40px] max-h-[160px]"
           />
-        </ResizablePanel>
-      </ResizablePanelGroup>
-
-      <ConfirmDialog
-        open={Boolean(deleteOutputId)}
-        onOpenChange={(open) => !open && setDeleteOutputId(null)}
-        title={t('common.confirmDelete')}
-        description={t('workspace.deleteConfirm')}
-        onConfirm={() => void handleDeleteOutput()}
-        loading={deletingOutput}
-      />
-
-      <BriefEditor
-        projectId={projectId}
-        open={briefOpen}
-        onClose={() => setBriefOpen(false)}
-      />
-    </CrmPageShell>
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => void onSend()}
+            disabled={sendMutation.isPending || !text.trim()}
+            className="shrink-0"
+            aria-label={t('marketing.sendMessage')}
+          >
+            <Send className="size-4" />
+          </Button>
+        </div>
+      </div>
+    </PageShell>
   );
 }
