@@ -1,4 +1,16 @@
-import type { SocialPlatform } from '@/modules/marketing/types/api';
+export type SocialPlatform =
+  | 'INSTAGRAM'
+  | 'TIKTOK'
+  | 'LINKEDIN'
+  | 'PRODUCT_HUNT'
+  | 'X'
+  | 'YOUTUBE'
+  | 'THREADS'
+  | 'BLUESKY'
+  | 'MASTODON'
+  | 'FACEBOOK'
+  | 'PINTEREST'
+  | 'REDDIT';
 
 /** Third-party brand colors for platform badges (inline style only). */
 export const platformColors: Record<SocialPlatform, string> = {
