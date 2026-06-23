@@ -1,4 +1,5 @@
 import { Route } from 'react-router-dom';
+import MarketingWorkspacePage from '@/modules/marketing/pages/MarketingWorkspacePage';
 import AgencyOverviewPage from '@/modules/marketing/pages/AgencyOverviewPage';
 import CompaniesPage from '@/modules/marketing/pages/CompaniesPage';
 import CompanyProjectsPage from '@/modules/marketing/pages/CompanyProjectsPage';
@@ -9,7 +10,8 @@ import SocialCalendarPage from '@/modules/marketing/pages/SocialCalendarPage';
 
 export const marketingRoutes = (
   <Route path="marketing">
-    <Route index element={<AgencyOverviewPage />} />
+    <Route index element={<MarketingWorkspacePage />} />
+    <Route path="agency" element={<AgencyOverviewPage />} />
     <Route path="companies" element={<CompaniesPage />} />
     <Route path="companies/:companyId" element={<CompanyProjectsPage />} />
     <Route path="projects/:projectId" element={<ProjectDashboardPage />} />
