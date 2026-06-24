@@ -71,6 +71,12 @@ function mapList(raw: LocationListApi | LocationApi[]): { items: LocationView[];
   };
 }
 
+export interface LocationImageInput {
+  url: string;
+  alt?: string;
+  order?: number;
+}
+
 export interface LocationInput {
   name: string;
   street?: string;
@@ -79,6 +85,7 @@ export interface LocationInput {
   postalCode?: string;
   country?: string;
   phone?: string;
+  images?: LocationImageInput[];
 }
 
 export function useLocations() {

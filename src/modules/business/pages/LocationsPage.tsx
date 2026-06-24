@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Plus, MapPin } from 'lucide-react';
 import { PageShell } from '@/shared/components/PageShell';
@@ -8,6 +9,11 @@ import { EmptyState } from '@/shared/components/EmptyState';
 import { ErrorState } from '@/shared/components/ErrorState';
 import { CardGridSkeleton } from '@/shared/components/Skeletons';
 import { DetailDrawer } from '@/shared/components/DetailDrawer';
+import {
+  EditableImagesSection,
+  entityImageUrls,
+  toImagePayload,
+} from '@/shared/components/EditableImagesSection';
 import { Button } from '@/design-system/components/ui/button';
 import { Input } from '@/design-system/components/ui/input';
 import { Label } from '@/design-system/components/ui/label';
@@ -46,7 +52,8 @@ function toDraft(l: LocationView): LocationInput {
 
 export default function LocationsPage() {
   const { t } = useTranslation();
-  const { hasTenant } = useTenantPath();
+  const queryClient = useQueryClient();
+  const { hasTenant, tenantId, path: tenantPath } = useTenantPath();
   const { data, isLoading, isError, refetch, isFetching } = useLocations();
   const createMutation = useCreateLocation();
   const updateMutation = useUpdateLocation();
@@ -78,6 +85,49 @@ export default function LocationsPage() {
     } catch (e) {
       toast.error((e as Error).message || t('locations.saveFailed'));
     }
+  };
+
+  const onImageUploaded = (url: string) => {
+    if (!tenantId) return;
+    void queryClient.invalidateQueries({ queryKey: ['business', tenantId, 'locations'] });
+    if (selected) {
+      const urls = [...entityImageUrls(selected.images), url];
+      setSelected({
+        ...selected,
+        images: toImagePayload(urls),
+      });
+    }
+  };
+
+  const syncLocationImages = (urls: string[]) => {
+    if (!selected) return;
+    setSelected({
+      ...selected,
+      images: toImagePayload(urls),
+    });
+  };
+
+  const onImageRemoved = async (url: string) => {
+    if (!selected || !tenantId) return;
+    const remaining = entityImageUrls(selected.images).filter((item) => item !== url);
+    await updateMutation.mutateAsync({
+      id: selected.id,
+      input: { images: toImagePayload(remaining) },
+    });
+    void queryClient.invalidateQueries({ queryKey: ['business', tenantId, 'locations'] });
+    syncLocationImages(remaining);
+  };
+
+  const onImageReplaced = async (oldUrl: string, newUrl: string) => {
+    if (!selected || !tenantId) return;
+    const current = entityImageUrls(selected.images);
+    const updated = current.map((item) => (item === oldUrl ? newUrl : item));
+    await updateMutation.mutateAsync({
+      id: selected.id,
+      input: { images: toImagePayload(updated) },
+    });
+    void queryClient.invalidateQueries({ queryKey: ['business', tenantId, 'locations'] });
+    syncLocationImages(updated);
   };
 
   const onDelete = async () => {
@@ -198,6 +248,23 @@ export default function LocationsPage() {
               <Label htmlFor="loc-phone">{t('locations.fieldPhone')}</Label>
               <Input id="loc-phone" value={draft.phone ?? ''} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} />
             </div>
+            <EditableImagesSection
+              isNew={isNew}
+              entityId={selected?.id}
+              entityName={selected?.name}
+              imageUrls={entityImageUrls(selected?.images)}
+              uploadEndpoint={
+                selected && tenantPath
+                  ? `${tenantPath}/locations/${selected.id}/images`
+                  : undefined
+              }
+              onImageUploaded={onImageUploaded}
+              onImageRemoved={onImageRemoved}
+              onImageReplaced={onImageReplaced}
+              labelKey="locations.fieldImages"
+              hintKey="locations.imagesHint"
+              afterSaveKey="locations.imagesAfterSave"
+            />
           </div>
         ) : null}
       </DetailDrawer>

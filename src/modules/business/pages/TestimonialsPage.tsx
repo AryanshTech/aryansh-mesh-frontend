@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Plus, Star, Quote } from 'lucide-react';
 import { PageShell } from '@/shared/components/PageShell';
@@ -8,6 +9,10 @@ import { EmptyState } from '@/shared/components/EmptyState';
 import { ErrorState } from '@/shared/components/ErrorState';
 import { CardGridSkeleton } from '@/shared/components/Skeletons';
 import { DetailDrawer } from '@/shared/components/DetailDrawer';
+import {
+  EditableImagesSection,
+  entityImageUrls,
+} from '@/shared/components/EditableImagesSection';
 import { Button } from '@/design-system/components/ui/button';
 import { Input } from '@/design-system/components/ui/input';
 import { Label } from '@/design-system/components/ui/label';
@@ -44,7 +49,8 @@ function StarRating({ rating }: { rating: number }) {
 
 export default function TestimonialsPage() {
   const { t } = useTranslation();
-  const { hasTenant } = useTenantPath();
+  const queryClient = useQueryClient();
+  const { hasTenant, tenantId, path: tenantPath } = useTenantPath();
   const { data, isLoading, isError, refetch, isFetching } = useTestimonials();
   const createMutation = useCreateTestimonial();
   const updateMutation = useUpdateTestimonial();
@@ -76,6 +82,34 @@ export default function TestimonialsPage() {
     } catch (e) {
       toast.error((e as Error).message || t('testimonials.saveFailed'));
     }
+  };
+
+  const onPhotoUploaded = (url: string) => {
+    if (!tenantId) return;
+    void queryClient.invalidateQueries({ queryKey: ['business', tenantId, 'testimonials'] });
+    if (selected) {
+      setSelected({
+        ...selected,
+        photoUrl: url,
+      });
+    }
+  };
+
+  const onPhotoRemoved = async () => {
+    if (!selected || !tenantId) return;
+    await updateMutation.mutateAsync({
+      id: selected.id,
+      input: { photoUrl: null },
+    });
+    void queryClient.invalidateQueries({ queryKey: ['business', tenantId, 'testimonials'] });
+    setSelected({
+      ...selected,
+      photoUrl: null,
+    });
+  };
+
+  const onPhotoReplaced = async (_oldUrl: string, newUrl: string) => {
+    onPhotoUploaded(newUrl);
   };
 
   const onDelete = async () => {
@@ -174,6 +208,26 @@ export default function TestimonialsPage() {
                 onChange={(e) => setDraft({ ...draft, rating: e.target.value ? parseInt(e.target.value, 10) : undefined })}
               />
             </div>
+            <EditableImagesSection
+              isNew={isNew}
+              entityId={selected?.id}
+              entityName={selected?.author}
+              imageUrls={entityImageUrls(null, selected?.photoUrl)}
+              mode="single"
+              uploadEndpoint={
+                selected && tenantPath
+                  ? `${tenantPath}/testimonials/${selected.id}/photo`
+                  : undefined
+              }
+              onImageUploaded={onPhotoUploaded}
+              onImageRemoved={async () => {
+                await onPhotoRemoved();
+              }}
+              onImageReplaced={onPhotoReplaced}
+              labelKey="testimonials.fieldPhoto"
+              hintKey="testimonials.photoHint"
+              afterSaveKey="testimonials.photoAfterSave"
+            />
           </div>
         ) : null}
       </DetailDrawer>

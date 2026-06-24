@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Plus, Package, Search } from 'lucide-react';
 import { PageShell } from '@/shared/components/PageShell';
@@ -10,6 +11,11 @@ import { ErrorState } from '@/shared/components/ErrorState';
 import { CardGridSkeleton, ListSkeleton } from '@/shared/components/Skeletons';
 import { StatusBadge } from '@/shared/components/StatusBadge';
 import { DetailDrawer } from '@/shared/components/DetailDrawer';
+import {
+  EditableImagesSection,
+  entityImageUrls,
+  toImagePayload,
+} from '@/shared/components/EditableImagesSection';
 import { Button } from '@/design-system/components/ui/button';
 import { Input } from '@/design-system/components/ui/input';
 import { Label } from '@/design-system/components/ui/label';
@@ -30,6 +36,7 @@ import {
   useDeleteProduct,
   type ProductFilters,
 } from '@/modules/business/api/hooks/use-products';
+import { useTenantPath } from '@/modules/business/api/use-tenant-path';
 import type {
   ProductView as Product,
   ProductInput,
@@ -85,6 +92,8 @@ function fromDraft(d: ProductDraft): ProductInput {
 
 export default function ProductsPage() {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const { tenantId, path: tenantPath } = useTenantPath();
   const [view, setView] = useViewMode('products', 'card');
   const [filters, setFilters] = useState<ProductFilters>({ status: 'ALL' });
   const [search, setSearch] = useState('');
@@ -143,6 +152,53 @@ export default function ProductsPage() {
     } catch (e) {
       toast.error((e as Error).message || t('products.saveFailed'));
     }
+  };
+
+  const onImageUploaded = (url: string) => {
+    if (!tenantId) return;
+    void queryClient.invalidateQueries({ queryKey: ['business', tenantId, 'products'] });
+    if (selected) {
+      const urls = [...entityImageUrls(selected.images, selected.imageUrl), url];
+      setSelected({
+        ...selected,
+        imageUrl: selected.imageUrl ?? url,
+        images: toImagePayload(urls),
+      });
+    }
+  };
+
+  const syncProductImages = (urls: string[]) => {
+    if (!selected) return;
+    setSelected({
+      ...selected,
+      imageUrl: urls[0] ?? null,
+      images: toImagePayload(urls),
+    });
+  };
+
+  const onImageRemoved = async (url: string) => {
+    if (!selected || !tenantId) return;
+    const remaining = entityImageUrls(selected.images, selected.imageUrl).filter(
+      (item) => item !== url,
+    );
+    await updateMutation.mutateAsync({
+      id: selected.id,
+      input: { images: toImagePayload(remaining) },
+    });
+    void queryClient.invalidateQueries({ queryKey: ['business', tenantId, 'products'] });
+    syncProductImages(remaining);
+  };
+
+  const onImageReplaced = async (oldUrl: string, newUrl: string) => {
+    if (!selected || !tenantId) return;
+    const current = entityImageUrls(selected.images, selected.imageUrl);
+    const updated = current.map((item) => (item === oldUrl ? newUrl : item));
+    await updateMutation.mutateAsync({
+      id: selected.id,
+      input: { images: toImagePayload(updated) },
+    });
+    void queryClient.invalidateQueries({ queryKey: ['business', tenantId, 'products'] });
+    syncProductImages(updated);
   };
 
   const onDelete = async () => {
@@ -260,7 +316,24 @@ export default function ProductsPage() {
           </div>
         }
       >
-        {draft ? <ProductForm draft={draft} onChange={setDraft} /> : null}
+        {draft ? (
+          <ProductForm
+            draft={draft}
+            onChange={setDraft}
+            isNew={isNew}
+            productId={selected?.id}
+            productName={selected?.name}
+            imageUrls={entityImageUrls(selected?.images, selected?.imageUrl)}
+            uploadEndpoint={
+              selected && tenantPath
+                ? `${tenantPath}/products/${selected.id}/images`
+                : undefined
+            }
+            onImageUploaded={onImageUploaded}
+            onImageRemoved={onImageRemoved}
+            onImageReplaced={onImageReplaced}
+          />
+        ) : null}
       </DetailDrawer>
     </PageShell>
   );
@@ -434,9 +507,25 @@ function ProductList({
 function ProductForm({
   draft,
   onChange,
+  isNew,
+  productId,
+  productName,
+  imageUrls,
+  uploadEndpoint,
+  onImageUploaded,
+  onImageRemoved,
+  onImageReplaced,
 }: {
   draft: ProductDraft;
   onChange: (next: ProductDraft) => void;
+  isNew: boolean;
+  productId?: string;
+  productName?: string;
+  imageUrls: string[];
+  uploadEndpoint?: string;
+  onImageUploaded: (url: string) => void;
+  onImageRemoved: (url: string) => void | Promise<void>;
+  onImageReplaced: (oldUrl: string, newUrl: string) => void | Promise<void>;
 }) {
   const { t } = useTranslation();
   const update = (patch: Partial<ProductDraft>) => onChange({ ...draft, ...patch });
@@ -513,6 +602,19 @@ function ProductForm({
           </SelectContent>
         </Select>
       </div>
+      <EditableImagesSection
+        isNew={isNew}
+        entityId={productId}
+        entityName={productName}
+        imageUrls={imageUrls}
+        uploadEndpoint={uploadEndpoint}
+        onImageUploaded={onImageUploaded}
+        onImageRemoved={onImageRemoved}
+        onImageReplaced={onImageReplaced}
+        labelKey="products.fieldImages"
+        hintKey="products.imagesHint"
+        afterSaveKey="products.imagesAfterSave"
+      />
     </div>
   );
 }

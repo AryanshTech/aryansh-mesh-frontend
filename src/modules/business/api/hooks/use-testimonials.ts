@@ -50,7 +50,7 @@ export interface TestimonialInput {
   author: string;
   quote: string;
   rating?: number;
-  photoUrl?: string;
+  photoUrl?: string | null;
 }
 
 export function useTestimonials() {

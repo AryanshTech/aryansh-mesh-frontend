@@ -36,6 +36,12 @@ export interface Product {
   updatedAt: string;
 }
 
+export interface ProductImageInput {
+  url: string;
+  alt?: string;
+  order?: number;
+}
+
 export interface ProductInput {
   name: string;
   sku?: string;
@@ -44,6 +50,7 @@ export interface ProductInput {
   currency: string;
   status: ProductStatus;
   category?: string;
+  images?: ProductImageInput[];
 }
 
 export interface ProductView extends Product {
