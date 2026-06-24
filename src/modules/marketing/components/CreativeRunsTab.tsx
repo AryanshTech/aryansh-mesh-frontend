@@ -95,7 +95,7 @@ export function CreativeRunsTab({ projectId }: Props) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-end gap-2">
-        <Button onClick={() => setNewRunRecipeId(recipes[0]?.id ?? '')} disabled={recipes.length === 0}>
+        <Button onClick={() => setNewRunRecipeId(recipes[0]?.id ?? null)} disabled={recipes.length === 0}>
           <Plus className="size-4" />{t('marketing.runs.create')}
         </Button>
       </div>
@@ -163,7 +163,7 @@ export function CreativeRunsTab({ projectId }: Props) {
               </Select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="run-notes">Notes</Label>
+              <Label htmlFor="run-notes">{t('marketing.runs.fieldNotes')}</Label>
               <Textarea
                 id="run-notes"
                 rows={4}
@@ -176,7 +176,7 @@ export function CreativeRunsTab({ projectId }: Props) {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="run-summary">Result summary</Label>
+              <Label htmlFor="run-summary">{t('marketing.runs.fieldResultSummary')}</Label>
               <Textarea
                 id="run-summary"
                 rows={3}
@@ -190,7 +190,7 @@ export function CreativeRunsTab({ projectId }: Props) {
             </div>
             {selected.sourcePrompt ? (
               <div className="flex flex-col gap-1.5">
-                <Label>Source prompt</Label>
+                <Label>{t('marketing.runs.fieldSourcePrompt')}</Label>
                 <Card className="p-3 max-h-64 overflow-y-auto">
                   <pre className="whitespace-pre-wrap font-mono text-xs text-foreground">{selected.sourcePrompt}</pre>
                 </Card>
@@ -216,9 +216,9 @@ export function CreativeRunsTab({ projectId }: Props) {
       >
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <Label>Recipe</Label>
+            <Label>{t('marketing.runs.fieldRecipe')}</Label>
             <Select value={newRunRecipeId ?? ''} onValueChange={(v) => setNewRunRecipeId(v)}>
-              <SelectTrigger><SelectValue placeholder="Select a recipe" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder={t('marketing.runs.selectRecipe')} /></SelectTrigger>
               <SelectContent>
                 {recipes.map((r) => <SelectItem key={r.id} value={r.id}>{r.title}</SelectItem>)}
               </SelectContent>

@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/core/api/client';
-import { ApiError } from '@/core/api/client';
+import { api, ApiError } from '@/core/api/client';
 
 export interface BrandIdentityColors {
   primary?: string;
@@ -62,10 +61,35 @@ export interface BrandIdentityInput {
   sourceMarkdown?: string;
 }
 
+interface CurrentBrandIdentityEnvelope {
+  identity: BrandIdentity | null;
+  projectId: string;
+}
+
 export const brandIdentityKeys = {
   list: (projectId: string) => ['marketing', 'brand-identity', 'list', projectId] as const,
   current: (projectId: string) => ['marketing', 'brand-identity', 'current', projectId] as const,
+  currentByTenant: (tenantId: string) =>
+    ['marketing', 'brand-identity', 'current', 'tenant', tenantId] as const,
 };
+
+function parseCurrentIdentity(
+  raw: BrandIdentity | CurrentBrandIdentityEnvelope | null | undefined,
+): BrandIdentity | null {
+  if (!raw) return null;
+  if ('identity' in raw) return raw.identity ?? null;
+  return raw;
+}
+
+async function fetchCurrentBrandIdentity(path: string): Promise<BrandIdentity | null> {
+  try {
+    const raw = await api.get<BrandIdentity | CurrentBrandIdentityEnvelope>(path);
+    return parseCurrentIdentity(raw);
+  } catch (e) {
+    if (e instanceof ApiError && (e.status === 404 || e.status === 204)) return null;
+    throw e;
+  }
+}
 
 export function useBrandIdentityVersions(projectId: string | undefined) {
   return useQuery({
@@ -77,43 +101,51 @@ export function useBrandIdentityVersions(projectId: string | undefined) {
   });
 }
 
-export function useCurrentBrandIdentity(projectId: string | undefined) {
+export function useCurrentBrandIdentity(
+  projectId: string | undefined,
+  tenantId?: string,
+) {
+  const useTenantScope = !!tenantId;
   return useQuery({
-    queryKey: brandIdentityKeys.current(projectId ?? ''),
-    queryFn: async () => {
-      try {
-        return await api.get<BrandIdentity | undefined>(
-          `/projects/${projectId!}/brand-identity/current`,
-        );
-      } catch (e) {
-        if (e instanceof ApiError && e.status === 404) return null;
-        throw e;
-      }
-    },
-    enabled: !!projectId,
+    queryKey: useTenantScope
+      ? brandIdentityKeys.currentByTenant(tenantId!)
+      : brandIdentityKeys.current(projectId ?? ''),
+    queryFn: () =>
+      useTenantScope
+        ? fetchCurrentBrandIdentity(
+            `/tenants/${tenantId!}/marketing/brand-identity/current`,
+          )
+        : fetchCurrentBrandIdentity(`/projects/${projectId!}/brand-identity/current`),
+    enabled: useTenantScope ? !!tenantId : !!projectId,
   });
 }
 
-export function useSaveBrandIdentity(projectId: string) {
+export function useSaveBrandIdentity(projectId: string, tenantId?: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: BrandIdentityInput) =>
       api.post<BrandIdentity>(`/projects/${projectId}/brand-identity`, input),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      qc.setQueryData(brandIdentityKeys.current(projectId), data);
+      if (tenantId) {
+        qc.setQueryData(brandIdentityKeys.currentByTenant(tenantId), data);
+      }
       void qc.invalidateQueries({ queryKey: brandIdentityKeys.list(projectId) });
-      void qc.invalidateQueries({ queryKey: brandIdentityKeys.current(projectId) });
     },
   });
 }
 
-export function useGenerateBrandIdentity(projectId: string) {
+export function useGenerateBrandIdentity(projectId: string, tenantId?: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: () =>
       api.post<BrandIdentity>(`/projects/${projectId}/brand-identity/generate`),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      qc.setQueryData(brandIdentityKeys.current(projectId), data);
+      if (tenantId) {
+        qc.setQueryData(brandIdentityKeys.currentByTenant(tenantId), data);
+      }
       void qc.invalidateQueries({ queryKey: brandIdentityKeys.list(projectId) });
-      void qc.invalidateQueries({ queryKey: brandIdentityKeys.current(projectId) });
     },
   });
 }

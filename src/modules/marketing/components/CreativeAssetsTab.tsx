@@ -90,10 +90,13 @@ export function CreativeAssetsTab({ projectId }: Props) {
 
   const onApproval = async (assetId: string, approvalStatus: ApprovalStatus) => {
     try {
-      await statusMutation.mutateAsync({ assetId, approvalStatus });
+      const updated = await statusMutation.mutateAsync({ assetId, approvalStatus });
+      if (selected?.id === assetId) {
+        setSelected(updated);
+      }
       toast.success(t(`marketing.assets.status${approvalStatus.charAt(0).toUpperCase() + approvalStatus.slice(1)}`));
     } catch (e) {
-      toast.error((e as Error).message || 'Failed');
+      toast.error((e as Error).message || t('marketing.assets.statusUpdateFailed'));
     }
   };
 
@@ -196,16 +199,16 @@ export function CreativeAssetsTab({ projectId }: Props) {
             ) : null}
             <Card className="p-4 flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <span className="typo-eyebrow-upper text-faint">Type</span>
+                <span className="typo-eyebrow-upper text-faint">{t('marketing.assets.fieldType')}</span>
                 <span className="typo-body-sm text-foreground">{selected.assetType}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="typo-eyebrow-upper text-faint">Status</span>
+                <span className="typo-eyebrow-upper text-faint">{t('marketing.assets.columnApproval')}</span>
                 <StatusBadge label={selected.approvalStatus} tone={approvalTone(selected.approvalStatus)} />
               </div>
               {selected.runId ? (
                 <div className="flex items-center justify-between">
-                  <span className="typo-eyebrow-upper text-faint">Run</span>
+                  <span className="typo-eyebrow-upper text-faint">{t('marketing.assets.fieldRunId')}</span>
                   <span className="typo-body-sm text-foreground">{runById.get(selected.runId) ?? selected.runId}</span>
                 </div>
               ) : null}
@@ -247,7 +250,7 @@ export function CreativeAssetsTab({ projectId }: Props) {
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="a-type">{t('marketing.assets.fieldType')}</Label>
             <Select value={uploadType} onValueChange={(v) => setUploadType(v as AssetType)}>
-              <SelectTrigger id="a-type"><SelectValue placeholder="Auto-detect" /></SelectTrigger>
+              <SelectTrigger id="a-type"><SelectValue placeholder={t('marketing.assets.autoDetect')} /></SelectTrigger>
               <SelectContent>
                 {ASSET_TYPES.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}
               </SelectContent>
@@ -257,7 +260,7 @@ export function CreativeAssetsTab({ projectId }: Props) {
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="a-run">{t('marketing.assets.fieldRunId')}</Label>
               <Select value={uploadRunId} onValueChange={(v) => setUploadRunId(v)}>
-                <SelectTrigger id="a-run"><SelectValue placeholder="None" /></SelectTrigger>
+                <SelectTrigger id="a-run"><SelectValue placeholder={t('marketing.assets.noRun')} /></SelectTrigger>
                 <SelectContent>
                   {runs.map((r) => <SelectItem key={r.id} value={r.id}>{r.id.slice(0, 8)} — {r.status}</SelectItem>)}
                 </SelectContent>

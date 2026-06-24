@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/core/api/client';
+import { api, ApiError } from '@/core/api/client';
 
 export interface BrandPerception {
   projectId: string;
@@ -13,8 +13,16 @@ export const brandPerceptionKeys = {
 export function useBrandPerceptionPreview(projectId: string | undefined) {
   return useQuery({
     queryKey: brandPerceptionKeys.preview(projectId ?? ''),
-    queryFn: () =>
-      api.get<BrandPerception>(`/projects/${projectId!}/brand-perception`),
+    queryFn: async () => {
+      try {
+        return await api.get<BrandPerception>(`/projects/${projectId!}/brand-perception`);
+      } catch (e) {
+        if (e instanceof ApiError && (e.status === 404 || e.status === 204)) {
+          return { projectId: projectId!, contentMarkdown: '' };
+        }
+        throw e;
+      }
+    },
     enabled: !!projectId,
   });
 }

@@ -1,8 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/core/api/client';
+import { resolveEntityId } from '@/modules/marketing/api/marketing-utils';
 
 export interface MarketingCompany {
   companyId: string;
+  id: string;
   companyCode: string;
   name: string;
   tenantId: string;
@@ -13,6 +15,7 @@ export interface MarketingCompany {
 
 export interface MarketingProject {
   projectId: string;
+  id: string;
   companyId: string;
   tenantId: string;
   tenantSlug: string;
@@ -31,6 +34,39 @@ export interface MarketingWorkspace {
   project: MarketingProject;
 }
 
+interface MarketingWorkspaceApi {
+  tenantId: string;
+  tenantSlug: string;
+  company: MarketingCompany & { id?: string; companyId?: string };
+  project: MarketingProject & { id?: string; projectId?: string };
+}
+
+function normalizeWorkspace(raw: MarketingWorkspaceApi): MarketingWorkspace {
+  const companyId = resolveEntityId(raw.company, 'companyId');
+  const projectId = resolveEntityId(raw.project, 'projectId');
+  return {
+    tenantId: raw.tenantId,
+    tenantSlug: raw.tenantSlug,
+    company: {
+      ...raw.company,
+      id: companyId,
+      companyId,
+    },
+    project: {
+      ...raw.project,
+      id: projectId,
+      projectId,
+      companyId: raw.project.companyId ?? companyId,
+    },
+  };
+}
+
+export function resolveMarketingProjectId(
+  project: Pick<MarketingProject, 'projectId' | 'id'> | null | undefined,
+): string {
+  return resolveEntityId(project, 'projectId');
+}
+
 export const workspaceKeys = {
   byTenant: (tenantId: string) => ['marketing', 'workspace', tenantId] as const,
 };
@@ -38,8 +74,12 @@ export const workspaceKeys = {
 export function useMarketingWorkspace(tenantId: string | undefined) {
   return useQuery({
     queryKey: workspaceKeys.byTenant(tenantId ?? ''),
-    queryFn: () =>
-      api.get<MarketingWorkspace>(`/tenants/${tenantId!}/marketing/workspace`),
+    queryFn: async () => {
+      const raw = await api.get<MarketingWorkspaceApi>(
+        `/tenants/${tenantId!}/marketing/workspace`,
+      );
+      return normalizeWorkspace(raw);
+    },
     enabled: !!tenantId,
   });
 }
@@ -47,8 +87,12 @@ export function useMarketingWorkspace(tenantId: string | undefined) {
 export function useEnsureMarketingWorkspace() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (tenantId: string) =>
-      api.post<MarketingWorkspace>(`/tenants/${tenantId}/marketing/workspace`),
+    mutationFn: async (tenantId: string) => {
+      const raw = await api.post<MarketingWorkspaceApi>(
+        `/tenants/${tenantId}/marketing/workspace`,
+      );
+      return normalizeWorkspace(raw);
+    },
     onSuccess: (data, tenantId) => {
       qc.setQueryData(workspaceKeys.byTenant(tenantId), data);
     },

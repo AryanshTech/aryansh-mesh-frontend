@@ -87,12 +87,12 @@ export function CreativeRecipesTab({ projectId }: Props) {
     }
   };
 
-  const copyText = async (text: string, label: string) => {
+  const copyText = async (text: string, labelKey: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      toast.success(`${label} copied`);
+      toast.success(t('marketing.recipes.copied', { label: t(labelKey) }));
     } catch {
-      toast.error('Copy failed');
+      toast.error(t('marketing.recipes.copyFailed'));
     }
   };
 
@@ -184,7 +184,7 @@ export function CreativeRecipesTab({ projectId }: Props) {
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <p className="typo-eyebrow-upper text-faint">{t('marketing.recipes.fieldPrompt')}</p>
-                <Button size="sm" variant="ghost" onClick={() => void copyText(selected.promptMarkdown, 'Prompt')}>
+                <Button size="sm" variant="ghost" onClick={() => void copyText(selected.promptMarkdown, 'marketing.recipes.fieldPrompt')}>
                   <Copy className="size-3.5" />
                 </Button>
               </div>
@@ -197,8 +197,8 @@ export function CreativeRecipesTab({ projectId }: Props) {
             {selected.setupCommands.length > 0 ? (
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <p className="typo-eyebrow-upper text-faint">Setup</p>
-                  <Button size="sm" variant="ghost" onClick={() => void copyText(selected.setupCommands.join('\n'), 'Setup')}>
+                  <p className="typo-eyebrow-upper text-faint">{t('marketing.recipes.setupCommands')}</p>
+                  <Button size="sm" variant="ghost" onClick={() => void copyText(selected.setupCommands.join('\n'), 'marketing.recipes.setupCommands')}>
                     <Copy className="size-3.5" />
                   </Button>
                 </div>
@@ -210,8 +210,8 @@ export function CreativeRecipesTab({ projectId }: Props) {
             {selected.runCommands.length > 0 ? (
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <p className="typo-eyebrow-upper text-faint">Run</p>
-                  <Button size="sm" variant="ghost" onClick={() => void copyText(selected.runCommands.join('\n'), 'Run')}>
+                  <p className="typo-eyebrow-upper text-faint">{t('marketing.recipes.runCommands')}</p>
+                  <Button size="sm" variant="ghost" onClick={() => void copyText(selected.runCommands.join('\n'), 'marketing.recipes.runCommands')}>
                     <Copy className="size-3.5" />
                   </Button>
                 </div>
@@ -222,7 +222,7 @@ export function CreativeRecipesTab({ projectId }: Props) {
             ) : null}
             {selected.expectedOutputs.length > 0 ? (
               <div className="flex flex-col gap-2">
-                <p className="typo-eyebrow-upper text-faint">Expected Outputs</p>
+                <p className="typo-eyebrow-upper text-faint">{t('marketing.recipes.expectedOutputs')}</p>
                 <Card className="p-3">
                   <ul className="list-disc list-inside text-sm text-foreground">
                     {selected.expectedOutputs.map((o, i) => <li key={i}>{o}</li>)}

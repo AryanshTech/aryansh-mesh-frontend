@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/core/api/client';
+import { api, ApiError } from '@/core/api/client';
+import { normalizeList } from '@/modules/marketing/api/marketing-utils';
 
 export type AssetType = 'IMAGE' | 'VIDEO' | 'REMOTION_PROJECT' | 'PROMPT_PACK' | 'OTHER';
 export type ToolType = string;
@@ -114,9 +115,11 @@ export function useCreativeRecipes(projectId: string | undefined) {
   return useQuery({
     queryKey: creativeKeys.recipes(projectId ?? ''),
     queryFn: () =>
-      api.get<CreativeRecipe[]>(`/projects/${projectId!}/creative/recipes`),
+      api.get<CreativeRecipe[] | { items?: CreativeRecipe[] }>(
+        `/projects/${projectId!}/creative/recipes`,
+      ),
     enabled: !!projectId,
-    select: (raw) => raw ?? [],
+    select: normalizeList,
   });
 }
 
@@ -147,9 +150,11 @@ export function useCreativeRuns(projectId: string | undefined) {
   return useQuery({
     queryKey: creativeKeys.runs(projectId ?? ''),
     queryFn: () =>
-      api.get<CreativeRun[]>(`/projects/${projectId!}/creative/runs`),
+      api.get<CreativeRun[] | { items?: CreativeRun[] }>(
+        `/projects/${projectId!}/creative/runs`,
+      ),
     enabled: !!projectId,
-    select: (raw) => raw ?? [],
+    select: normalizeList,
   });
 }
 
@@ -180,9 +185,11 @@ export function useCreativeAssets(projectId: string | undefined) {
   return useQuery({
     queryKey: creativeKeys.assets(projectId ?? ''),
     queryFn: () =>
-      api.get<CreativeAsset[]>(`/projects/${projectId!}/creative/assets`),
+      api.get<CreativeAsset[] | { items?: CreativeAsset[] }>(
+        `/projects/${projectId!}/creative/assets`,
+      ),
     enabled: !!projectId,
-    select: (raw) => raw ?? [],
+    select: normalizeList,
   });
 }
 

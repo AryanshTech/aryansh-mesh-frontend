@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { Sparkles, Eye } from 'lucide-react';
+import { RefreshCw, Sparkles, Eye } from 'lucide-react';
 import { EmptyState } from '@/shared/components/EmptyState';
 import { ErrorState } from '@/shared/components/ErrorState';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
@@ -17,12 +17,23 @@ interface Props {
 
 export function BrandPerceptionTab({ projectId }: Props) {
   const { t } = useTranslation();
-  const { data, isLoading, isError, refetch } = useBrandPerceptionPreview(projectId);
-  const generateMutation = useGenerateBrandPerception(projectId);
+  const { data, isLoading, isError, refetch, isFetching } = useBrandPerceptionPreview(projectId);
+  const saveMutation = useGenerateBrandPerception(projectId);
 
-  const onGenerate = async () => {
+  const hasPreview = Boolean(data?.contentMarkdown?.trim());
+
+  const onRefresh = async () => {
     try {
-      await generateMutation.mutateAsync();
+      await refetch();
+      toast.success(t('marketing.brandPerception.refreshed'));
+    } catch (e) {
+      toast.error((e as Error).message || t('marketing.brandPerception.errorTitle'));
+    }
+  };
+
+  const onSave = async () => {
+    try {
+      await saveMutation.mutateAsync();
       toast.success(t('marketing.brandPerception.generated'));
     } catch (e) {
       toast.error((e as Error).message || t('marketing.brandPerception.generateFailed'));
@@ -32,16 +43,16 @@ export function BrandPerceptionTab({ projectId }: Props) {
   if (isLoading) return <Skeleton className="h-96 w-full rounded-xl" />;
   if (isError) return <ErrorState title={t('marketing.brandPerception.errorTitle')} onRetry={() => void refetch()} />;
 
-  if (!data || !data.contentMarkdown?.trim()) {
+  if (!hasPreview) {
     return (
       <EmptyState
         icon={<Eye />}
         title={t('marketing.brandPerception.emptyTitle')}
         description={t('marketing.brandPerception.emptyDescription')}
         action={
-          <Button onClick={() => void onGenerate()} disabled={generateMutation.isPending}>
-            <Sparkles className="size-4" />
-            {generateMutation.isPending ? t('common.loading') : t('marketing.brandPerception.generate')}
+          <Button onClick={() => void onRefresh()} disabled={isFetching}>
+            <RefreshCw className="size-4" />
+            {isFetching ? t('common.loading') : t('marketing.brandPerception.refreshPreview')}
           </Button>
         }
       />
@@ -50,15 +61,19 @@ export function BrandPerceptionTab({ projectId }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-end">
-        <Button onClick={() => void onGenerate()} disabled={generateMutation.isPending}>
+      <div className="flex items-center justify-end gap-2">
+        <Button variant="outline" onClick={() => void onRefresh()} disabled={isFetching}>
+          <RefreshCw className="size-4" />
+          {isFetching ? t('common.loading') : t('marketing.brandPerception.refreshPreview')}
+        </Button>
+        <Button onClick={() => void onSave()} disabled={saveMutation.isPending}>
           <Sparkles className="size-4" />
-          {generateMutation.isPending ? t('common.loading') : t('marketing.brandPerception.generate')}
+          {saveMutation.isPending ? t('common.loading') : t('marketing.brandPerception.generate')}
         </Button>
       </div>
       <Card className="p-6 max-h-[70vh] overflow-y-auto">
         <pre className="whitespace-pre-wrap font-mono text-sm text-foreground leading-relaxed">
-          {data.contentMarkdown}
+          {data?.contentMarkdown}
         </pre>
       </Card>
     </div>
