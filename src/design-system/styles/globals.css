@@ -130,14 +130,14 @@ html.light {
 
 [data-state="open"].animate-in,
 [data-state="open"][class*="animate-in"] {
-  animation-duration: 220ms;
-  animation-timing-function: var(--ease-drawer);
+  animation-duration: 180ms;
+  animation-timing-function: var(--ease-out);
   animation-fill-mode: forwards;
 }
 [data-state="closed"].animate-out,
 [data-state="closed"][class*="animate-out"] {
-  animation-duration: 180ms;
-  animation-timing-function: ease-in;
+  animation-duration: 150ms;
+  animation-timing-function: var(--ease-out);
   animation-fill-mode: forwards;
 }
 
@@ -339,6 +339,29 @@ body {
   opacity: 1;
   transform: translateY(0);
   transition: opacity 160ms var(--ease-out), transform 160ms var(--ease-out);
+}
+
+/* Prevent hover flicker on touch devices */
+@media (hover: none) {
+  .hover\:bg-muted:hover,
+  .hover\:bg-accent:hover,
+  .hover\:bg-card\/80:hover,
+  .hover\:text-foreground:hover {
+    background-color: inherit;
+    color: inherit;
+  }
+}
+
+/* Auth card entrance */
+.auth-card {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 240ms var(--ease-out), transform 240ms var(--ease-out);
+
+  @starting-style {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 }
 
 /* Button :active press feedback (handled per-component, but global default) */
