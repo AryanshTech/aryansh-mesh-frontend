@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api, ApiError } from '@/core/api/client';
+import { api } from '@/core/api/client';
 import { normalizeList } from '@/modules/marketing/api/marketing-utils';
 
 export type AssetType = 'IMAGE' | 'VIDEO' | 'REMOTION_PROJECT' | 'PROMPT_PACK' | 'OTHER';
