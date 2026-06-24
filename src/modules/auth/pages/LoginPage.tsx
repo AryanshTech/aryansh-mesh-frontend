@@ -54,7 +54,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-8 shadow-floating">
+    <div className="auth-card rounded-2xl border border-border bg-card p-8 shadow-floating">
       <div className="mb-6 flex flex-col items-center gap-3">
         <div className="grid size-10 place-items-center rounded-lg bg-primary text-primary-foreground font-bold">
           AM

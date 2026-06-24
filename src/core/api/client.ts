@@ -3,7 +3,12 @@
  * Base: VITE_API_BASE_URL + /api/v1
  * Bearer token injected from token storage.
  */
-import { getAccessToken, getRefreshToken, clearTokens, setTokens } from '@/core/auth/token-storage';
+import {
+  clearTokens,
+  getAccessToken,
+  getRefreshToken,
+  setTokens,
+} from '@/core/auth/token-storage';
 import type { ApiError, ErrorEnvelope } from './types';
 
 const RAW_BASE =
@@ -60,15 +65,28 @@ async function refreshAccessToken(): Promise<string | null> {
       body: JSON.stringify({ refreshToken }),
     });
     if (!res.ok) return null;
-    const data = (await res.json()) as { idToken?: string; refreshToken?: string };
+    const data = (await res.json()) as {
+      idToken?: string;
+      refreshToken?: string;
+      expiresIn?: string | number;
+    };
     if (data.idToken) {
-      setTokens({ accessToken: data.idToken, refreshToken: data.refreshToken });
+      setTokens({
+        accessToken: data.idToken,
+        refreshToken: data.refreshToken,
+        expiresIn: data.expiresIn,
+      });
       return data.idToken;
     }
   } catch {
     /* swallow */
   }
   return null;
+}
+
+/** Refresh tokens using the persisted refresh token (e.g. on app startup). */
+export async function refreshAuthTokens(): Promise<string | null> {
+  return refreshAccessToken();
 }
 
 export async function apiRequest<T>(path: string, opts: RequestOptions = {}): Promise<T> {

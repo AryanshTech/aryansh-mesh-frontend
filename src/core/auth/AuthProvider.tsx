@@ -7,10 +7,12 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { api } from '@/core/api/client';
+import { api, ApiError, refreshAuthTokens } from '@/core/api/client';
 import {
   clearTokens,
-  getAccessToken,
+  hasPersistedAuth,
+  isAccessTokenExpired,
+  loadStoredSession,
   setTokens,
 } from '@/core/auth/token-storage';
 import type {
@@ -32,12 +34,14 @@ interface BackendSession {
 interface LoginResponse {
   idToken: string;
   refreshToken?: string;
+  expiresIn?: string;
   session: BackendSession;
 }
 
 interface AuthTokensResponse {
   idToken: string;
   refreshToken?: string;
+  expiresIn?: string;
 }
 
 interface AuthContextValue {
@@ -79,38 +83,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const session = await api.post<BackendSession>('/auth/session');
       setUser(mapSessionUser(session));
       setStatus('authenticated');
-    } catch {
+    } catch (error) {
       setUser(null);
       setStatus('unauthenticated');
-      clearTokens();
+      if (error instanceof ApiError && error.status === 401) {
+        clearTokens();
+      }
     }
   }, []);
 
   useEffect(() => {
-    if (getAccessToken()) {
-      void loadMe();
-    } else {
-      setStatus('unauthenticated');
+    async function bootstrap() {
+      if (!hasPersistedAuth()) {
+        setStatus('unauthenticated');
+        return;
+      }
+
+      const stored = loadStoredSession();
+      if (stored && isAccessTokenExpired(stored)) {
+        const refreshed = await refreshAuthTokens();
+        if (!refreshed) {
+          clearTokens();
+          setStatus('unauthenticated');
+          return;
+        }
+      }
+
+      await loadMe();
     }
+
+    void bootstrap();
   }, [loadMe]);
 
-  const login = useCallback(
-    async (req: LoginRequest) => {
-      const response = await api.post<LoginResponse>('/auth/login', req, { skipAuth: true });
-      setTokens({ accessToken: response.idToken, refreshToken: response.refreshToken });
-      setUser(mapSessionUser(response.session));
-      setStatus('authenticated');
-    },
-    []
-  );
+  const login = useCallback(async (req: LoginRequest) => {
+    const response = await api.post<LoginResponse>('/auth/login', req, { skipAuth: true });
+    setTokens({
+      accessToken: response.idToken,
+      refreshToken: response.refreshToken,
+      expiresIn: response.expiresIn,
+    });
+    setUser(mapSessionUser(response.session));
+    setStatus('authenticated');
+  }, []);
 
   const signUp = useCallback(
     async (req: SignUpRequest) => {
       const response = await api.post<AuthTokensResponse>('/auth/signup', req, { skipAuth: true });
-      setTokens({ accessToken: response.idToken, refreshToken: response.refreshToken });
+      setTokens({
+        accessToken: response.idToken,
+        refreshToken: response.refreshToken,
+        expiresIn: response.expiresIn,
+      });
       await loadMe();
     },
-    [loadMe]
+    [loadMe],
   );
 
   const logout = useCallback(() => {
@@ -121,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AuthContextValue>(
     () => ({ user, status, login, signUp, logout, refresh: loadMe }),
-    [user, status, login, signUp, logout, loadMe]
+    [user, status, login, signUp, logout, loadMe],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
