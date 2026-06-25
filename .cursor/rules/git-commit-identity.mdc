@@ -1,0 +1,23 @@
+---
+description: Use Yash Mehta's GitHub identity for all commits; never Cursor Agent co-authors
+alwaysApply: true
+---
+
+# Git commit identity
+
+All commits must attribute **only**:
+
+- **Name:** `Yash Mehta`
+- **Email:** `yashrajmehta3027@gmail.com`
+
+Never add `Co-authored-by: Cursor <cursoragent@cursor.com>`. Never use `yash.mehta@sap.com`.
+
+When creating commits, set author/committer via env vars (do not change git config):
+
+```bash
+GIT_AUTHOR_NAME='Yash Mehta' \
+GIT_AUTHOR_EMAIL='yashrajmehta3027@gmail.com' \
+GIT_COMMITTER_NAME='Yash Mehta' \
+GIT_COMMITTER_EMAIL='yashrajmehta3027@gmail.com' \
+git commit -m "message"
+```
