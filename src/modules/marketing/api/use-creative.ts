@@ -110,35 +110,41 @@ export const creativeKeys = {
   assets: (projectId: string) => ['marketing', 'creative', 'assets', projectId] as const,
 };
 
+function creativeRoot(projectId: string, tenantId?: string): string {
+  return tenantId
+    ? `/tenants/${tenantId}/marketing/creative`
+    : `/projects/${projectId}/creative`;
+}
+
 // Recipes
-export function useCreativeRecipes(projectId: string | undefined) {
+export function useCreativeRecipes(projectId: string | undefined, tenantId?: string) {
   return useQuery({
     queryKey: creativeKeys.recipes(projectId ?? ''),
     queryFn: () =>
       api.get<CreativeRecipe[] | { items?: CreativeRecipe[] }>(
-        `/projects/${projectId!}/creative/recipes`,
+        `${creativeRoot(projectId!, tenantId)}/recipes`,
       ),
     enabled: !!projectId,
     select: normalizeList,
   });
 }
 
-export function useCreateCreativeRecipe(projectId: string) {
+export function useCreateCreativeRecipe(projectId: string, tenantId?: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: CreativeRecipeInput) =>
-      api.post<CreativeRecipe>(`/projects/${projectId}/creative/recipes`, input),
+      api.post<CreativeRecipe>(`${creativeRoot(projectId, tenantId)}/recipes`, input),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: creativeKeys.recipes(projectId) });
     },
   });
 }
 
-export function useGenerateLocalPackage(projectId: string) {
+export function useGenerateLocalPackage(projectId: string, tenantId?: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: LocalPackageInput) =>
-      api.post<CreativeRecipe>(`/projects/${projectId}/creative/local-packages`, input),
+      api.post<CreativeRecipe>(`${creativeRoot(projectId, tenantId)}/local-packages`, input),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: creativeKeys.recipes(projectId) });
     },
@@ -146,34 +152,34 @@ export function useGenerateLocalPackage(projectId: string) {
 }
 
 // Runs
-export function useCreativeRuns(projectId: string | undefined) {
+export function useCreativeRuns(projectId: string | undefined, tenantId?: string) {
   return useQuery({
     queryKey: creativeKeys.runs(projectId ?? ''),
     queryFn: () =>
       api.get<CreativeRun[] | { items?: CreativeRun[] }>(
-        `/projects/${projectId!}/creative/runs`,
+        `${creativeRoot(projectId!, tenantId)}/runs`,
       ),
     enabled: !!projectId,
     select: normalizeList,
   });
 }
 
-export function useCreateCreativeRun(projectId: string) {
+export function useCreateCreativeRun(projectId: string, tenantId?: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: CreativeRunInput) =>
-      api.post<CreativeRun>(`/projects/${projectId}/creative/runs`, input),
+      api.post<CreativeRun>(`${creativeRoot(projectId, tenantId)}/runs`, input),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: creativeKeys.runs(projectId) });
     },
   });
 }
 
-export function useUpdateCreativeRun(projectId: string) {
+export function useUpdateCreativeRun(projectId: string, tenantId?: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ runId, input }: { runId: string; input: CreativeRunPatchInput }) =>
-      api.patch<CreativeRun>(`/projects/${projectId}/creative/runs/${runId}`, input),
+      api.patch<CreativeRun>(`${creativeRoot(projectId, tenantId)}/runs/${runId}`, input),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: creativeKeys.runs(projectId) });
     },
@@ -181,30 +187,30 @@ export function useUpdateCreativeRun(projectId: string) {
 }
 
 // Assets
-export function useCreativeAssets(projectId: string | undefined) {
+export function useCreativeAssets(projectId: string | undefined, tenantId?: string) {
   return useQuery({
     queryKey: creativeKeys.assets(projectId ?? ''),
     queryFn: () =>
       api.get<CreativeAsset[] | { items?: CreativeAsset[] }>(
-        `/projects/${projectId!}/creative/assets`,
+        `${creativeRoot(projectId!, tenantId)}/assets`,
       ),
     enabled: !!projectId,
     select: normalizeList,
   });
 }
 
-export function useCreateCreativeAssetFromUrl(projectId: string) {
+export function useCreateCreativeAssetFromUrl(projectId: string, tenantId?: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: CreativeAssetUrlInput) =>
-      api.post<CreativeAsset>(`/projects/${projectId}/creative/assets`, input),
+      api.post<CreativeAsset>(`${creativeRoot(projectId, tenantId)}/assets`, input),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: creativeKeys.assets(projectId) });
     },
   });
 }
 
-export function useUploadCreativeAsset(projectId: string) {
+export function useUploadCreativeAsset(projectId: string, tenantId?: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: CreativeAssetUploadInput) => {
@@ -214,7 +220,7 @@ export function useUploadCreativeAsset(projectId: string) {
       if (input.runId) form.append('runId', input.runId);
       if (input.assetType) form.append('assetType', input.assetType);
       return api.upload<CreativeAsset>(
-        `/projects/${projectId}/creative/assets/upload`,
+        `${creativeRoot(projectId, tenantId)}/assets/upload`,
         form,
       );
     },
@@ -225,12 +231,12 @@ export function useUploadCreativeAsset(projectId: string) {
   });
 }
 
-export function useUpdateCreativeAssetStatus(projectId: string) {
+export function useUpdateCreativeAssetStatus(projectId: string, tenantId?: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ assetId, approvalStatus }: { assetId: string; approvalStatus: ApprovalStatus }) =>
       api.patch<CreativeAsset>(
-        `/projects/${projectId}/creative/assets/${assetId}/status`,
+        `${creativeRoot(projectId, tenantId)}/assets/${assetId}/status`,
         { approvalStatus },
       ),
     onSuccess: () => {

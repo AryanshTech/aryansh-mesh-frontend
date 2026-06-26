@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/core/api/client';
+import { fetchAllPages } from '@/modules/business/api/fetch-paged-list';
 import { businessKeys } from '@/modules/business/api/query-keys';
 import { useTenantPath } from '@/modules/business/api/use-tenant-path';
 import type { ContentCollection, ContentItem } from '@/modules/business/types/entities';
@@ -68,21 +69,34 @@ function mapList(raw: ContentCollectionListApi | ContentCollectionApi[]): {
   };
 }
 
+function collectionKeyFromLabel(label: string): string {
+  const slug = label
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+  return slug || 'collection';
+}
+
 export interface ContentCollectionInput {
   label: string;
   description?: string;
+  key?: string;
 }
 
 export function useContentCollections() {
   const { tenantId, path, hasTenant } = useTenantPath();
   return useQuery({
     queryKey: businessKeys.content(tenantId),
-    queryFn: () =>
-      api.get<ContentCollectionListApi | ContentCollectionApi[]>(
-        `${path}/content-collections`,
-      ),
+    queryFn: async () => {
+      const result = await fetchAllPages<ContentCollectionApi>((page) =>
+        api.get<ContentCollectionListApi>(`${path}/content-collections`, {
+          query: { page, size: 100 },
+        }),
+      );
+      return { items: result.items.map(mapCollection), total: result.total };
+    },
     enabled: hasTenant,
-    select: mapList,
   });
 }
 
@@ -91,7 +105,11 @@ export function useCreateContentCollection() {
   const { tenantId, path } = useTenantPath();
   return useMutation({
     mutationFn: (input: ContentCollectionInput) =>
-      api.post<ContentCollectionApi>(`${path}/content-collections`, input),
+      api.post<ContentCollectionApi>(`${path}/content-collections`, {
+        key: input.key ?? collectionKeyFromLabel(input.label),
+        label: input.label,
+        description: input.description,
+      }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['business', tenantId, 'content'] });
     },

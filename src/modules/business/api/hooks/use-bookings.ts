@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/core/api/client';
+import { fetchAllPages } from '@/modules/business/api/fetch-paged-list';
 import { businessKeys } from '@/modules/business/api/query-keys';
 import { useTenantPath } from '@/modules/business/api/use-tenant-path';
 import type { Booking } from '@/modules/business/types/entities';
@@ -79,8 +80,12 @@ export function useBookings() {
   const { tenantId, path, hasTenant } = useTenantPath();
   return useQuery({
     queryKey: businessKeys.bookings(tenantId),
-    queryFn: () => api.get<BookingListApi | BookingApi[]>(`${path}/bookings`),
+    queryFn: async () => {
+      const result = await fetchAllPages<BookingApi>((page) =>
+        api.get<BookingListApi>(`${path}/bookings`, { query: { page, size: 100 } }),
+      );
+      return { items: result.items.map(mapBooking), total: result.total };
+    },
     enabled: hasTenant,
-    select: mapList,
   });
 }

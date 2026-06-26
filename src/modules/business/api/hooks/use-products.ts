@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/core/api/client';
+import { fetchAllPages } from '@/modules/business/api/fetch-paged-list';
 import { businessKeys } from '@/modules/business/api/query-keys';
 import { useTenantPath } from '@/modules/business/api/use-tenant-path';
 import type { ProductInput, ProductStatus, ProductView } from '@/modules/business/types/entities';
@@ -80,18 +81,30 @@ export function useProducts(filters: ProductFilters = {}) {
   const { tenantId, path, hasTenant } = useTenantPath();
   return useQuery({
     queryKey: businessKeys.products(tenantId, filters),
-    queryFn: () =>
-      api.get<ProductListApi | ProductApi[]>(`${path}/products`, {
-        query: {
-          search: filters.search || undefined,
-          status:
-            filters.status && filters.status !== 'ALL'
-              ? filters.status.toLowerCase()
-              : undefined,
-        },
-      }),
+    queryFn: async () => {
+      const result = await fetchAllPages<ProductApi>((page) =>
+        api.get<ProductListApi>(`${path}/products`, {
+          query: {
+            page,
+            size: 100,
+            status:
+              filters.status && filters.status !== 'ALL'
+                ? filters.status.toLowerCase()
+                : undefined,
+          },
+        }),
+      );
+      const items = result.items.map(mapProduct);
+      const search = filters.search?.trim().toLowerCase();
+      if (!search) return { items, total: result.total };
+      const filtered = items.filter(
+        (item) =>
+          item.name.toLowerCase().includes(search) ||
+          (item.sku ?? '').toLowerCase().includes(search),
+      );
+      return { items: filtered, total: filtered.length };
+    },
     enabled: hasTenant,
-    select: mapList,
   });
 }
 

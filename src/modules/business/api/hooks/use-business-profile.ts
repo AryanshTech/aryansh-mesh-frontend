@@ -53,6 +53,7 @@ export interface BusinessProfileInput {
   email?: string;
   phone?: string;
   websiteUrl?: string;
+  allowedWebsiteOrigins?: string[];
   address?: Record<string, string>;
   social?: Record<string, string>;
   logoUrl?: string;

@@ -10,9 +10,10 @@ import {
   Newspaper,
   Send,
   Building2,
-  Briefcase,
+  Link2,
   ShieldCheck,
   LineChart,
+  UsersRound,
 } from 'lucide-react';
 
 export type NavSection = 'workspace' | 'content' | 'marketing' | 'admin';
@@ -33,17 +34,18 @@ export const NAV_ITEMS: NavItem[] = [
   { to: '/clients', labelKey: 'nav.clients', icon: Users, section: 'workspace' },
   { to: '/bookings', labelKey: 'nav.bookings', icon: Calendar, section: 'workspace' },
   { to: '/costs', labelKey: 'nav.costs', icon: Receipt, section: 'workspace' },
+  { to: '/settings/team', labelKey: 'nav.team', icon: UsersRound, section: 'workspace' },
 
   // Content
   { to: '/locations', labelKey: 'nav.locations', icon: MapPin, section: 'content' },
   { to: '/testimonials', labelKey: 'nav.testimonials', icon: MessageSquareQuote, section: 'content' },
   { to: '/content', labelKey: 'nav.content', icon: Newspaper, section: 'content' },
   { to: '/publish', labelKey: 'nav.publish', icon: Send, section: 'content' },
+  { to: '/connect', labelKey: 'nav.connect', icon: Link2, section: 'content' },
   { to: '/business', labelKey: 'nav.business', icon: Building2, section: 'content' },
 
   // Marketing
   { to: '/marketing', labelKey: 'nav.marketingOverview', icon: LineChart, section: 'marketing' },
-  { to: '/marketing/companies', labelKey: 'nav.companies', icon: Briefcase, section: 'marketing' },
 
   // Admin
   { to: '/admin/tenants', labelKey: 'nav.tenants', icon: ShieldCheck, section: 'admin', requireRole: 'PLATFORM_ADMIN' },

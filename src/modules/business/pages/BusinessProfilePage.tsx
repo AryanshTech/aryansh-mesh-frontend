@@ -17,14 +17,22 @@ import {
   type BusinessProfileInput,
 } from '@/modules/business/api/hooks/use-business-profile';
 
-const EMPTY_DRAFT: BusinessProfileInput = {
+const EMPTY_DRAFT: BusinessProfileInput & { allowedWebsiteOriginsText: string } = {
   legalName: '',
   tagline: '',
   description: '',
   email: '',
   phone: '',
   websiteUrl: '',
+  allowedWebsiteOriginsText: '',
 };
+
+function parseOrigins(text: string): string[] {
+  return text
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
 
 export default function BusinessProfilePage() {
   const { t } = useTranslation();
@@ -32,7 +40,7 @@ export default function BusinessProfilePage() {
   const { data, isLoading, isError, refetch, isFetching } = useBusinessProfile();
   const updateMutation = useUpdateBusinessProfile();
 
-  const [draft, setDraft] = useState<BusinessProfileInput>(EMPTY_DRAFT);
+  const [draft, setDraft] = useState(EMPTY_DRAFT);
   const showSkeleton = !hasTenant || isLoading || (isFetching && !data);
 
   useEffect(() => {
@@ -44,6 +52,7 @@ export default function BusinessProfilePage() {
         email: data.email ?? '',
         phone: data.phone ?? '',
         websiteUrl: data.websiteUrl ?? '',
+        allowedWebsiteOriginsText: data.allowedWebsiteOrigins?.join('\n') ?? '',
       });
     }
   }, [data]);
@@ -61,6 +70,7 @@ export default function BusinessProfilePage() {
         email: draft.email?.trim() || undefined,
         phone: draft.phone?.trim() || undefined,
         websiteUrl: draft.websiteUrl?.trim() || undefined,
+        allowedWebsiteOrigins: parseOrigins(draft.allowedWebsiteOriginsText),
       });
       toast.success(t('business.updated'));
     } catch (e) {
@@ -142,6 +152,17 @@ export default function BusinessProfilePage() {
               placeholder="https://example.com"
               onChange={(e) => setDraft((d) => ({ ...d, websiteUrl: e.target.value }))}
             />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="bp-cors">{t('business.fieldAllowedWebsiteOrigins')}</Label>
+            <Textarea
+              id="bp-cors"
+              rows={4}
+              value={draft.allowedWebsiteOriginsText}
+              placeholder={t('business.fieldAllowedWebsiteOriginsPlaceholder')}
+              onChange={(e) => setDraft((d) => ({ ...d, allowedWebsiteOriginsText: e.target.value }))}
+            />
+            <p className="text-xs text-muted-foreground">{t('business.fieldAllowedWebsiteOriginsHint')}</p>
           </div>
         </Card>
       )}

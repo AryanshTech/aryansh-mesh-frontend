@@ -9,7 +9,9 @@ import TestimonialsPage from '@/modules/business/pages/TestimonialsPage';
 import ContentPage from '@/modules/business/pages/ContentPage';
 import BusinessProfilePage from '@/modules/business/pages/BusinessProfilePage';
 import PublishPage from '@/modules/business/pages/PublishPage';
+import WebsiteConnectPage from '@/modules/business/pages/WebsiteConnectPage';
 import OnboardingPage from '@/modules/business/pages/OnboardingPage';
+import TeamPage from '@/modules/business/pages/TeamPage';
 
 export const businessRoutes = (
   <>
@@ -23,6 +25,8 @@ export const businessRoutes = (
     <Route path="content" element={<ContentPage />} />
     <Route path="business" element={<BusinessProfilePage />} />
     <Route path="publish" element={<PublishPage />} />
+    <Route path="connect" element={<WebsiteConnectPage />} />
     <Route path="onboarding" element={<OnboardingPage />} />
+    <Route path="settings/team" element={<TeamPage />} />
   </>
 );

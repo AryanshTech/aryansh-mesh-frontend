@@ -24,7 +24,9 @@
     "testimonials": "Testimonials",
     "content": "Content",
     "publish": "Publish",
+    "connect": "Website connect",
     "business": "Business",
+    "team": "Team",
     "companies": "Companies",
     "marketingOverview": "Command center",
     "tenants": "Tenants",
@@ -48,6 +50,8 @@
     "selectBusiness": "Select business",
     "settings": "Settings",
     "switchBusiness": "Switch business",
+    "tenantLoadFailed": "Could not load businesses",
+    "retry": "Retry",
     "userMenu": "User menu",
     "zoneBusiness": "Business"
   },
@@ -83,7 +87,49 @@
     "signUpFailed": "Sign up failed. Try again.",
     "signUpSubtitle": "Start your workspace in seconds.",
     "signUpTitle": "Create your account",
-    "welcomeBack": "Welcome back"
+    "welcomeBack": "Welcome back",
+    "confirmPassword": "Confirm password",
+    "passwordMismatch": "Passwords do not match."
+  },
+  "invite": {
+    "acceptInstructions": "Create an account or sign in to accept this invitation.",
+    "accepting": "Accepting your invitation…",
+    "copyLinkHint": "Copy the invite link from the admin who invited you.",
+    "emailMismatch": "This invite was sent to a different email address.",
+    "linkCopied": "Invite link copied to clipboard.",
+    "missingToken": "This invite link is invalid or has expired.",
+    "missingTokenTitle": "Invalid invite",
+    "resentEmail": "Invitation resent to {{email}}.",
+    "resentLink": "Invitation updated. Share the copied link.",
+    "sentEmail": "Invitation sent to {{email}}.",
+    "sentLink": "Invitation created. Email could not be sent — link copied.",
+    "signInToAccept": "Sign in to accept invite",
+    "signUpForTenant": "You were invited to join {{tenant}}."
+  },
+  "team": {
+    "emailRequired": "Email is required.",
+    "emptyHint": "Invite teammates to collaborate on this workspace.",
+    "invite": "Invite member",
+    "inviteFailed": "Failed to send invitation.",
+    "inviteHint": "Send an email invitation or share the link if email delivery fails.",
+    "loadError": "Could not load team members.",
+    "memberRemoved": "Member removed.",
+    "noTenant": "Select a business to manage your team.",
+    "removeFailed": "Failed to remove member.",
+    "sendInvite": "Send invite",
+    "subtitle": "Manage who has access to this workspace.",
+    "title": "Team",
+    "table": {
+      "email": "Email",
+      "joined": "Joined",
+      "role": "Role"
+    },
+    "roles": {
+      "TENANT_OWNER": "Owner",
+      "TENANT_ADMIN": "Admin",
+      "TENANT_EDITOR": "Editor",
+      "TENANT_VIEWER": "Viewer"
+    }
   },
   "dashboard": {
     "emptyDescription": "Once you start creating products and bookings, your activity will appear here.",
@@ -254,6 +300,9 @@
     "fieldPhone": "Contact phone",
     "fieldTagline": "Tagline",
     "fieldWebsiteUrl": "Website URL",
+    "fieldAllowedWebsiteOrigins": "Website domains (CORS)",
+    "fieldAllowedWebsiteOriginsPlaceholder": "https://example.com\nhttps://www.example.com\nhttp://localhost:5173",
+    "fieldAllowedWebsiteOriginsHint": "One origin per line (scheme + host + port only). Required for your landing site to read public data from the browser.",
     "saveFailed": "Failed to update profile",
     "subtitle": "Your business profile and branding.",
     "title": "Business profile",
@@ -273,7 +322,105 @@
     "publishingMessage": "Publishing in progress…",
     "subtitle": "Push updates to your public site.",
     "title": "Publish",
-    "unpublishedMessage": "Your site has unpublished changes."
+    "unpublishedMessage": "Your site has unpublished changes.",
+    "connectLink": {
+      "action": "Website integration guide"
+    },
+    "hub": {
+      "slugLabel": "Slug: {{slug}}",
+      "viewApiSnapshot": "Open live snapshot"
+    },
+    "embed": {
+      "title": "Embed script",
+      "hint": "Add this script tag to your site layout to load the Mesh embed helper.",
+      "copy": "Copy script",
+      "copied": "Embed script copied"
+    },
+    "connectorGuide": {
+      "title": "Developer integration guide (Markdown)",
+      "description": "Full handoff document for your website developer — CORS, env vars, API routes, and field reference.",
+      "hint": "Copy and save as INTEGRATION.md in your client website repo.",
+      "copy": "Copy guide",
+      "copied": "Integration guide copied",
+      "copyFailed": "Could not copy guide"
+    },
+    "integration": {
+      "title": "Website integration",
+      "description": "Connect your landing site to read published business data via the public API.",
+      "howItWorks": "Publish content in Mesh, register your site origins for CORS, then call the public snapshot API from your frontend.",
+      "copy": "Copy",
+      "copied": "Copied to clipboard",
+      "corsIntro": "Browsers block cross-origin requests unless each origin is registered on your business profile.",
+      "registeredOrigins": "Registered origins",
+      "noOrigins": "No CORS origins configured yet. Add them on your business profile.",
+      "exampleOrigins": "Example origins",
+      "openProfile": "Edit business profile",
+      "envVars": "Environment variables",
+      "fetchExample": "Fetch example (snapshot + booking)",
+      "devIntro": "During local development, proxy API requests through your dev server to avoid CORS.",
+      "viteProxy": "Vite proxy config",
+      "nextProxy": "Next.js rewrites",
+      "debugCommands": "Debug curl commands",
+      "tabs": {
+        "setup": "Setup",
+        "cors": "CORS",
+        "api": "API",
+        "embed": "Embed",
+        "dev": "Local dev",
+        "troubleshoot": "Troubleshoot",
+        "guide": "MD guide"
+      },
+      "steps": {
+        "publish": "Publish your latest content from this page so the public snapshot reflects your changes.",
+        "cors": "Add every browser origin (production + local dev ports) under Business profile → Website domains (CORS).",
+        "env": "Set VITE_CRM_API_BASE_URL and VITE_CRM_TENANT_SLUG (or Next.js equivalents) in your client site.",
+        "routes": "Use only public routes: snapshot, availability, and bookings — no Authorization header.",
+        "verify": "Verify with curl or open the live snapshot link; fix CORS if the browser blocks fetch."
+      },
+      "table": {
+        "method": "Method",
+        "path": "Path",
+        "purpose": "Purpose",
+        "symptom": "Symptom",
+        "fix": "Fix"
+      },
+      "endpoints": {
+        "snapshot": "Full published business snapshot (products, locations, profile, etc.)",
+        "availability": "Booking availability for a given date",
+        "bookings": "Create a public booking"
+      },
+      "troubleshoot": {
+        "corsBlocked": {
+          "symptom": "Browser: blocked by CORS policy",
+          "fix": "Add the exact origin (including port) to Website domains on the business profile."
+        },
+        "curlWorks": {
+          "symptom": "curl works but browser fetch fails",
+          "fix": "Almost always CORS — register the page origin, not the API URL."
+        },
+        "unauthorized": {
+          "symptom": "401 Unauthorized on public route",
+          "fix": "Remove Authorization headers; public routes must be unauthenticated."
+        },
+        "booking403": {
+          "symptom": "403 on POST /bookings",
+          "fix": "Ensure bookings are enabled in business settings and the payload matches API requirements."
+        },
+        "notFound": {
+          "symptom": "404 on snapshot",
+          "fix": "Check tenant slug, publish at least once, and confirm the API base URL ends with /api/v1."
+        }
+      }
+    }
+  },
+  "connect": {
+    "title": "Website connect",
+    "subtitle": "CORS, public API, embed script, and Markdown guide for your landing site.",
+    "noSlugTitle": "Tenant slug not available",
+    "noSlugDescription": "Your workspace needs a tenant slug before you can connect a website. Contact support if this persists.",
+    "overviewTitle": "Public data for your site",
+    "overviewDescription": "After publishing, your site reads data from the gateway snapshot API. Register CORS origins on the business profile first.",
+    "openPublish": "Go to publish"
   },
   "onboarding": {
     "subtitle": "Let's set up your workspace.",
@@ -336,6 +483,21 @@
     },
     "brandMemorySubtitle": "Voice, tone, and brand context for this project.",
     "brandMemoryTitle": "Brand memory",
+    "brandMemory": {
+      "backToWorkspace": "Back to marketing workspace",
+      "current": "Current version",
+      "lastSaved": "Last saved {{date}}",
+      "loadFailed": "Failed to load brand memory",
+      "placeholder": "Write brand guidelines, tone of voice, key messages, and positioning…",
+      "saved": "Brand memory saved",
+      "saveFailed": "Failed to save brand memory",
+      "selectVersion": "Select version",
+      "setCurrent": "Set as current",
+      "versionLabel": "Version {{version}}",
+      "versionSet": "Current version updated",
+      "versionSetFailed": "Failed to update current version",
+      "viewLink": "View brand memory"
+    },
     "brandPerception": {
       "emptyDescription": "Generate a preview from tenant data, then save to Brand Memory.",
       "emptyTitle": "No brand perception yet",
@@ -385,6 +547,11 @@
       "title": "Creative recipes"
     },
     "reject": "Reject",
+    "social": {
+      "platform": "Platform",
+      "rejectFeedback": "Needs revision before approval.",
+      "scheduleDate": "Schedule date"
+    },
     "runs": {
       "columnRecipe": "Recipe",
       "columnStatus": "Status",
@@ -408,6 +575,68 @@
     "sendMessage": "Send message",
     "socialCalendarSubtitle": "Plan and schedule social content.",
     "socialCalendarTitle": "Social calendar",
+    "studio": {
+      "eyebrow": "Content studio",
+      "title": "Generate and save brand content",
+      "subtitle": "Build your brand foundation, run creative recipes, and keep everything stored in one place.",
+      "generateFoundation": "Generate brand foundation",
+      "foundationDone": "Brand foundation generated and saved",
+      "foundationFailed": "Failed to generate brand foundation",
+      "open": "Open",
+      "pipeline": {
+        "step1": "Define brand identity — colors, voice, mission, and visual style",
+        "step2": "Generate brand perception and save it to brand memory",
+        "step3": "Create recipes, run them locally, and upload creative assets",
+        "step4": "Draft social posts and start AI threads for ongoing content"
+      },
+      "status": {
+        "saved": "Saved",
+        "notYet": "Not yet",
+        "count": "{{count}} saved"
+      },
+      "types": {
+        "identity": {
+          "title": "Brand identity",
+          "description": "Structured brand profile — voice, colors, mission, and content pillars."
+        },
+        "memory": {
+          "title": "Brand memory",
+          "description": "Living brand guidelines and positioning saved as markdown."
+        },
+        "perception": {
+          "title": "Brand perception",
+          "description": "AI-generated market perception saved to brand memory."
+        },
+        "recipes": {
+          "title": "Creative recipes",
+          "description": "Reusable prompts and run packages for content generation."
+        },
+        "social": {
+          "title": "Social posts",
+          "description": "Draft, approve, and schedule posts across platforms."
+        },
+        "assets": {
+          "title": "Creative assets",
+          "description": "Uploaded outputs from recipe runs — images, copy, and files."
+        },
+        "threads": {
+          "title": "AI threads",
+          "description": "Conversations for brainstorming and refining marketing content."
+        }
+      }
+    },
+    "threads": {
+      "create": "Create",
+      "createFailed": "Failed to create thread",
+      "created": "Thread created",
+      "emptyDescription": "Create a thread to start a marketing conversation.",
+      "emptyTitle": "No threads yet",
+      "loadFailed": "Failed to load threads",
+      "nameLabel": "Thread name *",
+      "nameRequired": "Thread name is required",
+      "new": "New thread",
+      "title": "Threads"
+    },
     "threadsSubtitle": "Conversations and decisions for this project.",
     "threadsTitle": "Thread workspace",
     "workspace": {
@@ -440,7 +669,36 @@
     "tenantCreateTitle": "New tenant",
     "tenantDetailSubtitle": "Tenant configuration and members.",
     "tenantDetailTitle": "Tenant",
+    "tenantLoadFailed": "Failed to load tenant",
+    "tenantUpdateFailed": "Failed to update tenant",
+    "tenantUpdated": "Tenant updated",
     "tenantsSubtitle": "All workspaces on the platform.",
-    "tenantsTitle": "Tenants"
+    "tenantsTitle": "Tenants",
+    "tabs": {
+      "details": "Details",
+      "members": "Members"
+    },
+    "tenantStatus": {
+      "active": "Active",
+      "pending": "Pending",
+      "suspended": "Suspended"
+    },
+    "tenantForm": {
+      "legalName": "Legal name",
+      "name": "Name",
+      "nameRequired": "Name is required",
+      "slug": "Slug",
+      "slugHint": "Lowercase letters, numbers, and hyphens only.",
+      "slugInvalid": "Enter a valid slug (e.g. souvenir-cafe)",
+      "slugConflict": "This slug is already in use",
+      "currency": "Currency",
+      "currencyInvalid": "Currency must be a 3-letter code",
+      "timezone": "Timezone",
+      "timezoneRequired": "Timezone is required",
+      "status": "Status",
+      "submit": "Create tenant",
+      "created": "Tenant created",
+      "createFailed": "Failed to create tenant"
+    }
   }
 }

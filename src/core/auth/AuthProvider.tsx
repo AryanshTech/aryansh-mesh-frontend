@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { api, ApiError, refreshAuthTokens } from '@/core/api/client';
+import { api, ApiError, refreshAuthTokens, setUnauthorizedHandler } from '@/core/api/client';
 import {
   clearTokens,
   hasPersistedAuth,
@@ -47,8 +47,9 @@ interface AuthTokensResponse {
 interface AuthContextValue {
   user: User | null;
   status: 'loading' | 'authenticated' | 'unauthenticated';
-  login: (req: LoginRequest) => Promise<void>;
-  signUp: (req: SignUpRequest) => Promise<void>;
+  login: (req: LoginRequest) => Promise<User>;
+  signUp: (req: SignUpRequest) => Promise<User>;
+  acceptInvite: (token: string) => Promise<User>;
   logout: () => void;
   refresh: () => Promise<void>;
 }
@@ -74,46 +75,66 @@ function mapSessionUser(session: BackendSession): User {
   };
 }
 
+async function fetchSession(): Promise<BackendSession> {
+  return api.post<BackendSession>('/auth/session');
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [status, setStatus] = useState<AuthContextValue['status']>('loading');
 
+  const markUnauthenticated = useCallback(() => {
+    setUser(null);
+    setStatus('unauthenticated');
+  }, []);
+
   const loadMe = useCallback(async () => {
     try {
-      const session = await api.post<BackendSession>('/auth/session');
+      const session = await fetchSession();
       setUser(mapSessionUser(session));
       setStatus('authenticated');
     } catch (error) {
-      setUser(null);
-      setStatus('unauthenticated');
       if (error instanceof ApiError && error.status === 401) {
         clearTokens();
       }
+      markUnauthenticated();
     }
-  }, []);
+  }, [markUnauthenticated]);
+
+  useEffect(() => {
+    setUnauthorizedHandler(markUnauthenticated);
+    return () => setUnauthorizedHandler(null);
+  }, [markUnauthenticated]);
 
   useEffect(() => {
     async function bootstrap() {
-      if (!hasPersistedAuth()) {
-        setStatus('unauthenticated');
-        return;
-      }
-
-      const stored = loadStoredSession();
-      if (stored && isAccessTokenExpired(stored)) {
-        const refreshed = await refreshAuthTokens();
-        if (!refreshed) {
-          clearTokens();
-          setStatus('unauthenticated');
+      try {
+        if (!hasPersistedAuth()) {
+          markUnauthenticated();
           return;
         }
-      }
 
-      await loadMe();
+        const stored = loadStoredSession();
+        if (stored && isAccessTokenExpired(stored)) {
+          const refreshed = await refreshAuthTokens();
+          if (!refreshed) {
+            clearTokens();
+            markUnauthenticated();
+            return;
+          }
+        }
+
+        await loadMe();
+      } catch {
+        clearTokens();
+        markUnauthenticated();
+      } finally {
+        setStatus((current) => (current === 'loading' ? 'unauthenticated' : current));
+      }
     }
 
     void bootstrap();
-  }, [loadMe]);
+  }, [loadMe, markUnauthenticated]);
 
   const login = useCallback(async (req: LoginRequest) => {
     const response = await api.post<LoginResponse>('/auth/login', req, { skipAuth: true });
@@ -122,32 +143,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshToken: response.refreshToken,
       expiresIn: response.expiresIn,
     });
-    setUser(mapSessionUser(response.session));
+    const nextUser = mapSessionUser(response.session);
+    setUser(nextUser);
     setStatus('authenticated');
+    return nextUser;
   }, []);
 
   const signUp = useCallback(
     async (req: SignUpRequest) => {
-      const response = await api.post<AuthTokensResponse>('/auth/signup', req, { skipAuth: true });
+      const response = await api.post<AuthTokensResponse>(
+        '/auth/signup',
+        { email: req.email, password: req.password },
+        { skipAuth: true },
+      );
       setTokens({
         accessToken: response.idToken,
         refreshToken: response.refreshToken,
         expiresIn: response.expiresIn,
       });
-      await loadMe();
+      const session = await fetchSession();
+      const nextUser = mapSessionUser(session);
+      setUser(nextUser);
+      setStatus('authenticated');
+      return nextUser;
     },
-    [loadMe],
+    [],
   );
+
+  const acceptInvite = useCallback(async (token: string) => {
+    const session = await api.post<BackendSession>('/auth/accept-invite', { token });
+    const nextUser = mapSessionUser(session);
+    setUser(nextUser);
+    setStatus('authenticated');
+    return nextUser;
+  }, []);
 
   const logout = useCallback(() => {
     clearTokens();
-    setUser(null);
-    setStatus('unauthenticated');
-  }, []);
+    markUnauthenticated();
+  }, [markUnauthenticated]);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ user, status, login, signUp, logout, refresh: loadMe }),
-    [user, status, login, signUp, logout, loadMe],
+    () => ({ user, status, login, signUp, acceptInvite, logout, refresh: loadMe }),
+    [user, status, login, signUp, acceptInvite, logout, loadMe],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

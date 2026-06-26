@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,6 +10,8 @@ import { Input } from '@/design-system/components/ui/input';
 import { Label } from '@/design-system/components/ui/label';
 import { Alert, AlertDescription } from '@/design-system/components/ui/alert';
 import { useAuth } from '@/core/auth/use-auth';
+import { resolveLandingPath } from '@/core/auth/landing';
+import { ApiError } from '@/core/api/client';
 
 const schema = z.object({
   email: z.string().email(),
@@ -20,14 +22,19 @@ type FormValues = z.infer<typeof schema>;
 
 export default function LoginPage() {
   const { t } = useTranslation();
-  const { login } = useAuth();
+  const { login, acceptInvite } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const inviteToken = searchParams.get('inviteToken');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  const redirectParam = searchParams.get('redirect');
   const from =
-    (location.state as { from?: string } | null)?.from ?? '/dashboard';
+    redirectParam ??
+    (location.state as { from?: string } | null)?.from ??
+    '/dashboard';
 
   const {
     register,
@@ -42,12 +49,19 @@ export default function LoginPage() {
     setError(null);
     setSubmitting(true);
     try {
-      await login(values);
+      let user = await login(values);
+      if (inviteToken) {
+        user = await acceptInvite(inviteToken);
+      }
       toast.success(t('auth.welcomeBack'));
-      navigate(from, { replace: true });
+      navigate(inviteToken ? resolveLandingPath(user) : from, { replace: true });
     } catch (e) {
-      const msg = (e as Error).message ?? t('auth.loginFailed');
-      setError(msg);
+      if (e instanceof ApiError && inviteToken && e.status === 403) {
+        setError(e.message || t('invite.emailMismatch'));
+      } else {
+        const msg = (e as Error).message ?? t('auth.loginFailed');
+        setError(msg);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -62,7 +76,7 @@ export default function LoginPage() {
         <div className="text-center">
           <h1 className="typo-display-md text-foreground">{t('auth.signInTitle')}</h1>
           <p className="typo-body-sm text-muted-foreground mt-1">
-            {t('auth.signInSubtitle')}
+            {inviteToken ? t('invite.signInToAccept') : t('auth.signInSubtitle')}
           </p>
         </div>
       </div>

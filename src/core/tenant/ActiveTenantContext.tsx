@@ -37,7 +37,7 @@ export function ActiveTenantProvider({ children }: { children: ReactNode }) {
       setActiveTenantIdState(user.tenantId ?? '');
     } else {
       const saved = sessionStorage.getItem(SESSION_KEY) ?? '';
-      setActiveTenantIdState(saved);
+      setActiveTenantIdState(saved || user.tenantId || '');
     }
   }, [user]);
 

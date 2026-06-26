@@ -1,6 +1,7 @@
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { Rocket, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import { Rocket, CheckCircle2, Clock, AlertCircle, Link2 } from 'lucide-react';
 import { PageShell } from '@/shared/components/PageShell';
 import { PageHeader } from '@/shared/components/PageHeader';
 import { ErrorState } from '@/shared/components/ErrorState';
@@ -10,6 +11,8 @@ import { Card } from '@/design-system/components/ui/card';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
 import { useTenantPath } from '@/modules/business/api/use-tenant-path';
 import { usePublishStatus, usePublish } from '@/modules/business/api/hooks/use-publish';
+import { WebsiteIntegrationPanel } from '@/modules/business/components/website/WebsiteIntegrationPanel';
+import { useWebsiteIntegration } from '@/modules/business/hooks/use-website-integration';
 
 function publishTone(status: 'PUBLISHED' | 'DRAFT' | 'PUBLISHING') {
   if (status === 'PUBLISHED') return 'success' as const;
@@ -26,6 +29,7 @@ function formatDate(iso: string) {
 export default function PublishPage() {
   const { t } = useTranslation();
   const { hasTenant } = useTenantPath();
+  const integration = useWebsiteIntegration();
   const { data, isLoading, isError, refetch, isFetching } = usePublishStatus();
   const publishMutation = usePublish();
   const showSkeleton = !hasTenant || isLoading || (isFetching && !data);
@@ -52,8 +56,8 @@ export default function PublishPage() {
           <Skeleton className="h-40 w-full rounded-xl" />
         </div>
       ) : data ? (
-        <div className="flex flex-col gap-6 max-w-md">
-          <Card className="flex flex-col gap-4 p-5">
+        <div className="flex max-w-5xl flex-col gap-6">
+          <Card className="flex max-w-md flex-col gap-4 p-5">
             <div className="flex items-center justify-between">
               <p className="typo-card-title text-foreground">{t('publish.publishStatus')}</p>
               <StatusBadge label={data.status} tone={publishTone(data.status)} />
@@ -96,7 +100,27 @@ export default function PublishPage() {
               <Rocket className="size-4" />
               {data.status === 'PUBLISHING' ? t('publish.publishing') : t('publish.publishNow')}
             </Button>
+
+            {integration.hasSlug ? (
+              <Button variant="outline" size="sm" className="self-start" asChild>
+                <Link to={integration.connectPath}>
+                  <Link2 className="size-4" />
+                  {t('publish.connectLink.action')}
+                </Link>
+              </Button>
+            ) : null}
           </Card>
+
+          {integration.hasSlug ? (
+            <WebsiteIntegrationPanel
+              tenantName={integration.tenantName}
+              tenantSlug={integration.tenantSlug}
+              apiBase={integration.apiBase}
+              embedOrigin={integration.embedOrigin}
+              profilePath={integration.profilePath}
+              allowedOrigins={integration.allowedOrigins}
+            />
+          ) : null}
         </div>
       ) : null}
     </PageShell>

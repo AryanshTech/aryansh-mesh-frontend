@@ -19,7 +19,7 @@ function statusTone(status: string) {
 export default function TenantListPage() {
   const { t } = useTranslation();
   const { data, isLoading, isError, refetch } = useAdminTenants();
-  const tenants = Array.isArray(data) ? data : (data as any)?.items ?? [];
+  const tenants = data ?? [];
 
   return (
     <PageShell>
@@ -61,7 +61,7 @@ export default function TenantListPage() {
               </tr>
             </thead>
             <tbody>
-              {tenants.map((tenant: any) => (
+              {tenants.map((tenant) => (
                 <tr key={tenant.id} className="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
                   <td className="px-4 py-2.5">
                     <Link

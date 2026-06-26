@@ -7,15 +7,26 @@ export interface BrandPerception {
 }
 
 export const brandPerceptionKeys = {
-  preview: (projectId: string) => ['marketing', 'brand-perception', 'preview', projectId] as const,
+  preview: (scopeKey: string) => ['marketing', 'brand-perception', 'preview', scopeKey] as const,
 };
 
-export function useBrandPerceptionPreview(projectId: string | undefined) {
+function perceptionPath(projectId: string, tenantId?: string): string {
+  return tenantId
+    ? `/tenants/${tenantId}/marketing/brand-perception`
+    : `/projects/${projectId}/brand-perception`;
+}
+
+function scopeKey(projectId: string, tenantId?: string): string {
+  return tenantId ? `tenant:${tenantId}` : `project:${projectId}`;
+}
+
+export function useBrandPerceptionPreview(projectId: string | undefined, tenantId?: string) {
+  const key = scopeKey(projectId ?? '', tenantId);
   return useQuery({
-    queryKey: brandPerceptionKeys.preview(projectId ?? ''),
+    queryKey: brandPerceptionKeys.preview(key),
     queryFn: async () => {
       try {
-        return await api.get<BrandPerception>(`/projects/${projectId!}/brand-perception`);
+        return await api.get<BrandPerception>(perceptionPath(projectId!, tenantId));
       } catch (e) {
         if (e instanceof ApiError && (e.status === 404 || e.status === 204)) {
           return { projectId: projectId!, contentMarkdown: '' };
@@ -23,18 +34,18 @@ export function useBrandPerceptionPreview(projectId: string | undefined) {
         throw e;
       }
     },
-    enabled: !!projectId,
+    enabled: !!projectId || !!tenantId,
   });
 }
 
-export function useGenerateBrandPerception(projectId: string) {
+export function useGenerateBrandPerception(projectId: string, tenantId?: string) {
   const qc = useQueryClient();
+  const key = scopeKey(projectId, tenantId);
   return useMutation({
-    mutationFn: () =>
-      api.post<BrandPerception>(`/projects/${projectId}/brand-perception`),
+    mutationFn: () => api.post<BrandPerception>(perceptionPath(projectId, tenantId)),
     onSuccess: (data) => {
-      qc.setQueryData(brandPerceptionKeys.preview(projectId), data);
-      void qc.invalidateQueries({ queryKey: ['marketing', 'brand-memory', projectId] });
+      qc.setQueryData(brandPerceptionKeys.preview(key), data);
+      void qc.invalidateQueries({ queryKey: ['marketing', 'brand-memory', 'current', key] });
     },
   });
 }

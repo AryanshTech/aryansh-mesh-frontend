@@ -31,6 +31,7 @@ import {
 
 interface Props {
   projectId: string;
+  tenantId?: string;
 }
 
 const ASSET_TYPES: AssetType[] = ['IMAGE', 'VIDEO', 'REMOTION_PROJECT', 'PROMPT_PACK', 'OTHER'];
@@ -51,11 +52,11 @@ const NEW_PACKAGE: LocalPackageInput = {
   toolType: '',
 };
 
-export function CreativeRecipesTab({ projectId }: Props) {
+export function CreativeRecipesTab({ projectId, tenantId }: Props) {
   const { t } = useTranslation();
-  const { data, isLoading, isError, refetch } = useCreativeRecipes(projectId);
-  const createMutation = useCreateCreativeRecipe(projectId);
-  const generateMutation = useGenerateLocalPackage(projectId);
+  const { data, isLoading, isError, refetch } = useCreativeRecipes(projectId, tenantId);
+  const createMutation = useCreateCreativeRecipe(projectId, tenantId);
+  const generateMutation = useGenerateLocalPackage(projectId, tenantId);
 
   const [selected, setSelected] = useState<CreativeRecipe | null>(null);
   const [draftRecipe, setDraftRecipe] = useState<CreativeRecipeInput | null>(null);

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { RefreshCw, Sparkles, Eye } from 'lucide-react';
@@ -13,12 +14,16 @@ import {
 
 interface Props {
   projectId: string;
+  tenantId?: string;
 }
 
-export function BrandPerceptionTab({ projectId }: Props) {
+export function BrandPerceptionTab({ projectId, tenantId }: Props) {
   const { t } = useTranslation();
-  const { data, isLoading, isError, refetch, isFetching } = useBrandPerceptionPreview(projectId);
-  const saveMutation = useGenerateBrandPerception(projectId);
+  const { data, isLoading, isError, refetch, isFetching } = useBrandPerceptionPreview(
+    projectId,
+    tenantId,
+  );
+  const saveMutation = useGenerateBrandPerception(projectId, tenantId);
 
   const hasPreview = Boolean(data?.contentMarkdown?.trim());
 
@@ -76,6 +81,13 @@ export function BrandPerceptionTab({ projectId }: Props) {
           {data?.contentMarkdown}
         </pre>
       </Card>
+      {saveMutation.isSuccess ? (
+        <Button variant="link" className="h-auto self-start p-0" asChild>
+          <Link to={`/marketing/projects/${projectId}/brand-memory`}>
+            {t('marketing.brandMemory.viewLink')}
+          </Link>
+        </Button>
+      ) : null}
     </div>
   );
 }

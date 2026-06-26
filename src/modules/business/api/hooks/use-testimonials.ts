@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/core/api/client';
+import { fetchAllPages } from '@/modules/business/api/fetch-paged-list';
 import { businessKeys } from '@/modules/business/api/query-keys';
 import { useTenantPath } from '@/modules/business/api/use-tenant-path';
 import type { Testimonial } from '@/modules/business/types/entities';
@@ -57,9 +58,13 @@ export function useTestimonials() {
   const { tenantId, path, hasTenant } = useTenantPath();
   return useQuery({
     queryKey: businessKeys.testimonials(tenantId),
-    queryFn: () => api.get<TestimonialListApi | TestimonialApi[]>(`${path}/testimonials`),
+    queryFn: async () => {
+      const result = await fetchAllPages<TestimonialApi>((page) =>
+        api.get<TestimonialListApi>(`${path}/testimonials`, { query: { page, size: 100 } }),
+      );
+      return { items: result.items.map(mapTestimonial), total: result.total };
+    },
     enabled: hasTenant,
-    select: mapList,
   });
 }
 

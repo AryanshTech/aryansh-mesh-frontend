@@ -28,6 +28,7 @@ import {
   useRemoveMember,
   type InviteInput,
 } from '@/modules/marketing/api/use-members';
+import { toastInviteResult } from '@/modules/business/lib/invite-toast';
 
 const ROLES = ['TENANT_OWNER', 'TENANT_ADMIN', 'TENANT_EDITOR', 'TENANT_VIEWER'];
 
@@ -38,25 +39,20 @@ export default function TenantDetailPage() {
   const { data: tenant, isLoading, isError, refetch } = useAdminTenantDetail(tenantId);
   const updateMutation = useUpdateAdminTenant(tenantId ?? '');
 
-  const [detailForm, setDetailForm] = useState({ name: '', legalName: '', status: 'active' });
+  const [status, setStatus] = useState('active');
 
   useEffect(() => {
     if (tenant) {
-      setDetailForm({ name: tenant.name, legalName: tenant.legalName ?? '', status: tenant.status ?? 'active' });
+      setStatus(tenant.status ?? 'active');
     }
   }, [tenant]);
 
   const onSaveDetails = async () => {
-    if (!detailForm.name.trim()) { toast.error('Name is required'); return; }
     try {
-      await updateMutation.mutateAsync({
-        name: detailForm.name.trim(),
-        legalName: detailForm.legalName.trim() || undefined,
-        status: detailForm.status,
-      });
-      toast.success('Tenant updated');
+      await updateMutation.mutateAsync({ status });
+      toast.success(t('admin.tenantUpdated'));
     } catch (e) {
-      toast.error((e as Error).message || 'Failed to update tenant');
+      toast.error((e as Error).message || t('admin.tenantUpdateFailed'));
     }
   };
 
@@ -65,26 +61,32 @@ export default function TenantDetailPage() {
   const inviteMutation = useInviteMember(tenantId ?? '');
   const removeMutation = useRemoveMember(tenantId ?? '');
 
-  const [inviteForm, setInviteForm] = useState<InviteInput>({ email: '', role: 'TENANT_EDITOR' });
+  const [inviteForm, setInviteForm] = useState<InviteInput>({ email: '', role: 'TENANT_OWNER' });
   const members = membersData?.items ?? [];
 
   const onInvite = async () => {
-    if (!inviteForm.email.trim()) { toast.error('Email is required'); return; }
+    if (!inviteForm.email.trim()) {
+      toast.error(t('team.emailRequired'));
+      return;
+    }
     try {
-      await inviteMutation.mutateAsync(inviteForm);
-      toast.success('Invitation sent');
-      setInviteForm({ email: '', role: 'TENANT_EDITOR' });
+      const result = await inviteMutation.mutateAsync({
+        email: inviteForm.email.trim(),
+        role: inviteForm.role,
+      });
+      await toastInviteResult(t, inviteForm.email.trim(), result);
+      setInviteForm({ email: '', role: 'TENANT_OWNER' });
     } catch (e) {
-      toast.error((e as Error).message || 'Failed to invite member');
+      toast.error((e as Error).message || t('team.inviteFailed'));
     }
   };
 
   const onRemove = async (uid: string) => {
     try {
       await removeMutation.mutateAsync(uid);
-      toast.success('Member removed');
+      toast.success(t('team.memberRemoved'));
     } catch (e) {
-      toast.error((e as Error).message || 'Failed to remove member');
+      toast.error((e as Error).message || t('team.removeFailed'));
     }
   };
 
@@ -97,64 +99,65 @@ export default function TenantDetailPage() {
       {isLoading ? (
         <ListSkeleton rows={3} />
       ) : isError ? (
-        <ErrorState title="Failed to load tenant" onRetry={() => void refetch()} />
+        <ErrorState title={t('admin.tenantLoadFailed')} onRetry={() => void refetch()} />
       ) : (
         <Tabs defaultValue="details" className="flex flex-col gap-4">
           <TabsList className="w-fit">
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="members">Members</TabsTrigger>
+            <TabsTrigger value="details">{t('admin.tabs.details')}</TabsTrigger>
+            <TabsTrigger value="members">{t('admin.tabs.members')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="details" className="flex flex-col gap-4 max-w-md">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="td-name">Name *</Label>
-              <Input id="td-name" value={detailForm.name} onChange={(e) => setDetailForm((f) => ({ ...f, name: e.target.value }))} />
+              <Label>{t('admin.tenantForm.name')}</Label>
+              <p className="text-sm text-foreground">{tenant?.name}</p>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="td-legal">Legal Name</Label>
-              <Input id="td-legal" value={detailForm.legalName} onChange={(e) => setDetailForm((f) => ({ ...f, legalName: e.target.value }))} />
+              <Label>{t('admin.tenantForm.slug')}</Label>
+              <p className="text-sm text-muted-foreground">{tenant?.slug}</p>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label>Status</Label>
-              <Select value={detailForm.status} onValueChange={(v) => setDetailForm((f) => ({ ...f, status: v }))}>
+              <Label>{t('admin.tenantForm.status')}</Label>
+              <Select value={status} onValueChange={setStatus}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="active">{t('admin.tenantStatus.active')}</SelectItem>
+                  <SelectItem value="suspended">{t('admin.tenantStatus.suspended')}</SelectItem>
+                  <SelectItem value="pending">{t('admin.tenantStatus.pending')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <Button onClick={() => void onSaveDetails()} disabled={updateMutation.isPending} className="self-start">
-              {updateMutation.isPending ? 'Saving…' : 'Save Changes'}
+              {updateMutation.isPending ? t('common.loading') : t('common.save')}
             </Button>
           </TabsContent>
 
           <TabsContent value="members" className="flex flex-col gap-6">
             <div className="flex flex-col gap-3">
-              <p className="typo-card-title text-foreground">Invite Member</p>
+              <p className="typo-card-title text-foreground">{t('team.invite')}</p>
               <div className="flex flex-col gap-3 max-w-md">
                 <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="inv-email">Email</Label>
+                  <Label htmlFor="inv-email">{t('auth.email')}</Label>
                   <Input id="inv-email" type="email" value={inviteForm.email} onChange={(e) => setInviteForm((f) => ({ ...f, email: e.target.value }))} />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <Label>Role</Label>
+                  <Label>{t('team.table.role')}</Label>
                   <Select value={inviteForm.role} onValueChange={(v) => setInviteForm((f) => ({ ...f, role: v }))}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       {ROLES.map((r) => (
-                        <SelectItem key={r} value={r}>{r}</SelectItem>
+                        <SelectItem key={r} value={r}>{t(`team.roles.${r}`)}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <Button onClick={() => void onInvite()} disabled={inviteMutation.isPending} className="self-start">
                   <UserPlus className="size-4" />
-                  {inviteMutation.isPending ? 'Inviting…' : 'Send Invite'}
+                  {inviteMutation.isPending ? t('common.loading') : t('team.sendInvite')}
                 </Button>
               </div>
             </div>
@@ -162,14 +165,14 @@ export default function TenantDetailPage() {
             {membersLoading ? (
               <ListSkeleton rows={3} />
             ) : membersError ? (
-              <ErrorState title="Failed to load members" onRetry={() => void refetchMembers()} />
+              <ErrorState title={t('team.loadError')} onRetry={() => void refetchMembers()} />
             ) : (
               <div className="overflow-hidden rounded-xl border border-border bg-card max-w-lg">
                 <table className="w-full text-sm">
                   <thead className="border-b border-border bg-muted/30 text-left">
                     <tr>
-                      <th className="px-4 py-2.5 typo-eyebrow-upper text-faint font-medium">Email</th>
-                      <th className="px-4 py-2.5 typo-eyebrow-upper text-faint font-medium">Role</th>
+                      <th className="px-4 py-2.5 typo-eyebrow-upper text-faint font-medium">{t('team.table.email')}</th>
+                      <th className="px-4 py-2.5 typo-eyebrow-upper text-faint font-medium">{t('team.table.role')}</th>
                       <th className="px-4 py-2.5 w-10" />
                     </tr>
                   </thead>

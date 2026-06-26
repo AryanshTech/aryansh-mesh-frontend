@@ -31,6 +31,7 @@ import { useCreativeRuns } from '@/modules/marketing/api/use-creative';
 
 interface Props {
   projectId: string;
+  tenantId?: string;
 }
 
 const ASSET_TYPES: AssetType[] = ['IMAGE', 'VIDEO', 'REMOTION_PROJECT', 'PROMPT_PACK', 'OTHER'];
@@ -41,12 +42,12 @@ function approvalTone(status: ApprovalStatus): 'success' | 'danger' | 'warning' 
   return 'warning';
 }
 
-export function CreativeAssetsTab({ projectId }: Props) {
+export function CreativeAssetsTab({ projectId, tenantId }: Props) {
   const { t } = useTranslation();
-  const { data, isLoading, isError, refetch } = useCreativeAssets(projectId);
-  const { data: runsData } = useCreativeRuns(projectId);
-  const uploadMutation = useUploadCreativeAsset(projectId);
-  const statusMutation = useUpdateCreativeAssetStatus(projectId);
+  const { data, isLoading, isError, refetch } = useCreativeAssets(projectId, tenantId);
+  const { data: runsData } = useCreativeRuns(projectId, tenantId);
+  const uploadMutation = useUploadCreativeAsset(projectId, tenantId);
+  const statusMutation = useUpdateCreativeAssetStatus(projectId, tenantId);
 
   const [selected, setSelected] = useState<CreativeAsset | null>(null);
   const [uploadOpen, setUploadOpen] = useState(false);

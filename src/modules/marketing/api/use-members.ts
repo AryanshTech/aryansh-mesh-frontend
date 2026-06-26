@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/core/api/client';
+import type { InviteResponse } from '@/modules/business/types/invite';
 
 export interface Member {
   uid: string;
@@ -16,7 +17,7 @@ export interface InviteInput {
 
 export function useMembers(tenantId: string | undefined) {
   return useQuery({
-    queryKey: ['admin', 'members', tenantId],
+    queryKey: ['members', tenantId],
     queryFn: () =>
       api.get<{ items: Member[]; total: number } | Member[]>(
         `/tenants/${tenantId!}/members`,
@@ -30,9 +31,9 @@ export function useInviteMember(tenantId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: InviteInput) =>
-      api.post<Member>(`/tenants/${tenantId}/members/invite`, input),
+      api.post<InviteResponse>(`/tenants/${tenantId}/members/invite`, input),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['admin', 'members', tenantId] });
+      void qc.invalidateQueries({ queryKey: ['members', tenantId] });
     },
   });
 }
@@ -43,7 +44,7 @@ export function useUpdateMember(tenantId: string) {
     mutationFn: ({ uid, role }: { uid: string; role: string }) =>
       api.patch<Member>(`/tenants/${tenantId}/members/${uid}`, { role }),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['admin', 'members', tenantId] });
+      void qc.invalidateQueries({ queryKey: ['members', tenantId] });
     },
   });
 }
@@ -54,7 +55,7 @@ export function useRemoveMember(tenantId: string) {
     mutationFn: (uid: string) =>
       api.delete<void>(`/tenants/${tenantId}/members/${uid}`),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['admin', 'members', tenantId] });
+      void qc.invalidateQueries({ queryKey: ['members', tenantId] });
     },
   });
 }

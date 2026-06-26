@@ -122,9 +122,11 @@ export function useCurrentBrandIdentity(
 
 export function useSaveBrandIdentity(projectId: string, tenantId?: string) {
   const qc = useQueryClient();
+  const savePath = tenantId
+    ? `/tenants/${tenantId}/marketing/brand-identity`
+    : `/projects/${projectId}/brand-identity`;
   return useMutation({
-    mutationFn: (input: BrandIdentityInput) =>
-      api.post<BrandIdentity>(`/projects/${projectId}/brand-identity`, input),
+    mutationFn: (input: BrandIdentityInput) => api.post<BrandIdentity>(savePath, input),
     onSuccess: (data) => {
       qc.setQueryData(brandIdentityKeys.current(projectId), data);
       if (tenantId) {
@@ -137,9 +139,11 @@ export function useSaveBrandIdentity(projectId: string, tenantId?: string) {
 
 export function useGenerateBrandIdentity(projectId: string, tenantId?: string) {
   const qc = useQueryClient();
+  const generatePath = tenantId
+    ? `/tenants/${tenantId}/marketing/brand-identity/generate`
+    : `/projects/${projectId}/brand-identity/generate`;
   return useMutation({
-    mutationFn: () =>
-      api.post<BrandIdentity>(`/projects/${projectId}/brand-identity/generate`),
+    mutationFn: () => api.post<BrandIdentity>(generatePath),
     onSuccess: (data) => {
       qc.setQueryData(brandIdentityKeys.current(projectId), data);
       if (tenantId) {

@@ -3,9 +3,10 @@ import { api } from '@/core/api/client';
 
 export interface Thread {
   id: string;
-  name: string;
   projectId: string;
+  title: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface Message {
@@ -16,28 +17,81 @@ export interface Message {
 }
 
 export interface ThreadInput {
-  name: string;
+  title: string;
 }
 
-export function useThreads(projectId: string | undefined) {
+interface ThreadApi {
+  threadId: string;
+  projectId: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface MessageApi {
+  messageId: string;
+  role: string;
+  content: string;
+  createdAt: string;
+}
+
+interface MessagesPageApi {
+  items: MessageApi[];
+  page: number;
+  size: number;
+  total: number;
+}
+
+function threadsRoot(projectId: string, tenantId?: string): string {
+  return tenantId
+    ? `/tenants/${tenantId}/marketing/threads`
+    : `/projects/${projectId}/threads`;
+}
+
+function mapThread(raw: ThreadApi): Thread {
+  return {
+    id: raw.threadId,
+    projectId: raw.projectId,
+    title: raw.title,
+    createdAt: raw.createdAt,
+    updatedAt: raw.updatedAt,
+  };
+}
+
+function mapMessage(raw: MessageApi): Message {
+  return {
+    id: raw.messageId,
+    role: raw.role === 'assistant' ? 'assistant' : 'user',
+    content: raw.content,
+    createdAt: raw.createdAt,
+  };
+}
+
+export function useThreads(projectId: string | undefined, tenantId?: string) {
+  const scopeKey = tenantId ? `tenant:${tenantId}` : `project:${projectId}`;
   return useQuery({
-    queryKey: ['marketing', 'threads', projectId],
-    queryFn: () =>
-      api.get<{ items: Thread[]; total: number } | Thread[]>(
-        `/projects/${projectId!}/threads`,
-      ),
-    enabled: !!projectId,
-    select: (data) => (Array.isArray(data) ? { items: data, total: data.length } : data),
+    queryKey: ['marketing', 'threads', scopeKey],
+    queryFn: async () => {
+      const rows = await api.get<ThreadApi[]>(threadsRoot(projectId!, tenantId));
+      const items = (rows ?? []).map(mapThread);
+      return { items, total: items.length };
+    },
+    enabled: !!projectId || !!tenantId,
   });
 }
 
-export function useCreateThread(projectId: string) {
+export function useCreateThread(projectId: string, tenantId?: string) {
   const qc = useQueryClient();
+  const scopeKey = tenantId ? `tenant:${tenantId}` : `project:${projectId}`;
   return useMutation({
-    mutationFn: (input: ThreadInput) =>
-      api.post<Thread>(`/projects/${projectId}/threads`, input),
+    mutationFn: async (input: ThreadInput) => {
+      const raw = await api.post<ThreadApi>(threadsRoot(projectId, tenantId), {
+        title: input.title,
+      });
+      return mapThread(raw);
+    },
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['marketing', 'threads', projectId] });
+      void qc.invalidateQueries({ queryKey: ['marketing', 'threads', scopeKey] });
     },
   });
 }
@@ -45,12 +99,14 @@ export function useCreateThread(projectId: string) {
 export function useMessages(threadId: string | undefined) {
   return useQuery({
     queryKey: ['marketing', 'messages', threadId],
-    queryFn: () =>
-      api.get<{ items: Message[]; total: number } | Message[]>(
-        `/threads/${threadId!}/messages`,
-      ),
+    queryFn: async () => {
+      const page = await api.get<MessagesPageApi>(`/threads/${threadId!}/messages`, {
+        query: { page: 0, size: 100 },
+      });
+      const items = (page.items ?? []).map(mapMessage);
+      return { items, total: page.total ?? items.length };
+    },
     enabled: !!threadId,
-    select: (data) => (Array.isArray(data) ? { items: data, total: data.length } : data),
   });
 }
 
@@ -58,7 +114,7 @@ export function useSendMessage(threadId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (content: string) =>
-      api.post<Message>(`/threads/${threadId}/messages/sync`, { content }),
+      api.post<{ content: string }>(`/threads/${threadId}/messages/sync`, { content }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['marketing', 'messages', threadId] });
     },

@@ -30,6 +30,7 @@ import { useCreativeRecipes } from '@/modules/marketing/api/use-creative';
 
 interface Props {
   projectId: string;
+  tenantId?: string;
 }
 
 const RUN_STATUSES: RunStatus[] = [
@@ -52,12 +53,12 @@ function statusTone(status: RunStatus): 'default' | 'info' | 'warning' | 'succes
   }
 }
 
-export function CreativeRunsTab({ projectId }: Props) {
+export function CreativeRunsTab({ projectId, tenantId }: Props) {
   const { t } = useTranslation();
-  const { data, isLoading, isError, refetch } = useCreativeRuns(projectId);
-  const { data: recipesData } = useCreativeRecipes(projectId);
-  const createMutation = useCreateCreativeRun(projectId);
-  const updateMutation = useUpdateCreativeRun(projectId);
+  const { data, isLoading, isError, refetch } = useCreativeRuns(projectId, tenantId);
+  const { data: recipesData } = useCreativeRecipes(projectId, tenantId);
+  const createMutation = useCreateCreativeRun(projectId, tenantId);
+  const updateMutation = useUpdateCreativeRun(projectId, tenantId);
 
   const [selected, setSelected] = useState<CreativeRun | null>(null);
   const [newRunRecipeId, setNewRunRecipeId] = useState<string | null>(null);

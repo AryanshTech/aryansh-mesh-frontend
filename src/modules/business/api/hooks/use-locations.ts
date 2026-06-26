@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/core/api/client';
+import { fetchAllPages } from '@/modules/business/api/fetch-paged-list';
 import { businessKeys } from '@/modules/business/api/query-keys';
 import { useTenantPath } from '@/modules/business/api/use-tenant-path';
 import type { Location } from '@/modules/business/types/entities';
@@ -92,9 +93,13 @@ export function useLocations() {
   const { tenantId, path, hasTenant } = useTenantPath();
   return useQuery({
     queryKey: businessKeys.locations(tenantId),
-    queryFn: () => api.get<LocationListApi | LocationApi[]>(`${path}/locations`),
+    queryFn: async () => {
+      const result = await fetchAllPages<LocationApi>((page) =>
+        api.get<LocationListApi>(`${path}/locations`, { query: { page, size: 100 } }),
+      );
+      return { items: result.items.map(mapLocation), total: result.total };
+    },
     enabled: hasTenant,
-    select: mapList,
   });
 }
 

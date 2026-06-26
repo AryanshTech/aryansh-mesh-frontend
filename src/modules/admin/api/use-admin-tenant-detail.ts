@@ -6,14 +6,16 @@ export interface TenantDetail {
   name: string;
   slug: string;
   status: string;
-  legalName?: string;
+  plan?: string;
+  currency?: string;
+  timezone?: string;
+  onboardingComplete?: boolean;
   createdAt: string;
+  updatedAt?: string;
 }
 
-export interface TenantDetailInput {
-  name?: string;
-  legalName?: string;
-  status?: string;
+export interface TenantStatusInput {
+  status: string;
 }
 
 export function useAdminTenantDetail(tenantId: string | undefined) {
@@ -27,7 +29,7 @@ export function useAdminTenantDetail(tenantId: string | undefined) {
 export function useUpdateAdminTenant(tenantId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: TenantDetailInput) =>
+    mutationFn: (input: TenantStatusInput) =>
       api.patch<TenantDetail>(`/admin/tenants/${tenantId}`, input),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['admin', 'tenant', tenantId] });
@@ -36,11 +38,23 @@ export function useUpdateAdminTenant(tenantId: string) {
   });
 }
 
+export interface CreateTenantInput {
+  name: string;
+  slug: string;
+  currency: string;
+  timezone: string;
+}
+
 export function useCreateAdminTenant() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: { name: string; slug: string; legalName?: string }) =>
-      api.post<TenantDetail>('/admin/tenants', input),
+    mutationFn: (input: CreateTenantInput) =>
+      api.post<TenantDetail>('/admin/tenants', {
+        name: input.name,
+        slug: input.slug,
+        currency: input.currency.toUpperCase(),
+        timezone: input.timezone,
+      }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['admin', 'tenants'] });
     },

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/core/api/client';
+import { fetchAllPages } from '@/modules/business/api/fetch-paged-list';
 import { businessKeys } from '@/modules/business/api/query-keys';
 import { useTenantPath } from '@/modules/business/api/use-tenant-path';
 import type { Cost } from '@/modules/business/types/entities';
@@ -76,9 +77,13 @@ export function useCosts() {
   const { tenantId, path, hasTenant } = useTenantPath();
   return useQuery({
     queryKey: businessKeys.costs(tenantId),
-    queryFn: () => api.get<CostListApi | CostApi[]>(`${path}/costs`),
+    queryFn: async () => {
+      const result = await fetchAllPages<CostApi>((page) =>
+        api.get<CostListApi>(`${path}/costs`, { query: { page, size: 100 } }),
+      );
+      return { items: result.items.map(mapCost), total: result.total };
+    },
     enabled: hasTenant,
-    select: mapList,
   });
 }
 

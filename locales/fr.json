@@ -24,7 +24,9 @@
     "testimonials": "Témoignages",
     "content": "Contenu",
     "publish": "Publier",
+    "connect": "Connexion site web",
     "business": "Entreprise",
+    "team": "Équipe",
     "companies": "Entreprises",
     "marketingOverview": "Centre de commandement",
     "tenants": "Locataires",
@@ -48,6 +50,8 @@
     "selectBusiness": "Sélectionner une entreprise",
     "settings": "Paramètres",
     "switchBusiness": "Changer d'entreprise",
+    "tenantLoadFailed": "Impossible de charger les entreprises",
+    "retry": "Réessayer",
     "userMenu": "Menu utilisateur",
     "zoneBusiness": "Entreprise"
   },
@@ -83,7 +87,49 @@
     "signUpFailed": "Échec de l'inscription. Réessayez.",
     "signUpSubtitle": "Lancez votre espace en quelques secondes.",
     "signUpTitle": "Créez votre compte",
-    "welcomeBack": "Bon retour"
+    "welcomeBack": "Bon retour",
+    "confirmPassword": "Confirmer le mot de passe",
+    "passwordMismatch": "Les mots de passe ne correspondent pas."
+  },
+  "invite": {
+    "acceptInstructions": "Créez un compte ou connectez-vous pour accepter cette invitation.",
+    "accepting": "Acceptation de l'invitation…",
+    "copyLinkHint": "Copiez le lien d'invitation envoyé par l'administrateur.",
+    "emailMismatch": "Cette invitation a été envoyée à une autre adresse e-mail.",
+    "linkCopied": "Lien d'invitation copié dans le presse-papiers.",
+    "missingToken": "Ce lien d'invitation est invalide ou a expiré.",
+    "missingTokenTitle": "Invitation invalide",
+    "resentEmail": "Invitation renvoyée à {{email}}.",
+    "resentLink": "Invitation mise à jour. Partagez le lien copié.",
+    "sentEmail": "Invitation envoyée à {{email}}.",
+    "sentLink": "Invitation créée. L'e-mail n'a pas pu être envoyé — lien copié.",
+    "signInToAccept": "Se connecter pour accepter",
+    "signUpForTenant": "Vous avez été invité à rejoindre {{tenant}}."
+  },
+  "team": {
+    "emailRequired": "L'e-mail est requis.",
+    "emptyHint": "Invitez des collègues à collaborer sur cet espace.",
+    "invite": "Inviter un membre",
+    "inviteFailed": "Impossible d'envoyer l'invitation.",
+    "inviteHint": "Envoyez une invitation par e-mail ou partagez le lien si l'envoi échoue.",
+    "loadError": "Impossible de charger les membres de l'équipe.",
+    "memberRemoved": "Membre retiré.",
+    "noTenant": "Sélectionnez une entreprise pour gérer votre équipe.",
+    "removeFailed": "Impossible de retirer le membre.",
+    "sendInvite": "Envoyer l'invitation",
+    "subtitle": "Gérez qui a accès à cet espace.",
+    "title": "Équipe",
+    "table": {
+      "email": "E-mail",
+      "joined": "Inscrit le",
+      "role": "Rôle"
+    },
+    "roles": {
+      "TENANT_OWNER": "Propriétaire",
+      "TENANT_ADMIN": "Administrateur",
+      "TENANT_EDITOR": "Éditeur",
+      "TENANT_VIEWER": "Lecteur"
+    }
   },
   "dashboard": {
     "emptyDescription": "Dès que vous créerez des produits ou des réservations, l'activité apparaîtra ici.",
@@ -254,6 +300,9 @@
     "fieldPhone": "Téléphone",
     "fieldTagline": "Accroche",
     "fieldWebsiteUrl": "Site web",
+    "fieldAllowedWebsiteOrigins": "Domaines du site (CORS)",
+    "fieldAllowedWebsiteOriginsPlaceholder": "https://exemple.com\nhttps://www.exemple.com\nhttp://localhost:5173",
+    "fieldAllowedWebsiteOriginsHint": "Une origine par ligne (schéma + hôte + port uniquement). Requis pour que votre site lise les données publiques depuis le navigateur.",
     "saveFailed": "Échec de la mise à jour",
     "subtitle": "Profil et identité de votre entreprise.",
     "title": "Profil d'entreprise",
@@ -273,7 +322,105 @@
     "publishingMessage": "Publication en cours…",
     "subtitle": "Publiez vos mises à jour.",
     "title": "Publier",
-    "unpublishedMessage": "Votre site a des modifications non publiées."
+    "unpublishedMessage": "Votre site a des modifications non publiées.",
+    "connectLink": {
+      "action": "Guide d'intégration site web"
+    },
+    "hub": {
+      "slugLabel": "Slug : {{slug}}",
+      "viewApiSnapshot": "Ouvrir l'instantané en direct"
+    },
+    "embed": {
+      "title": "Script d'intégration",
+      "hint": "Ajoutez cette balise script à la mise en page de votre site pour charger l'assistant Mesh.",
+      "copy": "Copier le script",
+      "copied": "Script copié"
+    },
+    "connectorGuide": {
+      "title": "Guide d'intégration développeur (Markdown)",
+      "description": "Document complet pour votre développeur web — CORS, variables d'environnement, routes API et référence des champs.",
+      "hint": "Copiez et enregistrez sous INTEGRATION.md dans le dépôt du site client.",
+      "copy": "Copier le guide",
+      "copied": "Guide copié",
+      "copyFailed": "Impossible de copier le guide"
+    },
+    "integration": {
+      "title": "Intégration site web",
+      "description": "Connectez votre site vitrine pour lire les données publiées via l'API publique.",
+      "howItWorks": "Publiez le contenu dans Mesh, enregistrez les origines CORS de votre site, puis appelez l'API snapshot depuis votre frontend.",
+      "copy": "Copier",
+      "copied": "Copié dans le presse-papiers",
+      "corsIntro": "Les navigateurs bloquent les requêtes cross-origin sauf si chaque origine est enregistrée sur le profil entreprise.",
+      "registeredOrigins": "Origines enregistrées",
+      "noOrigins": "Aucune origine CORS configurée. Ajoutez-les sur le profil entreprise.",
+      "exampleOrigins": "Exemples d'origines",
+      "openProfile": "Modifier le profil entreprise",
+      "envVars": "Variables d'environnement",
+      "fetchExample": "Exemple fetch (snapshot + réservation)",
+      "devIntro": "En développement local, proxyez les requêtes API via votre serveur de dev pour éviter le CORS.",
+      "viteProxy": "Config proxy Vite",
+      "nextProxy": "Rewrites Next.js",
+      "debugCommands": "Commandes curl de débogage",
+      "tabs": {
+        "setup": "Configuration",
+        "cors": "CORS",
+        "api": "API",
+        "embed": "Intégration",
+        "dev": "Dev local",
+        "troubleshoot": "Dépannage",
+        "guide": "Guide MD"
+      },
+      "steps": {
+        "publish": "Publiez votre contenu depuis cette page pour que l'instantané public reflète vos changements.",
+        "cors": "Ajoutez chaque origine navigateur (production + ports locaux) sous Profil entreprise → Domaines du site (CORS).",
+        "env": "Définissez VITE_CRM_API_BASE_URL et VITE_CRM_TENANT_SLUG (ou équivalents Next.js) sur le site client.",
+        "routes": "Utilisez uniquement les routes publiques : snapshot, disponibilités et réservations — sans en-tête Authorization.",
+        "verify": "Vérifiez avec curl ou ouvrez l'instantané en direct ; corrigez le CORS si le navigateur bloque fetch."
+      },
+      "table": {
+        "method": "Méthode",
+        "path": "Chemin",
+        "purpose": "Usage",
+        "symptom": "Symptôme",
+        "fix": "Correction"
+      },
+      "endpoints": {
+        "snapshot": "Instantané complet publié (produits, lieux, profil, etc.)",
+        "availability": "Disponibilités de réservation pour une date",
+        "bookings": "Créer une réservation publique"
+      },
+      "troubleshoot": {
+        "corsBlocked": {
+          "symptom": "Navigateur : bloqué par la politique CORS",
+          "fix": "Ajoutez l'origine exacte (port inclus) dans Domaines du site sur le profil entreprise."
+        },
+        "curlWorks": {
+          "symptom": "curl fonctionne mais fetch échoue",
+          "fix": "Presque toujours CORS — enregistrez l'origine de la page, pas l'URL de l'API."
+        },
+        "unauthorized": {
+          "symptom": "401 Unauthorized sur route publique",
+          "fix": "Retirez les en-têtes Authorization ; les routes publiques sont non authentifiées."
+        },
+        "booking403": {
+          "symptom": "403 sur POST /bookings",
+          "fix": "Vérifiez que les réservations sont activées et que le payload respecte l'API."
+        },
+        "notFound": {
+          "symptom": "404 sur snapshot",
+          "fix": "Vérifiez le slug tenant, publiez au moins une fois et confirmez que l'URL API se termine par /api/v1."
+        }
+      }
+    }
+  },
+  "connect": {
+    "title": "Connexion site web",
+    "subtitle": "CORS, API publique, script d'intégration et guide Markdown pour votre site vitrine.",
+    "noSlugTitle": "Slug tenant indisponible",
+    "noSlugDescription": "Votre espace a besoin d'un slug tenant avant de connecter un site. Contactez le support si le problème persiste.",
+    "overviewTitle": "Données publiques pour votre site",
+    "overviewDescription": "Après publication, votre site lit les données via l'API snapshot. Enregistrez d'abord les origines CORS sur le profil entreprise.",
+    "openPublish": "Aller à Publier"
   },
   "onboarding": {
     "subtitle": "Configurons votre espace.",
@@ -336,6 +483,21 @@
     },
     "brandMemorySubtitle": "Voix, ton et contexte de marque pour ce projet.",
     "brandMemoryTitle": "Mémoire de marque",
+    "brandMemory": {
+      "backToWorkspace": "Retour à l'espace marketing",
+      "current": "Version actuelle",
+      "lastSaved": "Dernière sauvegarde {{date}}",
+      "loadFailed": "Impossible de charger la mémoire de marque",
+      "placeholder": "Rédigez les lignes directrices, le ton, les messages clés et le positionnement…",
+      "saved": "Mémoire de marque enregistrée",
+      "saveFailed": "Échec de l'enregistrement",
+      "selectVersion": "Choisir une version",
+      "setCurrent": "Définir comme actuelle",
+      "versionLabel": "Version {{version}}",
+      "versionSet": "Version actuelle mise à jour",
+      "versionSetFailed": "Impossible de mettre à jour la version actuelle",
+      "viewLink": "Voir la mémoire de marque"
+    },
     "brandPerception": {
       "emptyDescription": "Générez un aperçu à partir des données du locataire, puis enregistrez-le dans la mémoire de marque.",
       "emptyTitle": "Aucune perception de marque",
@@ -385,6 +547,11 @@
       "title": "Recettes créatives"
     },
     "reject": "Rejeter",
+    "social": {
+      "platform": "Plateforme",
+      "rejectFeedback": "Révision nécessaire avant approbation.",
+      "scheduleDate": "Date de publication"
+    },
     "runs": {
       "columnRecipe": "Recette",
       "columnStatus": "Statut",
@@ -408,6 +575,68 @@
     "sendMessage": "Envoyer le message",
     "socialCalendarSubtitle": "Planifiez votre contenu social.",
     "socialCalendarTitle": "Calendrier social",
+    "studio": {
+      "eyebrow": "Studio de contenu",
+      "title": "Générer et enregistrer le contenu de marque",
+      "subtitle": "Construisez les fondations de votre marque, exécutez des recettes créatives et conservez tout au même endroit.",
+      "generateFoundation": "Générer les fondations de marque",
+      "foundationDone": "Fondations de marque générées et enregistrées",
+      "foundationFailed": "Échec de la génération des fondations de marque",
+      "open": "Ouvrir",
+      "pipeline": {
+        "step1": "Définir l'identité de marque — couleurs, voix, mission et style visuel",
+        "step2": "Générer la perception de marque et l'enregistrer dans la mémoire de marque",
+        "step3": "Créer des recettes, les exécuter localement et téléverser les assets créatifs",
+        "step4": "Rédiger des publications sociales et démarrer des fils IA pour le contenu continu"
+      },
+      "status": {
+        "saved": "Enregistré",
+        "notYet": "Pas encore",
+        "count": "{{count}} enregistré(s)"
+      },
+      "types": {
+        "identity": {
+          "title": "Identité de marque",
+          "description": "Profil de marque structuré — voix, couleurs, mission et piliers de contenu."
+        },
+        "memory": {
+          "title": "Mémoire de marque",
+          "description": "Directives de marque et positionnement enregistrés en markdown."
+        },
+        "perception": {
+          "title": "Perception de marque",
+          "description": "Perception de marché générée par IA enregistrée dans la mémoire de marque."
+        },
+        "recipes": {
+          "title": "Recettes créatives",
+          "description": "Prompts réutilisables et packages d'exécution pour la génération de contenu."
+        },
+        "social": {
+          "title": "Publications sociales",
+          "description": "Rédigez, approuvez et planifiez des publications sur les plateformes."
+        },
+        "assets": {
+          "title": "Assets créatifs",
+          "description": "Résultats téléversés des exécutions — images, textes et fichiers."
+        },
+        "threads": {
+          "title": "Fils IA",
+          "description": "Conversations pour brainstormer et affiner le contenu marketing."
+        }
+      }
+    },
+    "threads": {
+      "create": "Créer",
+      "createFailed": "Échec de la création du fil",
+      "created": "Fil créé",
+      "emptyDescription": "Créez un fil pour démarrer une conversation marketing.",
+      "emptyTitle": "Aucun fil pour l'instant",
+      "loadFailed": "Échec du chargement des fils",
+      "nameLabel": "Nom du fil *",
+      "nameRequired": "Le nom du fil est requis",
+      "new": "Nouveau fil",
+      "title": "Fils de discussion"
+    },
     "threadsSubtitle": "Conversations et décisions du projet.",
     "threadsTitle": "Espace de discussion",
     "workspace": {
@@ -440,7 +669,36 @@
     "tenantCreateTitle": "Nouveau locataire",
     "tenantDetailSubtitle": "Configuration et membres du locataire.",
     "tenantDetailTitle": "Locataire",
+    "tenantLoadFailed": "Impossible de charger le locataire",
+    "tenantUpdateFailed": "Échec de la mise à jour du locataire",
+    "tenantUpdated": "Locataire mis à jour",
     "tenantsSubtitle": "Tous les espaces de la plateforme.",
-    "tenantsTitle": "Locataires"
+    "tenantsTitle": "Locataires",
+    "tabs": {
+      "details": "Détails",
+      "members": "Membres"
+    },
+    "tenantStatus": {
+      "active": "Actif",
+      "pending": "En attente",
+      "suspended": "Suspendu"
+    },
+    "tenantForm": {
+      "legalName": "Raison sociale",
+      "name": "Nom",
+      "nameRequired": "Le nom est requis",
+      "slug": "Slug",
+      "slugHint": "Lettres minuscules, chiffres et tirets uniquement.",
+      "slugInvalid": "Entrez un slug valide (ex. souvenir-cafe)",
+      "slugConflict": "Ce slug est déjà utilisé",
+      "currency": "Devise",
+      "currencyInvalid": "La devise doit être un code à 3 lettres",
+      "timezone": "Fuseau horaire",
+      "timezoneRequired": "Le fuseau horaire est requis",
+      "status": "Statut",
+      "submit": "Créer le locataire",
+      "created": "Locataire créé",
+      "createFailed": "Échec de la création du locataire"
+    }
   }
 }

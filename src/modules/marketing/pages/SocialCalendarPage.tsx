@@ -15,6 +15,14 @@ import { Input } from '@/design-system/components/ui/input';
 import { Label } from '@/design-system/components/ui/label';
 import { Textarea } from '@/design-system/components/ui/textarea';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/design-system/components/ui/select';
+import { useTenantPath } from '@/modules/business/api/use-tenant-path';
+import {
   useSocialPosts,
   useCreateSocialPost,
   useApproveSocialPost,
@@ -23,23 +31,34 @@ import {
   type SocialPostInput,
 } from '@/modules/marketing/api/use-social-posts';
 
+const PLATFORMS = [
+  'LINKEDIN',
+  'X',
+  'INSTAGRAM',
+  'TIKTOK',
+  'YOUTUBE',
+  'FACEBOOK',
+  'THREADS',
+] as const;
+
+const NEW_POST: SocialPostInput = { content: '', platform: 'LINKEDIN' };
+
 function postTone(status: SocialPost['status']) {
   if (status === 'APPROVED') return 'success' as const;
   if (status === 'SCHEDULED') return 'info' as const;
-  if (status === 'REJECTED') return 'warning' as const;
+  if (status === 'PENDING_APPROVAL') return 'warning' as const;
   return 'default' as const;
 }
-
-const NEW_POST: SocialPostInput = { content: '', platform: '', scheduledAt: '' };
 
 export default function SocialCalendarPage() {
   const { t } = useTranslation();
   const { projectId } = useParams<{ projectId: string }>();
+  const { tenantId } = useTenantPath();
 
-  const { data, isLoading, isError, refetch } = useSocialPosts(projectId);
-  const createMutation = useCreateSocialPost(projectId ?? '');
-  const approveMutation = useApproveSocialPost(projectId ?? '');
-  const rejectMutation = useRejectSocialPost(projectId ?? '');
+  const { data, isLoading, isError, refetch } = useSocialPosts(projectId, tenantId);
+  const createMutation = useCreateSocialPost(projectId ?? '', tenantId);
+  const approveMutation = useApproveSocialPost(projectId ?? '', tenantId);
+  const rejectMutation = useRejectSocialPost(projectId ?? '', tenantId);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [draft, setDraft] = useState<SocialPostInput>({ ...NEW_POST });
@@ -51,8 +70,8 @@ export default function SocialCalendarPage() {
     try {
       await createMutation.mutateAsync({
         content: draft.content.trim(),
-        platform: draft.platform?.trim() || undefined,
-        scheduledAt: draft.scheduledAt?.trim() || undefined,
+        platform: draft.platform,
+        scheduledDate: draft.scheduledDate?.trim() || undefined,
       });
       toast.success('Post created');
       setDrawerOpen(false);
@@ -73,7 +92,10 @@ export default function SocialCalendarPage() {
 
   const onReject = async (postId: string) => {
     try {
-      await rejectMutation.mutateAsync(postId);
+      await rejectMutation.mutateAsync({
+        postId,
+        feedback: t('marketing.social.rejectFeedback'),
+      });
       toast.success('Post rejected');
     } catch (e) {
       toast.error((e as Error).message || 'Failed to reject');
@@ -107,14 +129,14 @@ export default function SocialCalendarPage() {
                     <span className="text-xs text-muted-foreground">{post.platform}</span>
                   ) : null}
                 </div>
-                {post.scheduledAt ? (
+                {post.scheduledDate ? (
                   <span className="text-xs text-muted-foreground tabular-nums">
-                    {new Date(post.scheduledAt).toLocaleDateString()}
+                    {post.scheduledDate}
                   </span>
                 ) : null}
               </div>
               <p className="typo-body-sm text-foreground line-clamp-4">{post.content}</p>
-              {post.status === 'DRAFT' ? (
+              {post.status === 'DRAFT' || post.status === 'PENDING_APPROVAL' ? (
                 <div className="flex items-center gap-2">
                   <Button
                     size="sm"
@@ -129,7 +151,10 @@ export default function SocialCalendarPage() {
                     variant="ghost"
                     className="text-destructive hover:text-destructive"
                     onClick={() => void onReject(post.id)}
-                    disabled={rejectMutation.isPending && rejectMutation.variables === post.id}
+                    disabled={
+                      rejectMutation.isPending &&
+                      rejectMutation.variables?.postId === post.id
+                    }
                   >
                     {t('marketing.reject')}
                   </Button>
@@ -169,12 +194,33 @@ export default function SocialCalendarPage() {
             <Textarea id="sp-content" rows={5} value={draft.content} onChange={(e) => setDraft((d) => ({ ...d, content: e.target.value }))} />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="sp-platform">Platform</Label>
-            <Input id="sp-platform" placeholder="Instagram, Twitter, LinkedIn…" value={draft.platform ?? ''} onChange={(e) => setDraft((d) => ({ ...d, platform: e.target.value }))} />
+            <Label htmlFor="sp-platform">{t('marketing.social.platform')}</Label>
+            <Select
+              value={draft.platform}
+              onValueChange={(value) =>
+                setDraft((d) => ({ ...d, platform: value as SocialPostInput['platform'] }))
+              }
+            >
+              <SelectTrigger id="sp-platform">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PLATFORMS.map((platform) => (
+                  <SelectItem key={platform} value={platform}>
+                    {platform}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="sp-date">Schedule Date</Label>
-            <Input id="sp-date" type="date" value={draft.scheduledAt ?? ''} onChange={(e) => setDraft((d) => ({ ...d, scheduledAt: e.target.value }))} />
+            <Label htmlFor="sp-date">{t('marketing.social.scheduleDate')}</Label>
+            <Input
+              id="sp-date"
+              type="date"
+              value={draft.scheduledDate ?? ''}
+              onChange={(e) => setDraft((d) => ({ ...d, scheduledDate: e.target.value }))}
+            />
           </div>
         </div>
       </DetailDrawer>

@@ -54,7 +54,22 @@ class ApiErrorImpl extends Error implements ApiError {
   }
 }
 
-async function refreshAccessToken(): Promise<string | null> {
+type UnauthorizedHandler = () => void;
+
+let onUnauthorized: UnauthorizedHandler | null = null;
+let refreshInFlight: Promise<string | null> | null = null;
+
+/** Called by AuthProvider so 401 + failed refresh updates React auth state. */
+export function setUnauthorizedHandler(handler: UnauthorizedHandler | null) {
+  onUnauthorized = handler;
+}
+
+function emitUnauthorized() {
+  clearTokens();
+  onUnauthorized?.();
+}
+
+async function performTokenRefresh(): Promise<string | null> {
   const refreshToken = getRefreshToken();
   if (!refreshToken) return null;
 
@@ -82,6 +97,14 @@ async function refreshAccessToken(): Promise<string | null> {
     /* swallow */
   }
   return null;
+}
+
+async function refreshAccessToken(): Promise<string | null> {
+  if (refreshInFlight) return refreshInFlight;
+  refreshInFlight = performTokenRefresh().finally(() => {
+    refreshInFlight = null;
+  });
+  return refreshInFlight;
 }
 
 /** Refresh tokens using the persisted refresh token (e.g. on app startup). */
@@ -116,9 +139,11 @@ export async function apiRequest<T>(path: string, opts: RequestOptions = {}): Pr
     const newToken = await refreshAccessToken();
     if (newToken) {
       res = await doFetch(newToken);
-    } else {
-      clearTokens();
     }
+  }
+
+  if (res.status === 401 && !skipAuth) {
+    emitUnauthorized();
   }
 
   if (res.status === 204) return undefined as T;
