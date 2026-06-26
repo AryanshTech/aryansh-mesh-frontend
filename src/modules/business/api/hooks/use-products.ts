@@ -64,14 +64,6 @@ function mapProduct(p: ProductApi): ProductView {
   };
 }
 
-function mapList(raw: ProductListApi | ProductApi[]): { items: ProductView[]; total: number } {
-  if (Array.isArray(raw)) return { items: raw.map(mapProduct), total: raw.length };
-  return {
-    items: (raw.items ?? []).map(mapProduct),
-    total: raw.total ?? raw.totalElements ?? raw.items?.length ?? 0,
-  };
-}
-
 export interface ProductFilters {
   search?: string;
   status?: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED' | 'ALL';

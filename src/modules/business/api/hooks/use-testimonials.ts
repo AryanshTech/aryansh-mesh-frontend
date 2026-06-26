@@ -39,14 +39,6 @@ function mapTestimonial(t: TestimonialApi): TestimonialView {
   };
 }
 
-function mapList(raw: TestimonialListApi | TestimonialApi[]): { items: TestimonialView[]; total: number } {
-  if (Array.isArray(raw)) return { items: raw.map(mapTestimonial), total: raw.length };
-  return {
-    items: (raw.items ?? []).map(mapTestimonial),
-    total: raw.total ?? raw.totalElements ?? raw.items?.length ?? 0,
-  };
-}
-
 export interface TestimonialInput {
   author: string;
   quote: string;

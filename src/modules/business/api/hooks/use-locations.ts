@@ -64,14 +64,6 @@ function mapLocation(l: LocationApi): LocationView {
   };
 }
 
-function mapList(raw: LocationListApi | LocationApi[]): { items: LocationView[]; total: number } {
-  if (Array.isArray(raw)) return { items: raw.map(mapLocation), total: raw.length };
-  return {
-    items: (raw.items ?? []).map(mapLocation),
-    total: raw.total ?? raw.totalElements ?? raw.items?.length ?? 0,
-  };
-}
-
 export interface LocationImageInput {
   url: string;
   alt?: string;

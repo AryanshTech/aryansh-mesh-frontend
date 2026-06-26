@@ -58,17 +58,6 @@ function mapCollection(c: ContentCollectionApi): ContentCollectionView {
   };
 }
 
-function mapList(raw: ContentCollectionListApi | ContentCollectionApi[]): {
-  items: ContentCollectionView[];
-  total: number;
-} {
-  if (Array.isArray(raw)) return { items: raw.map(mapCollection), total: raw.length };
-  return {
-    items: (raw.items ?? []).map(mapCollection),
-    total: raw.total ?? raw.totalElements ?? raw.items?.length ?? 0,
-  };
-}
-
 function collectionKeyFromLabel(label: string): string {
   const slug = label
     .trim()

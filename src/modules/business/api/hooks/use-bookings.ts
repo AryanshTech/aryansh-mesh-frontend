@@ -68,14 +68,6 @@ function mapBooking(b: BookingApi): BookingView {
   };
 }
 
-function mapList(raw: BookingListApi | BookingApi[]): { items: BookingView[]; total: number } {
-  if (Array.isArray(raw)) return { items: raw.map(mapBooking), total: raw.length };
-  return {
-    items: (raw.items ?? []).map(mapBooking),
-    total: raw.total ?? raw.totalElements ?? raw.items?.length ?? 0,
-  };
-}
-
 export function useBookings() {
   const { tenantId, path, hasTenant } = useTenantPath();
   return useQuery({

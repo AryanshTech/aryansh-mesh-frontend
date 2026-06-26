@@ -80,7 +80,7 @@ export default function TeamPage() {
       <PageHeader
         title={t('team.title')}
         description={t('team.subtitle')}
-        action={
+        actions={
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button>

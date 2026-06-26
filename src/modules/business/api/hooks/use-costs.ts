@@ -48,11 +48,6 @@ function mapCost(c: CostApi): CostView {
   };
 }
 
-function mapList(raw: CostListApi | CostApi[]): { items: CostView[]; total: number } {
-  if (Array.isArray(raw)) return { items: raw.map(mapCost), total: raw.length };
-  return { items: (raw.items ?? []).map(mapCost), total: raw.total ?? raw.items?.length ?? 0 };
-}
-
 export interface CostInput {
   label: string;
   amount: number;

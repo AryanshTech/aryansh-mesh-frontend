@@ -42,14 +42,6 @@ function mapClient(c: ClientApi): ClientView {
   };
 }
 
-function mapList(raw: ClientListApi | ClientApi[]): { items: ClientView[]; total: number } {
-  if (Array.isArray(raw)) return { items: raw.map(mapClient), total: raw.length };
-  return {
-    items: (raw.items ?? []).map(mapClient),
-    total: raw.total ?? raw.totalElements ?? raw.items?.length ?? 0,
-  };
-}
-
 export interface ClientInput {
   name: string;
   email?: string;

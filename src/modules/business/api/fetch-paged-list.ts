@@ -1,6 +1,6 @@
 export interface PagedListResponse<T> {
   items: T[];
-  total: number;
+  total?: number;
   page?: number;
   size?: number;
   totalPages?: number;
