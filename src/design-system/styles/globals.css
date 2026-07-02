@@ -146,6 +146,10 @@ html.light {
   backdrop-filter: blur(2px);
 }
 
+.dialog-overlay[data-state="closed"] {
+  pointer-events: none;
+}
+
 [class*="fade-in-0"] { animation-name: fade-in; }
 [class*="fade-out-0"] { animation-name: fade-out; }
 [class*="slide-in-from-right"] { animation-name: slide-in-from-right; }

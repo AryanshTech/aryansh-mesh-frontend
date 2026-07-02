@@ -11,6 +11,13 @@ import { Card } from '@/design-system/components/ui/card';
 import { Input } from '@/design-system/components/ui/input';
 import { Label } from '@/design-system/components/ui/label';
 import {
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/design-system/components/ui/dialog';
+import { FormDialog, useFormDialogOpen } from '@/shared/components/FormDialog';
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -56,6 +63,7 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
   const [uploadType, setUploadType] = useState<AssetType | ''>('');
   const [uploadRunId, setUploadRunId] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { scheduleOpen, triggerProps } = useFormDialogOpen();
 
   const assets = data ?? [];
   const runs = runsData ?? [];
@@ -65,9 +73,17 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
     return map;
   }, [runs]);
 
+  const resetUpload = () => {
+    setUploadFile(null);
+    setUploadLabel('');
+    setUploadType('');
+    setUploadRunId('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const onUpload = async () => {
     if (!uploadFile || !uploadLabel.trim()) {
-      toast.error(t('common.errorRequired'));
+      toast.error(t('marketing.assets.fileRequired'));
       return;
     }
     try {
@@ -79,11 +95,7 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
       });
       toast.success(t('marketing.assets.uploaded'));
       setUploadOpen(false);
-      setUploadFile(null);
-      setUploadLabel('');
-      setUploadType('');
-      setUploadRunId('');
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      resetUpload();
     } catch (e) {
       toast.error((e as Error).message || t('marketing.assets.uploadFailed'));
     }
@@ -101,10 +113,15 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
     }
   };
 
-  return (
+  const openUpload = () => {
+    setUploadOpen(false);
+    scheduleOpen(() => setUploadOpen(true));
+  };
+
+  const listContent = (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-end gap-2">
-        <Button onClick={() => setUploadOpen(true)}>
+        <Button {...triggerProps} onClick={openUpload}>
           <Upload className="size-4" />{t('marketing.assets.upload')}
         </Button>
       </div>
@@ -118,7 +135,11 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
           icon={<ImageIcon />}
           title={t('marketing.assets.emptyTitle')}
           description={t('marketing.assets.emptyDescription')}
-          action={<Button onClick={() => setUploadOpen(true)}><Upload className="size-4" />{t('marketing.assets.upload')}</Button>}
+          action={
+            <Button {...triggerProps} onClick={openUpload}>
+              <Upload className="size-4" />{t('marketing.assets.upload')}
+            </Button>
+          }
         />
       ) : (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
@@ -126,7 +147,7 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
             <button
               key={a.id}
               type="button"
-              onClick={() => setSelected(a)}
+              onClick={() => requestAnimationFrame(() => setSelected(a))}
               className={cn(
                 'group flex flex-col gap-3 rounded-xl border bg-card p-4 text-left transition-all duration-150',
                 'hover:border-hairline-strong hover:shadow-card',
@@ -146,17 +167,21 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
                 <p className="typo-card-title text-foreground line-clamp-1">{a.label}</p>
                 <StatusBadge label={t(`marketing.assets.status${a.approvalStatus.charAt(0).toUpperCase() + a.approvalStatus.slice(1)}`)} tone={approvalTone(a.approvalStatus)} />
               </div>
-              <p className="typo-body-sm text-muted-foreground">{a.assetType}</p>
+              <p className="typo-body-sm text-muted-foreground">{t(`marketing.assets.types.${a.assetType}`)}</p>
             </button>
           ))}
         </div>
       )}
+    </div>
+  );
 
+  return (
+    <>
       <DetailDrawer
         open={!!selected}
-        onOpenChange={(o) => (o ? null : setSelected(null))}
+        onOpenChange={(open) => { if (!open) setSelected(null); }}
         title={selected?.label ?? ''}
-        master={<div />}
+        master={listContent}
         footer={
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -201,7 +226,7 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
             <Card className="p-4 flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <span className="typo-eyebrow-upper text-faint">{t('marketing.assets.fieldType')}</span>
-                <span className="typo-body-sm text-foreground">{selected.assetType}</span>
+                <span className="typo-body-sm text-foreground">{t(`marketing.assets.types.${selected.assetType}`)}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="typo-eyebrow-upper text-faint">{t('marketing.assets.columnApproval')}</span>
@@ -218,58 +243,66 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
         ) : null}
       </DetailDrawer>
 
-      <DetailDrawer
+      <FormDialog
         open={uploadOpen}
-        onOpenChange={(o) => { setUploadOpen(o); if (!o) { setUploadFile(null); setUploadLabel(''); setUploadType(''); setUploadRunId(''); } }}
-        title={t('marketing.assets.upload')}
-        master={<div />}
-        footer={
-          <div className="flex items-center justify-end gap-2">
-            <Button variant="outline" onClick={() => setUploadOpen(false)}>{t('common.cancel')}</Button>
-            <Button onClick={() => void onUpload()} disabled={uploadMutation.isPending}>
-              <Upload className="size-4" />
-              {uploadMutation.isPending ? t('common.loading') : t('marketing.assets.upload')}
-            </Button>
-          </div>
-        }
+        onOpenChange={(open) => {
+          setUploadOpen(open);
+          if (!open) resetUpload();
+        }}
       >
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="a-file">{t('marketing.assets.fieldFile')} *</Label>
-            <Input
-              id="a-file"
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp,video/mp4,application/zip"
-              onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)}
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="a-label">{t('marketing.assets.fieldLabel')} *</Label>
-            <Input id="a-label" value={uploadLabel} onChange={(e) => setUploadLabel(e.target.value)} />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="a-type">{t('marketing.assets.fieldType')}</Label>
-            <Select value={uploadType} onValueChange={(v) => setUploadType(v as AssetType)}>
-              <SelectTrigger id="a-type"><SelectValue placeholder={t('marketing.assets.autoDetect')} /></SelectTrigger>
-              <SelectContent>
-                {ASSET_TYPES.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-          {runs.length > 0 ? (
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('marketing.assets.upload')}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 py-2">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="a-run">{t('marketing.assets.fieldRunId')}</Label>
-              <Select value={uploadRunId} onValueChange={(v) => setUploadRunId(v)}>
-                <SelectTrigger id="a-run"><SelectValue placeholder={t('marketing.assets.noRun')} /></SelectTrigger>
+              <Label htmlFor="a-file">{t('marketing.assets.fieldFile')} *</Label>
+              <Input
+                id="a-file"
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,video/mp4,application/zip"
+                onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="a-label">{t('marketing.assets.fieldLabel')} *</Label>
+              <Input id="a-label" value={uploadLabel} onChange={(e) => setUploadLabel(e.target.value)} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="a-type">{t('marketing.assets.fieldType')}</Label>
+              <Select value={uploadType} onValueChange={(v) => setUploadType(v as AssetType)}>
+                <SelectTrigger id="a-type"><SelectValue placeholder={t('marketing.assets.autoDetect')} /></SelectTrigger>
                 <SelectContent>
-                  {runs.map((r) => <SelectItem key={r.id} value={r.id}>{r.id.slice(0, 8)} — {r.status}</SelectItem>)}
+                  {ASSET_TYPES.map((a) => (
+                    <SelectItem key={a} value={a}>{t(`marketing.assets.types.${a}`)}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
-          ) : null}
-        </div>
-      </DetailDrawer>
-    </div>
+            {runs.length > 0 ? (
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="a-run">{t('marketing.assets.fieldRunId')}</Label>
+                <Select value={uploadRunId} onValueChange={setUploadRunId}>
+                  <SelectTrigger id="a-run"><SelectValue placeholder={t('marketing.assets.noRun')} /></SelectTrigger>
+                  <SelectContent>
+                    {runs.map((r) => <SelectItem key={r.id} value={r.id}>{r.id.slice(0, 8)} — {r.status}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : null}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" type="button" onClick={() => { setUploadOpen(false); resetUpload(); }}>
+              {t('common.cancel')}
+            </Button>
+            <Button type="button" onClick={() => void onUpload()} disabled={uploadMutation.isPending}>
+              <Upload className="size-4" />
+              {uploadMutation.isPending ? t('common.loading') : t('marketing.assets.upload')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </FormDialog>
+    </>
   );
 }

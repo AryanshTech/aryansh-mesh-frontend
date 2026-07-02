@@ -21,3 +21,5 @@ GIT_COMMITTER_NAME='Yash Mehta' \
 GIT_COMMITTER_EMAIL='yashrajmehta3027@gmail.com' \
 git commit -m "message"
 ```
+
+If Cursor injects a co-author trailer, use `git commit-tree` + `git reset --hard` instead of amend.

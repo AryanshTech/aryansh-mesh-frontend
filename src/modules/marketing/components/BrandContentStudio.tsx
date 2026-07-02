@@ -11,7 +11,6 @@ import {
   Image as ImageIcon,
   MessageSquare,
   CheckCircle2,
-  Circle,
   ArrowRight,
 } from 'lucide-react';
 import { Button } from '@/design-system/components/ui/button';
@@ -28,6 +27,7 @@ import { useThreads } from '@/modules/marketing/api/use-threads';
 interface Props {
   projectId: string;
   tenantId?: string;
+  onOpenTab?: (tab: string) => void;
 }
 
 interface ContentTypeCard {
@@ -41,9 +41,11 @@ interface ContentTypeCard {
   count?: number;
   href?: string;
   tab?: string;
+  iconBg: string;
+  iconColor: string;
 }
 
-export function BrandContentStudio({ projectId, tenantId }: Props) {
+export function BrandContentStudio({ projectId, tenantId, onOpenTab }: Props) {
   const { t } = useTranslation();
   const qc = useQueryClient();
 
@@ -70,6 +72,8 @@ export function BrandContentStudio({ projectId, tenantId }: Props) {
       emptyKey: 'marketing.studio.status.notYet',
       saved: Boolean(identity),
       tab: 'brand-identity',
+      iconBg: 'bg-primary/10',
+      iconColor: 'text-primary',
     },
     {
       id: 'memory',
@@ -80,6 +84,8 @@ export function BrandContentStudio({ projectId, tenantId }: Props) {
       emptyKey: 'marketing.studio.status.notYet',
       saved: Boolean(memory?.contentMarkdown?.trim()),
       href: `/marketing/projects/${projectId}/brand-memory`,
+      iconBg: 'bg-cyan-500/10',
+      iconColor: 'text-cyan-400',
     },
     {
       id: 'perception',
@@ -90,6 +96,8 @@ export function BrandContentStudio({ projectId, tenantId }: Props) {
       emptyKey: 'marketing.studio.status.notYet',
       saved: Boolean(perception?.contentMarkdown?.trim()),
       tab: 'brand-perception',
+      iconBg: 'bg-violet-500/10',
+      iconColor: 'text-violet-400',
     },
     {
       id: 'recipes',
@@ -101,6 +109,8 @@ export function BrandContentStudio({ projectId, tenantId }: Props) {
       saved: (recipes?.length ?? 0) > 0,
       count: recipes?.length ?? 0,
       tab: 'recipes',
+      iconBg: 'bg-amber-500/10',
+      iconColor: 'text-amber-400',
     },
     {
       id: 'social',
@@ -112,6 +122,8 @@ export function BrandContentStudio({ projectId, tenantId }: Props) {
       saved: (posts?.items.length ?? 0) > 0,
       count: posts?.items.length ?? 0,
       href: `/marketing/projects/${projectId}/social`,
+      iconBg: 'bg-pink-500/10',
+      iconColor: 'text-pink-400',
     },
     {
       id: 'assets',
@@ -123,6 +135,8 @@ export function BrandContentStudio({ projectId, tenantId }: Props) {
       saved: (assets?.length ?? 0) > 0,
       count: assets?.length ?? 0,
       tab: 'assets',
+      iconBg: 'bg-emerald-500/10',
+      iconColor: 'text-emerald-400',
     },
     {
       id: 'threads',
@@ -134,6 +148,8 @@ export function BrandContentStudio({ projectId, tenantId }: Props) {
       saved: (threads?.items.length ?? 0) > 0,
       count: threads?.items.length ?? 0,
       href: `/marketing/projects/${projectId}`,
+      iconBg: 'bg-sky-500/10',
+      iconColor: 'text-sky-400',
     },
   ];
 
@@ -158,7 +174,7 @@ export function BrandContentStudio({ projectId, tenantId }: Props) {
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div className="flex flex-col gap-2 max-w-xl">
             <p className="typo-eyebrow-upper text-faint">{t('marketing.studio.eyebrow')}</p>
-            <h2 className="typo-display-sm text-foreground">{t('marketing.studio.title')}</h2>
+            <h2 className="typo-display-md text-foreground">{t('marketing.studio.title')}</h2>
             <p className="typo-body-sm text-muted-foreground">{t('marketing.studio.subtitle')}</p>
           </div>
           <Button
@@ -171,16 +187,13 @@ export function BrandContentStudio({ projectId, tenantId }: Props) {
           </Button>
         </div>
 
-        <ol className="mt-5 flex flex-col gap-2 border-t border-border pt-4">
-          {(['step1', 'step2', 'step3', 'step4'] as const).map((step, index) => (
-            <li key={step} className="flex items-start gap-3 typo-body-sm text-muted-foreground">
-              <span className="grid size-6 shrink-0 place-items-center rounded-full bg-muted typo-eyebrow text-foreground">
-                {index + 1}
-              </span>
+        <div className="mt-5 flex flex-wrap gap-x-5 gap-y-1 border-t border-border pt-4">
+          {(['step1', 'step2', 'step3', 'step4'] as const).map((step) => (
+            <p key={step} className="typo-body-sm text-muted-foreground">
               {t(`marketing.studio.pipeline.${step}`)}
-            </li>
+            </p>
           ))}
-        </ol>
+        </div>
       </Card>
 
       <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-3">
@@ -195,8 +208,8 @@ export function BrandContentStudio({ projectId, tenantId }: Props) {
           const inner = (
             <>
               <div className="flex items-start justify-between gap-2">
-                <div className="grid size-9 place-items-center rounded-lg bg-muted">
-                  <Icon className="size-4 text-muted-foreground" />
+                <div className={cn('grid size-9 place-items-center rounded-lg', card.iconBg)}>
+                  <Icon className={cn('size-4', card.iconColor)} />
                 </div>
                 <span
                   className={cn(
@@ -206,11 +219,7 @@ export function BrandContentStudio({ projectId, tenantId }: Props) {
                       : 'bg-muted text-muted-foreground',
                   )}
                 >
-                  {card.saved ? (
-                    <CheckCircle2 className="size-3" />
-                  ) : (
-                    <Circle className="size-3" />
-                  )}
+                  {card.saved && <CheckCircle2 className="size-3" />}
                   {statusLabel}
                 </span>
               </div>
@@ -240,13 +249,14 @@ export function BrandContentStudio({ projectId, tenantId }: Props) {
           }
 
           return (
-            <a
+            <button
               key={card.id}
-              href={`#tab-${card.tab}`}
-              className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 transition-all hover:border-hairline-strong hover:shadow-card min-h-[148px]"
+              type="button"
+              onClick={() => onOpenTab?.(card.tab!)}
+              className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 transition-all hover:border-hairline-strong hover:shadow-card min-h-[148px] text-left w-full"
             >
               {inner}
-            </a>
+            </button>
           );
         })}
       </div>

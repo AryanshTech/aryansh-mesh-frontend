@@ -2,7 +2,7 @@
 
 > **See also:** [DATA-DROPDOWN-AUDIT.md](DATA-DROPDOWN-AUDIT.md) — data loading, API shape mismatches, and dropdown/Select failures.
 
-**Date:** 2026-06-22  
+**Date:** 2026-06-26 (marketing fixes applied 2026-06-26)  
 **Branch:** working tree (uncommitted)  
 **Active source:** `src/` (not `src.legacy/`)  
 **Dev server:** `http://localhost:5175/`  
@@ -23,8 +23,8 @@
 ### Top 5 user-facing problems
 
 1. **Settings & Profile links go to a 404** — User menu and sidebar link to `/settings`, which has no route. **Live verified.**
-2. **No mobile navigation** — Sidebar is hidden below `md` (768px) with no hamburger or sheet fallback; users cannot reach most pages on phone.
-3. **Row action buttons disable globally** — Approving one social post or removing one tenant member disables the same buttons on every other row.
+2. **No mobile navigation on small screens** — `MobileNav` exists in `Header.tsx`, but marketing sub-pages still require in-page links (MKT-006 partially addressed via quick links).
+3. **Row action buttons disable globally** — Tenant member remove still global (UI-004). Social calendar approve/reject **fixed** (UI-003 ✅).
 4. **Mobile detail drawer blocks the list** — Below 1280px, opening a drawer overlays the master list; background rows feel “unclickable.”
 5. **Inconsistent i18n** — Only `ProductsPage` fully uses locale keys; most CRUD pages hardcode English labels, toasts, and drawer actions (French locale incomplete in UI).
 
@@ -37,7 +37,7 @@
 | Area | Routes |
 |------|--------|
 | Business | `/dashboard`, `/products`, `/clients`, `/bookings`, `/costs`, `/locations`, `/testimonials`, `/content`, `/business`, `/publish`, `/onboarding` |
-| Marketing | `/marketing`, `/marketing/companies`, `/marketing/companies/:id`, `/marketing/projects/:id`, threads, brand-memory, social |
+| Marketing | `/marketing` (command center), `/marketing/projects/:id`, threads, brand-memory, social; `/marketing/companies` redirects to `/marketing` |
 | Admin | `/admin/tenants`, `/admin/tenants/new`, `/admin/tenants/:id` |
 | Auth | `/auth/login`, `/auth/signup`, `/auth/forgot-password`, `/auth/accept-invite` |
 | Shell | Command palette (⌘K), BusinessSelector, UserMenu, Settings link |
@@ -70,8 +70,8 @@ All other findings below are **statically verified** from source unless marked L
 | ID | Sev | Page / Area | Symptom | Root cause | File(s) | Suggested fix | Locale keys | Verified |
 |----|-----|-------------|---------|------------|---------|---------------|-------------|----------|
 | UI-001 | P0 | Shell | Settings / Profile → 404 | No `/settings` route; links in UserMenu + Sidebar | `src/shell/UserMenu.tsx` L40–46, `src/shell/Sidebar.tsx` L111–117, `src/modules/business/routes.tsx` | Add route wiring to settings page **or** remove links until ready | `shell.settings`, `shell.profile` exist | **Live** |
-| UI-002 | P0 | Shell (mobile) | Cannot navigate on phone | Sidebar `hidden md:flex`; no mobile nav | `src/shell/Sidebar.tsx` L20, `src/shell/AppShell.tsx`, `src/shell/Header.tsx` | Add `MobileNav` sheet + menu button in Header | `shell.openMenu`, `shell.closeMenu` (new) | Static |
-| UI-003 | P0 | Social calendar | All Approve/Reject buttons freeze when one is clicked | `disabled={approveMutation.isPending}` not scoped to post ID | `src/modules/marketing/pages/SocialCalendarPage.tsx` L119–122 | `disabled={approveMutation.isPending && approveMutation.variables === post.id}` | `marketing.approve`, `marketing.reject` (new) | Static |
+| UI-002 | P0 | Shell (mobile) | Cannot navigate on phone | Sidebar `hidden md:flex`; MobileNav added but limited discoverability for deep links | `src/shell/Sidebar.tsx`, `src/shell/MobileNav.tsx`, `src/shell/Header.tsx` | MobileNav exists; expand marketing sub-nav if needed | `shell.openMenu`, `shell.closeMenu` | Static |
+| UI-003 | ~~P0~~ | Social calendar | ~~All Approve/Reject buttons freeze~~ | **RESOLVED** — scoped to `post.id` | `SocialCalendarPage.tsx` | — | `marketing.approve`, `marketing.reject` | **Fixed** |
 | UI-004 | P0 | Tenant detail | All remove-member buttons freeze when one is clicked | `disabled={removeMutation.isPending}` on every row | `src/modules/admin/pages/TenantDetailPage.tsx` L182–185 | Scope to `removeMutation.variables === m.uid` | `admin.removeMember` (new) | Static |
 | UI-005 | P0 | Accept invite | Button disabled forever when token missing; no error shown | Error only set inside `accept()` which never runs | `src/modules/auth/pages/AcceptInvitePage.tsx` L45–46 | Show `t('auth.inviteMissing')` when `!token` on render | `auth.inviteMissing` exists | Static |
 | UI-006 | P1 | Design system | Buttons inside future forms may submit unintentionally | `Button` has no default `type="button"` | `src/design-system/components/ui/button.tsx` L46–54 | Default `type="button"` when not `asChild` and no explicit type | — | Static |
@@ -82,15 +82,39 @@ All other findings below are **statically verified** from source unless marked L
 | UI-011 | P2 | All CRUD except Products | English-only buttons, toasts, empty states | Hardcoded strings in JSX | See locale gap table below | Mirror `ProductsPage` pattern | Per-page keys | Static |
 | UI-012 | P2 | ViewToggle | “Cards” / “List” not translated | Hardcoded labels | `src/shared/components/ViewToggle.tsx` L33, L47 | `common.viewCards`, `common.viewList` | New keys | Static |
 | UI-013 | P2 | DetailDrawer | Close aria-label hardcoded | `aria-label="Close"` | `src/shared/components/DetailDrawer.tsx` L105 | `t('common.close')` | New key | Static |
-| UI-014 | P2 | Thread workspace | Send button icon-only, no aria-label | Missing accessibility label | `src/modules/marketing/pages/ThreadWorkspacePage.tsx` | Add `aria-label={t('marketing.sendMessage')}` | New key | Static |
+| UI-014 | ~~P2~~ | Thread workspace | ~~Send button icon-only, no aria-label~~ | **RESOLVED** | `ThreadWorkspacePage.tsx` | — | `marketing.sendMessage` | **Fixed** |
 | UI-015 | P2 | Command palette | “Switch business” hardcoded | Admin-only group heading | `src/shell/CommandPalette.tsx` L56 | `shell.switchBusiness` | New key | Static |
 | UI-016 | P2 | BusinessSelector | Hardcoded English | Not using i18n | `src/shell/BusinessSelector.tsx` L35–42 | Use `t('shell.switchBusiness')`, etc. | New keys | Static |
 | UI-017 | P3 | Shell + pages | CI token check fails | Inline `text-[Npx]` | See token table below | Replace with `.typo-*` from `typography.ts` | — | Static |
 | UI-018 | P3 | Business profile | Raw hex in placeholder | `#3B82F6` in input placeholder | `src/modules/business/pages/BusinessProfilePage.tsx` L97 | Move default to token file if used as value | — | Static |
 | UI-019 | P4 | Bookings | Read-only list, no actions | No drawer/detail flow | `src/modules/business/pages/BookingsPage.tsx` | Add detail view or document as intentional | `bookings.*` keys needed | Static |
-| UI-020 | P4 | Marketing nav | Agency overview hard to discover | Sidebar only links to `/marketing/companies` | `src/shell/navigation.ts` L44 | Add overview link or redirect `/marketing` → companies | — | Static |
+| UI-020 | ~~P4~~ | Marketing nav | ~~Agency overview hard to discover~~ | **RESOLVED** — tenant command center at `/marketing`; quick links added | `MarketingWorkspacePage.tsx`, `MarketingQuickLinks.tsx` | Legacy agency hierarchy removed | — | **Fixed** |
 
 ---
+
+## Marketing module registry (2026-06-26)
+
+| ID | Sev | Status | Issue | Fix |
+|----|-----|--------|-------|-----|
+| MKT-001 | P0 | **Fixed** | Validation toasts used missing `common.errorRequired` | Added `common.errorRequired`; specific keys for recipes/assets |
+| MKT-002 | P0 | **Fixed** | Brand memory back link went to project dashboard | Back link → `/marketing` |
+| MKT-003 | P0 | **Fixed** | Thread messages hit wrong tenant URL → chunked encoding error | GET/SSE use global `/threads/:id/messages`; list/create stay tenant-scoped |
+| MKT-004 | P0 | **Fixed** | Orphan agency pages (Companies, AgencyOverview) | Deleted dead pages + `use-companies.ts`; trimmed `use-projects.ts` |
+| MKT-005 | P1 | **Fixed** | No back navigation from thread/social pages | `MarketingBackLink` on sub-pages |
+| MKT-006 | P1 | **Fixed** | Sub-pages hard to discover | `MarketingQuickLinks` on command center |
+| MKT-007 | P1 | **Fixed** | Project dashboard duplicated brand-memory/social entry points | Project dashboard is threads-only + back link |
+| MKT-008 | P1 | **Fixed** | Raw enum labels for platforms/status | Locale keys + `platformColors` badges on social calendar |
+| MKT-009 | P2 | **Fixed** | Brand identity color/typography labels hardcoded | `marketing.brandIdentity.colors.*` / `typography.*` |
+| MKT-010 | P2 | **Fixed** | Social calendar + thread workspace hardcoded English | Full i18n sweep with `fr.json` parity |
+| MKT-011 | P4 | **Deferred** | Legacy features (Spy, CRM, Content studio, full thread workspace) | Hybrid backlog — user to pick next port |
+| MKT-012 | P0 | **Fixed** | Tenant switch + stale project URL broke threads/social/brand pages | `useMarketingProjectGuard` rewrites URL preserving sub-path; `MarketingQuerySync` clears cache |
+| MKT-013 | P1 | **Fixed** | Thread workspace chat area collapsed (zero height) | Flex height chain: `AppShell` main + `MarketingLayout` + thread `PageShell` use `min-h-0 flex-1` |
+| MKT-014 | P1 | **Fixed** | Project dashboard used DetailDrawer for create-only flow (layout friction) | Replaced with Dialog; thread list always visible |
+| MKT-015 | P0 | **Fixed** | Create/upload buttons flash-close (Recipes, Runs, Assets, Social) | `FormDialog` + guarded `onOpenChange`; `DetailDrawer` dismiss guard; `useStableWide` locks layout while open |
+
+**Removed dead code:** `AgencyOverviewPage`, `CompaniesPage`, `CompanyProjectsPage`, `use-companies.ts`.
+
+**New shared components:** `MarketingBackLink`, `MarketingQuickLinks`.
 
 ## Design token violations
 
@@ -275,13 +299,13 @@ Legend: ✅ Pass · ⚠️ Partial · ❌ Fail · 🔒 Auth required (not live-t
 
 | Page | Nav | Primary CTA | Drawer/Actions | i18n | Known bugs |
 |------|-----|-------------|----------------|------|------------|
-| `/marketing` | 🔒 | — | — | ⚠️ | UI-020 discoverability |
-| `/marketing/companies` | 🔒 | ✅ | ✅ | ❌ | |
-| Company projects | 🔒 | ✅ | ✅ | ❌ | |
-| Project dashboard | 🔒 | ✅ | ✅ | ❌ | |
-| Thread workspace | 🔒 | ✅ Send | — | ❌ | UI-014 aria-label |
-| Brand memory | 🔒 | ✅ Save | — | ❌ | |
-| Social calendar | 🔒 | ✅ | ✅ Approve/Reject | ❌ | **UI-003 global disable** |
+| `/marketing` | 🔒 | ✅ | Tabs + quick links | ✅ | — |
+| `/marketing/companies` | — | — | Redirects to `/marketing` | — | Intentional |
+| Company projects | — | — | Removed (dead code) | — | — |
+| Project dashboard | 🔒 | ✅ threads | ✅ | ✅ | — |
+| Thread workspace | 🔒 | ✅ Send | — | ✅ | Minimal chat vs legacy workspace (MKT-011) |
+| Brand memory | 🔒 | ✅ Save | — | ✅ | — |
+| Social calendar | 🔒 | ✅ | ✅ Approve/Reject | ✅ | UI-003 fixed |
 
 ### Admin pages
 
@@ -323,7 +347,7 @@ flowchart TB
   subgraph shell [App Shell]
     Sidebar["Sidebar hidden on mobile"]
     Header["Header sticky z-30"]
-    MobileNav["MobileNav MISSING"]
+    MobileNav["MobileNav in Header"]
     CmdK["CommandPalette"]
   end
   subgraph drawer [DetailDrawer]
@@ -340,9 +364,10 @@ flowchart TB
 
 ## Next steps
 
-1. **You (review):** Prioritize Sprint 1 items — Settings 404 and mobile nav are the most visible breakages.
-2. **Implementation:** Request fixes per sprint; each i18n batch should update `locales/en.json` and `locales/fr.json` together.
-3. **Re-audit:** After Sprint 1–2, re-run live pass in an authenticated browser session on `http://localhost:5175/` at 375px and 1440px widths.
+1. **You (review):** Prioritize remaining Sprint 1 items — Settings 404 (UI-001) is the most visible shell breakage.
+2. **Marketing backlog (MKT-011):** Pick next legacy port — thread workspace upgrade, Spy, or Content studio.
+3. **Implementation:** Business/admin i18n batches should still update `locales/en.json` and `locales/fr.json` together.
+4. **Re-audit:** After remaining P0 fixes, re-run live pass at 375px and 1440px widths.
 
 ---
 

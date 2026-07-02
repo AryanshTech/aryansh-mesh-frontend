@@ -25,7 +25,7 @@ export function Sidebar() {
   );
 
   return (
-    <aside className="hidden md:flex h-screen w-[220px] shrink-0 flex-col border-r border-border bg-canvas">
+    <aside className="hidden md:flex h-dvh w-[220px] shrink-0 flex-col border-r border-border bg-canvas">
       {/* Brand */}
       <div className="flex items-center gap-2.5 px-4 pt-4 pb-3">
         <div className="grid size-7 place-items-center rounded-md bg-primary text-primary-foreground">

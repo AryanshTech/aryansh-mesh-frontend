@@ -6,6 +6,7 @@
     "cancel": "Annuler",
     "close": "Fermer",
     "delete": "Supprimer",
+    "errorRequired": "Champ obligatoire manquant",
     "loading": "Chargement…",
     "notFoundDescription": "La page que vous cherchez n'existe pas ou a été déplacée.",
     "notFoundTitle": "Page introuvable",
@@ -451,7 +452,15 @@
       "title": "Actifs créatifs",
       "upload": "Téléverser un actif",
       "uploadFailed": "Échec du téléversement",
-      "uploaded": "Actif téléversé"
+      "uploaded": "Actif téléversé",
+      "fileRequired": "Le fichier et le libellé sont requis",
+      "types": {
+        "IMAGE": "Image",
+        "VIDEO": "Vidéo",
+        "REMOTION_PROJECT": "Projet Remotion",
+        "PROMPT_PACK": "Pack de prompts",
+        "OTHER": "Autre"
+      }
     },
     "brandIdentity": {
       "createManual": "Créer manuellement",
@@ -461,6 +470,21 @@
       "emptyTitle": "Aucune identité de marque",
       "errorTitle": "Échec du chargement de l'identité de marque",
       "fieldAudience": "Audience",
+      "colors": {
+        "primary": "Principale",
+        "secondary": "Secondaire",
+        "accent": "Accent",
+        "background": "Arrière-plan",
+        "surface": "Surface",
+        "text": "Texte",
+        "mutedText": "Texte atténué"
+      },
+      "typography": {
+        "heading": "Titres",
+        "body": "Corps",
+        "caption": "Légende",
+        "rules": "Règles"
+      },
       "fieldColors": "Couleurs",
       "fieldContentPillars": "Piliers de contenu (séparés par des virgules)",
       "fieldDoRules": "Règles à suivre (une par ligne)",
@@ -517,6 +541,9 @@
     "overviewTitle": "Vue d'ensemble",
     "projectDashboardSubtitle": "Pouls du projet.",
     "projectDashboardTitle": "Tableau du projet",
+    "projectDashboard": {
+      "backToWorkspace": "Retour au centre de commandement"
+    },
     "projectsSubtitle": "Tous les projets pour cette entreprise.",
     "projectsTitle": "Projets",
     "recipes": {
@@ -544,13 +571,59 @@
       "saveFailed": "Échec de l'enregistrement de la recette",
       "setupCommands": "Commandes d'installation",
       "tabTitle": "Recettes",
-      "title": "Recettes créatives"
+      "title": "Recettes créatives",
+      "titleRequired": "Le titre de la recette est requis",
+      "goalRequired": "L'objectif est requis"
     },
     "reject": "Rejeter",
     "social": {
+      "addPost": "Ajouter une publication",
+      "approveFailed": "Échec de l'approbation",
+      "contentRequired": "Le contenu est requis",
+      "create": "Créer",
+      "createFailed": "Échec de la création de la publication",
+      "creating": "Création…",
+      "createForPlatform": "Créer une publication",
+      "composeTitle": "Nouvelle publication {{platform}}",
+      "composeDescription": "Ajoutez un sujet et un brief. Générez avec l'IA ou rédigez manuellement dans le calendrier.",
+      "fieldTopic": "Sujet *",
+      "fieldBrief": "Brief (facultatif)",
+      "topicPlaceholder": "ex. Lancement du menu d'été",
+      "briefPlaceholder": "Message clé, offre ou CTA…",
+      "topicRequired": "Le sujet est requis",
+      "generateWithAi": "Générer avec l'IA",
+      "draftManually": "Rédiger manuellement",
+      "rememberStyle": "Enregistrer le style dans la mémoire de marque",
+      "styleSaved": "Style enregistré dans la mémoire de marque",
+      "styleSaveFailed": "Échec de l'enregistrement du style",
+      "emptyDescription": "Créez des publications sociales pour ce projet.",
+      "emptyTitle": "Aucune publication",
+      "errorTitle": "Échec du chargement des publications",
+      "fieldContent": "Contenu *",
+      "newPost": "Nouvelle publication",
       "platform": "Plateforme",
+      "platforms": {
+        "LINKEDIN": "LinkedIn",
+        "X": "X",
+        "INSTAGRAM": "Instagram",
+        "TIKTOK": "TikTok",
+        "YOUTUBE": "YouTube",
+        "FACEBOOK": "Facebook",
+        "THREADS": "Threads"
+      },
+      "postApproved": "Publication approuvée",
+      "postCreated": "Publication créée",
+      "postRejected": "Publication rejetée",
+      "rejectFailed": "Échec du rejet",
       "rejectFeedback": "Révision nécessaire avant approbation.",
-      "scheduleDate": "Date de publication"
+      "scheduleDate": "Date de publication",
+      "status": {
+        "DRAFT": "Brouillon",
+        "PENDING_APPROVAL": "En attente d'approbation",
+        "APPROVED": "Approuvé",
+        "SCHEDULED": "Planifié",
+        "REJECTED": "Rejeté"
+      }
     },
     "runs": {
       "columnRecipe": "Recette",
@@ -570,7 +643,15 @@
       "title": "Exécutions créatives",
       "update": "Mettre à jour l'exécution",
       "updateFailed": "Échec de la mise à jour de l'exécution",
-      "updated": "Exécution mise à jour"
+      "updated": "Exécution mise à jour",
+      "status": {
+        "PLANNED": "Planifié",
+        "READY_TO_RUN_LOCALLY": "Prêt pour exécution locale",
+        "RUNNING_LOCALLY": "Exécution locale en cours",
+        "UPLOADED": "Téléversé",
+        "APPROVED": "Approuvé",
+        "REJECTED": "Rejeté"
+      }
     },
     "sendMessage": "Envoyer le message",
     "socialCalendarSubtitle": "Planifiez votre contenu social.",
@@ -626,16 +707,25 @@
       }
     },
     "threads": {
+      "backToProject": "Retour au projet",
+      "backToWorkspace": "Retour au centre de commandement",
       "create": "Créer",
       "createFailed": "Échec de la création du fil",
       "created": "Fil créé",
       "emptyDescription": "Créez un fil pour démarrer une conversation marketing.",
+      "emptyMessages": "Aucun message. Commencez la conversation ci-dessous.",
       "emptyTitle": "Aucun fil pour l'instant",
       "loadFailed": "Échec du chargement des fils",
+      "loadMessagesFailed": "Échec du chargement des messages",
+      "notFound": "Ce fil n'est pas disponible pour l'entreprise sélectionnée. Ouvrez un fil depuis l'espace de travail actuel.",
       "nameLabel": "Nom du fil *",
       "nameRequired": "Le nom du fil est requis",
       "new": "Nouveau fil",
-      "title": "Fils de discussion"
+      "sendFailed": "Échec de l'envoi du message",
+      "serviceUnavailable": "L'assistant est temporairement indisponible. Veuillez réessayer dans un instant.",
+      "streaming": "L'assistant répond",
+      "title": "Fils de discussion",
+      "vertexUnavailable": "La génération IA est indisponible. Vertex AI démarre peut-être encore — réessayez dans une minute."
     },
     "threadsSubtitle": "Conversations et décisions du projet.",
     "threadsTitle": "Espace de discussion",
@@ -644,6 +734,7 @@
       "linkedTenant": "Entreprise liée",
       "noTenantDescription": "Sélectionnez un locataire pour afficher le centre de commandement marketing.",
       "noTenantTitle": "Sélectionnez un locataire",
+      "quickLinks": "Liens rapides",
       "subtitle": "Identité de marque, perception et pipeline créatif.",
       "title": "Centre de commandement marketing"
     }

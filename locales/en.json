@@ -6,6 +6,7 @@
     "cancel": "Cancel",
     "close": "Close",
     "delete": "Delete",
+    "errorRequired": "Required field is missing",
     "loading": "Loading…",
     "notFoundDescription": "The page you're looking for doesn't exist or has moved.",
     "notFoundTitle": "Page not found",
@@ -451,7 +452,15 @@
       "title": "Creative assets",
       "upload": "Upload asset",
       "uploadFailed": "Upload failed",
-      "uploaded": "Asset uploaded"
+      "uploaded": "Asset uploaded",
+      "fileRequired": "File and label are required",
+      "types": {
+        "IMAGE": "Image",
+        "VIDEO": "Video",
+        "REMOTION_PROJECT": "Remotion project",
+        "PROMPT_PACK": "Prompt pack",
+        "OTHER": "Other"
+      }
     },
     "brandIdentity": {
       "createManual": "Create manually",
@@ -461,6 +470,21 @@
       "emptyTitle": "No brand identity yet",
       "errorTitle": "Failed to load brand identity",
       "fieldAudience": "Audience",
+      "colors": {
+        "primary": "Primary",
+        "secondary": "Secondary",
+        "accent": "Accent",
+        "background": "Background",
+        "surface": "Surface",
+        "text": "Text",
+        "mutedText": "Muted text"
+      },
+      "typography": {
+        "heading": "Heading",
+        "body": "Body",
+        "caption": "Caption",
+        "rules": "Rules"
+      },
       "fieldColors": "Colors",
       "fieldContentPillars": "Content pillars (comma separated)",
       "fieldDoRules": "Do rules (one per line)",
@@ -517,6 +541,9 @@
     "overviewTitle": "Agency overview",
     "projectDashboardSubtitle": "Pulse of this project.",
     "projectDashboardTitle": "Project dashboard",
+    "projectDashboard": {
+      "backToWorkspace": "Back to command center"
+    },
     "projectsSubtitle": "All projects for this company.",
     "projectsTitle": "Projects",
     "recipes": {
@@ -544,13 +571,59 @@
       "saveFailed": "Failed to save recipe",
       "setupCommands": "Setup commands",
       "tabTitle": "Recipes",
-      "title": "Creative recipes"
+      "title": "Creative recipes",
+      "titleRequired": "Recipe title is required",
+      "goalRequired": "Goal is required"
     },
     "reject": "Reject",
     "social": {
+      "addPost": "Add Post",
+      "approveFailed": "Failed to approve",
+      "contentRequired": "Content is required",
+      "create": "Create",
+      "createFailed": "Failed to create post",
+      "creating": "Creating…",
+      "createForPlatform": "Create a post",
+      "composeTitle": "New {{platform}} post",
+      "composeDescription": "Add a topic and brief. Generate with AI or draft manually in the calendar.",
+      "fieldTopic": "Topic *",
+      "fieldBrief": "Brief (optional)",
+      "topicPlaceholder": "e.g. Summer menu launch",
+      "briefPlaceholder": "Key message, offer, or CTA…",
+      "topicRequired": "Topic is required",
+      "generateWithAi": "Generate with AI",
+      "draftManually": "Draft manually",
+      "rememberStyle": "Save style to brand memory",
+      "styleSaved": "Post style saved to brand memory",
+      "styleSaveFailed": "Failed to save style to brand memory",
+      "emptyDescription": "Create social media posts for this project.",
+      "emptyTitle": "No posts yet",
+      "errorTitle": "Failed to load posts",
+      "fieldContent": "Content *",
+      "newPost": "New Social Post",
       "platform": "Platform",
+      "platforms": {
+        "LINKEDIN": "LinkedIn",
+        "X": "X",
+        "INSTAGRAM": "Instagram",
+        "TIKTOK": "TikTok",
+        "YOUTUBE": "YouTube",
+        "FACEBOOK": "Facebook",
+        "THREADS": "Threads"
+      },
+      "postApproved": "Post approved",
+      "postCreated": "Post created",
+      "postRejected": "Post rejected",
+      "rejectFailed": "Failed to reject",
       "rejectFeedback": "Needs revision before approval.",
-      "scheduleDate": "Schedule date"
+      "scheduleDate": "Schedule date",
+      "status": {
+        "DRAFT": "Draft",
+        "PENDING_APPROVAL": "Pending approval",
+        "APPROVED": "Approved",
+        "SCHEDULED": "Scheduled",
+        "REJECTED": "Rejected"
+      }
     },
     "runs": {
       "columnRecipe": "Recipe",
@@ -570,7 +643,15 @@
       "title": "Creative runs",
       "update": "Update run",
       "updateFailed": "Failed to update run",
-      "updated": "Run updated"
+      "updated": "Run updated",
+      "status": {
+        "PLANNED": "Planned",
+        "READY_TO_RUN_LOCALLY": "Ready to run locally",
+        "RUNNING_LOCALLY": "Running locally",
+        "UPLOADED": "Uploaded",
+        "APPROVED": "Approved",
+        "REJECTED": "Rejected"
+      }
     },
     "sendMessage": "Send message",
     "socialCalendarSubtitle": "Plan and schedule social content.",
@@ -626,16 +707,25 @@
       }
     },
     "threads": {
+      "backToProject": "Back to project",
+      "backToWorkspace": "Back to command center",
       "create": "Create",
       "createFailed": "Failed to create thread",
       "created": "Thread created",
       "emptyDescription": "Create a thread to start a marketing conversation.",
+      "emptyMessages": "No messages yet. Start the conversation below.",
       "emptyTitle": "No threads yet",
       "loadFailed": "Failed to load threads",
+      "loadMessagesFailed": "Failed to load messages",
+      "notFound": "This thread is not available for the selected business. Open a thread from the current workspace.",
       "nameLabel": "Thread name *",
       "nameRequired": "Thread name is required",
       "new": "New thread",
-      "title": "Threads"
+      "sendFailed": "Failed to send message",
+      "serviceUnavailable": "The assistant is temporarily unavailable. Please try again in a moment.",
+      "streaming": "Assistant is responding",
+      "title": "Threads",
+      "vertexUnavailable": "AI generation is unavailable. Vertex AI may still be starting — try again in a minute."
     },
     "threadsSubtitle": "Conversations and decisions for this project.",
     "threadsTitle": "Thread workspace",
@@ -644,6 +734,7 @@
       "linkedTenant": "Linked business",
       "noTenantDescription": "Select a tenant to view the marketing command center.",
       "noTenantTitle": "Select a tenant",
+      "quickLinks": "Quick links",
       "subtitle": "Brand identity, perception, and creative pipeline.",
       "title": "Marketing command center"
     }

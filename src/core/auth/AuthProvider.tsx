@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { queryClient } from '@/core/query/client';
 import { api, ApiError, refreshAuthTokens, setUnauthorizedHandler } from '@/core/api/client';
 import {
   clearTokens,
@@ -84,6 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<AuthContextValue['status']>('loading');
 
   const markUnauthenticated = useCallback(() => {
+    queryClient.clear();
     setUser(null);
     setStatus('unauthenticated');
   }, []);
@@ -143,6 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshToken: response.refreshToken,
       expiresIn: response.expiresIn,
     });
+    queryClient.clear();
     const nextUser = mapSessionUser(response.session);
     setUser(nextUser);
     setStatus('authenticated');
@@ -161,6 +164,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         refreshToken: response.refreshToken,
         expiresIn: response.expiresIn,
       });
+      queryClient.clear();
       const session = await fetchSession();
       const nextUser = mapSessionUser(session);
       setUser(nextUser);

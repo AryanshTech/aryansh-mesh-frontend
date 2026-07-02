@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { PageShell } from '@/shared/components/PageShell';
@@ -9,6 +9,7 @@ import { Button } from '@/design-system/components/ui/button';
 import { Textarea } from '@/design-system/components/ui/textarea';
 import { Skeleton } from '@/design-system/components/ui/skeleton';
 import { Badge } from '@/design-system/components/ui/badge';
+import { MarketingBackLink } from '@/modules/marketing/components/MarketingBackLink';
 import {
   Select,
   SelectContent,
@@ -17,6 +18,7 @@ import {
   SelectValue,
 } from '@/design-system/components/ui/select';
 import { useTenantPath } from '@/modules/business/api/use-tenant-path';
+import { useMarketingProjectGuard } from '@/modules/marketing/hooks/use-marketing-project-guard';
 import {
   useBrandMemory,
   useBrandMemoryVersions,
@@ -26,11 +28,21 @@ import {
 
 export default function BrandMemoryPage() {
   const { t } = useTranslation();
-  const { projectId } = useParams<{ projectId: string }>();
+  const { projectId: urlProjectId } = useParams<{ projectId: string }>();
   const { tenantId } = useTenantPath();
+  const { projectId, isResolving, projectMismatch, queriesEnabled } =
+    useMarketingProjectGuard(tenantId, urlProjectId);
 
-  const { data, isLoading, isError, refetch } = useBrandMemory(projectId, tenantId || undefined);
-  const { data: versions = [] } = useBrandMemoryVersions(projectId, tenantId || undefined);
+  const { data, isLoading, isError, refetch } = useBrandMemory(
+    projectId,
+    tenantId || undefined,
+    queriesEnabled,
+  );
+  const { data: versions = [] } = useBrandMemoryVersions(
+    projectId,
+    tenantId || undefined,
+    queriesEnabled,
+  );
   const saveMutation = useSaveBrandMemory(projectId ?? '', tenantId || undefined);
   const setCurrentMutation = useSetCurrentBrandMemory(projectId ?? '', tenantId || undefined);
 
@@ -43,6 +55,11 @@ export default function BrandMemoryPage() {
       setSelectedVersionId(data.id);
     }
   }, [data]);
+
+  useEffect(() => {
+    setContent('');
+    setSelectedVersionId('');
+  }, [tenantId, projectId]);
 
   const onSave = async () => {
     try {
@@ -70,6 +87,11 @@ export default function BrandMemoryPage() {
 
   return (
     <PageShell>
+      <MarketingBackLink
+        to="/marketing"
+        label={t('marketing.brandMemory.backToWorkspace')}
+        className="mb-4"
+      />
       <PageHeader
         title={t('marketing.brandMemoryTitle')}
         description={t('marketing.brandMemorySubtitle')}
@@ -84,7 +106,7 @@ export default function BrandMemoryPage() {
           title={t('marketing.brandMemory.loadFailed')}
           onRetry={() => void refetch()}
         />
-      ) : isLoading ? (
+      ) : isResolving || projectMismatch || isLoading ? (
         <Skeleton className="h-64 w-full rounded-xl" />
       ) : (
         <div className="flex flex-col gap-4 max-w-3xl">
@@ -133,11 +155,6 @@ export default function BrandMemoryPage() {
             </p>
           ) : null}
 
-          <Button variant="link" className="h-auto p-0 self-start" asChild>
-            <Link to={`/marketing/projects/${projectId}`}>
-              {t('marketing.brandMemory.backToWorkspace')}
-            </Link>
-          </Button>
         </div>
       )}
     </PageShell>

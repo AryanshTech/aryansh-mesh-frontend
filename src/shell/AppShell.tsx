@@ -9,11 +9,11 @@ export function AppShell() {
   return (
     <CommandPaletteProvider>
       <HeaderActionsProvider>
-        <div className="flex min-h-screen bg-canvas text-foreground">
+        <div className="flex h-dvh bg-canvas text-foreground">
           <Sidebar />
-          <div className="flex min-h-screen flex-1 flex-col min-w-0">
+          <div className="flex flex-1 flex-col min-w-0 min-h-0">
             <Header />
-            <main className="flex-1 min-w-0">
+            <main className="flex min-h-0 flex-1 flex-col min-w-0 overflow-y-auto">
               <Outlet />
             </main>
           </div>

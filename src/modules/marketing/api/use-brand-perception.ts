@@ -26,7 +26,8 @@ export function useBrandPerceptionPreview(projectId: string | undefined, tenantI
     queryKey: brandPerceptionKeys.preview(key),
     queryFn: async () => {
       try {
-        return await api.get<BrandPerception>(perceptionPath(projectId!, tenantId));
+        const raw = await api.get<BrandPerception>(perceptionPath(projectId!, tenantId));
+        return raw ?? { projectId: projectId!, contentMarkdown: '' };
       } catch (e) {
         if (e instanceof ApiError && (e.status === 404 || e.status === 204)) {
           return { projectId: projectId!, contentMarkdown: '' };

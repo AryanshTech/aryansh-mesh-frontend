@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/core/api/client';
+import { streamThreadChat, type ThreadChatEventHandler } from '@/modules/marketing/api/stream-thread-chat';
 
 export interface Thread {
   id: string;
@@ -48,6 +49,12 @@ function threadsRoot(projectId: string, tenantId?: string): string {
     : `/projects/${projectId}/threads`;
 }
 
+function threadMessagesRoot(threadId: string, tenantId?: string): string {
+  return tenantId
+    ? `/tenants/${tenantId}/marketing/threads/${threadId}/messages`
+    : `/threads/${threadId}/messages`;
+}
+
 function mapThread(raw: ThreadApi): Thread {
   return {
     id: raw.threadId,
@@ -67,7 +74,11 @@ function mapMessage(raw: MessageApi): Message {
   };
 }
 
-export function useThreads(projectId: string | undefined, tenantId?: string) {
+export function useThreads(
+  projectId: string | undefined,
+  tenantId?: string,
+  enabled = true,
+) {
   const scopeKey = tenantId ? `tenant:${tenantId}` : `project:${projectId}`;
   return useQuery({
     queryKey: ['marketing', 'threads', scopeKey],
@@ -76,7 +87,7 @@ export function useThreads(projectId: string | undefined, tenantId?: string) {
       const items = (rows ?? []).map(mapThread);
       return { items, total: items.length };
     },
-    enabled: !!projectId || !!tenantId,
+    enabled: enabled && (!!projectId || !!tenantId),
   });
 }
 
@@ -96,27 +107,38 @@ export function useCreateThread(projectId: string, tenantId?: string) {
   });
 }
 
-export function useMessages(threadId: string | undefined) {
+export function useMessages(
+  threadId: string | undefined,
+  tenantId?: string,
+  options?: { enabled?: boolean },
+) {
+  const enabled = (options?.enabled ?? true) && !!threadId && !!tenantId;
   return useQuery({
-    queryKey: ['marketing', 'messages', threadId],
+    queryKey: ['marketing', 'messages', threadId, tenantId ?? 'project'],
     queryFn: async () => {
-      const page = await api.get<MessagesPageApi>(`/threads/${threadId!}/messages`, {
+      const page = await api.get<MessagesPageApi>(threadMessagesRoot(threadId!, tenantId), {
         query: { page: 0, size: 100 },
       });
+      if (!page) return { items: [], total: 0 };
       const items = (page.items ?? []).map(mapMessage);
       return { items, total: page.total ?? items.length };
     },
-    enabled: !!threadId,
+    enabled,
   });
 }
 
-export function useSendMessage(threadId: string) {
+export interface StreamMessageInput {
+  content: string;
+  onEvent: ThreadChatEventHandler;
+}
+
+export function useSendMessage(threadId: string, tenantId?: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (content: string) =>
-      api.post<{ content: string }>(`/threads/${threadId}/messages/sync`, { content }),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['marketing', 'messages', threadId] });
+    mutationFn: ({ content, onEvent }: StreamMessageInput) =>
+      streamThreadChat(threadId, { content }, onEvent, tenantId),
+    onSettled: () => {
+      void qc.invalidateQueries({ queryKey: ['marketing', 'messages', threadId, tenantId ?? 'project'] });
     },
   });
 }

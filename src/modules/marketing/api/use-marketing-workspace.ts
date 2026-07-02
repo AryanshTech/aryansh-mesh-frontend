@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/core/api/client';
+import { useAuth } from '@/core/auth/use-auth';
 import { resolveEntityId } from '@/modules/marketing/api/marketing-utils';
 
 export interface MarketingCompany {
@@ -72,6 +73,7 @@ export const workspaceKeys = {
 };
 
 export function useMarketingWorkspace(tenantId: string | undefined) {
+  const { status } = useAuth();
   return useQuery({
     queryKey: workspaceKeys.byTenant(tenantId ?? ''),
     queryFn: async () => {
@@ -80,7 +82,7 @@ export function useMarketingWorkspace(tenantId: string | undefined) {
       );
       return normalizeWorkspace(raw);
     },
-    enabled: !!tenantId,
+    enabled: !!tenantId && status === 'authenticated',
   });
 }
 

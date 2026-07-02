@@ -1,4 +1,5 @@
 import { Navigate, Route } from 'react-router-dom';
+import { MarketingLayout } from '@/modules/marketing/MarketingLayout';
 import MarketingWorkspacePage from '@/modules/marketing/pages/MarketingWorkspacePage';
 import ProjectDashboardPage from '@/modules/marketing/pages/ProjectDashboardPage';
 import ThreadWorkspacePage from '@/modules/marketing/pages/ThreadWorkspacePage';
@@ -6,7 +7,7 @@ import BrandMemoryPage from '@/modules/marketing/pages/BrandMemoryPage';
 import SocialCalendarPage from '@/modules/marketing/pages/SocialCalendarPage';
 
 export const marketingRoutes = (
-  <Route path="marketing">
+  <Route path="marketing" element={<MarketingLayout />}>
     <Route index element={<MarketingWorkspacePage />} />
     <Route path="companies" element={<Navigate to="/marketing" replace />} />
     <Route path="companies/:companyId" element={<Navigate to="/marketing" replace />} />

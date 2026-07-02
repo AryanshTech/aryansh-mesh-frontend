@@ -28,29 +28,38 @@ function basePath(projectId: string, tenantId?: string): string {
 
 async function fetchCurrent(path: string): Promise<BrandMemory | null> {
   try {
-    return await api.get<BrandMemory>(`${path}/current`);
+    const raw = await api.get<BrandMemory>(`${path}/current`);
+    return raw ?? null;
   } catch (e) {
     if (e instanceof ApiError && (e.status === 404 || e.status === 204)) return null;
     throw e;
   }
 }
 
-export function useBrandMemoryVersions(projectId: string | undefined, tenantId?: string) {
+export function useBrandMemoryVersions(
+  projectId: string | undefined,
+  tenantId?: string,
+  enabled = true,
+) {
   const key = scopeKey(projectId ?? '', tenantId);
   return useQuery({
     queryKey: brandMemoryKeys.list(key),
     queryFn: () => api.get<BrandMemory[]>(basePath(projectId!, tenantId)),
-    enabled: !!projectId || !!tenantId,
+    enabled: enabled && (!!projectId || !!tenantId),
     select: (raw) => raw ?? [],
   });
 }
 
-export function useBrandMemory(projectId: string | undefined, tenantId?: string) {
+export function useBrandMemory(
+  projectId: string | undefined,
+  tenantId?: string,
+  enabled = true,
+) {
   const key = scopeKey(projectId ?? '', tenantId);
   return useQuery({
     queryKey: brandMemoryKeys.current(key),
     queryFn: () => fetchCurrent(basePath(projectId!, tenantId)),
-    enabled: !!projectId || !!tenantId,
+    enabled: enabled && (!!projectId || !!tenantId),
   });
 }
 

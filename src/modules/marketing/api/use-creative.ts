@@ -124,7 +124,7 @@ export function useCreativeRecipes(projectId: string | undefined, tenantId?: str
       api.get<CreativeRecipe[] | { items?: CreativeRecipe[] }>(
         `${creativeRoot(projectId!, tenantId)}/recipes`,
       ),
-    enabled: !!projectId,
+    enabled: !!projectId || !!tenantId,
     select: normalizeList,
   });
 }
@@ -159,7 +159,7 @@ export function useCreativeRuns(projectId: string | undefined, tenantId?: string
       api.get<CreativeRun[] | { items?: CreativeRun[] }>(
         `${creativeRoot(projectId!, tenantId)}/runs`,
       ),
-    enabled: !!projectId,
+    enabled: !!projectId || !!tenantId,
     select: normalizeList,
   });
 }
@@ -194,7 +194,7 @@ export function useCreativeAssets(projectId: string | undefined, tenantId?: stri
       api.get<CreativeAsset[] | { items?: CreativeAsset[] }>(
         `${creativeRoot(projectId!, tenantId)}/assets`,
       ),
-    enabled: !!projectId,
+    enabled: !!projectId || !!tenantId,
     select: normalizeList,
   });
 }

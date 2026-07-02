@@ -82,7 +82,7 @@ function BrandIdentityForm({
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
           {(['primary', 'secondary', 'accent', 'background', 'surface', 'text', 'mutedText'] as const).map((key) => (
             <div key={key} className="flex flex-col gap-1.5">
-              <Label htmlFor={`color-${key}`} className="capitalize">{key}</Label>
+              <Label htmlFor={`color-${key}`}>{t(`marketing.brandIdentity.colors.${key}`)}</Label>
               <div className="flex items-center gap-2">
                 <span
                   className="size-7 rounded-md border border-border shrink-0"
@@ -105,7 +105,7 @@ function BrandIdentityForm({
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {(['heading', 'body', 'caption', 'rules'] as const).map((key) => (
             <div key={key} className="flex flex-col gap-1.5">
-              <Label htmlFor={`type-${key}`} className="capitalize">{key}</Label>
+              <Label htmlFor={`type-${key}`}>{t(`marketing.brandIdentity.typography.${key}`)}</Label>
               <Input
                 id={`type-${key}`}
                 value={draft.typography?.[key] ?? ''}

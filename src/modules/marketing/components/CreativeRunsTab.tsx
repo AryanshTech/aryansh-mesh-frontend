@@ -11,6 +11,13 @@ import { Card } from '@/design-system/components/ui/card';
 import { Label } from '@/design-system/components/ui/label';
 import { Textarea } from '@/design-system/components/ui/textarea';
 import {
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/design-system/components/ui/dialog';
+import { FormDialog, useFormDialogOpen } from '@/shared/components/FormDialog';
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -61,7 +68,9 @@ export function CreativeRunsTab({ projectId, tenantId }: Props) {
   const updateMutation = useUpdateCreativeRun(projectId, tenantId);
 
   const [selected, setSelected] = useState<CreativeRun | null>(null);
-  const [newRunRecipeId, setNewRunRecipeId] = useState<string | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [newRunRecipeId, setNewRunRecipeId] = useState<string>('');
+  const { scheduleOpen, triggerProps } = useFormDialogOpen();
 
   const runs = data ?? [];
   const recipes = recipesData ?? [];
@@ -76,7 +85,8 @@ export function CreativeRunsTab({ projectId, tenantId }: Props) {
     try {
       await createMutation.mutateAsync({ recipeId: newRunRecipeId });
       toast.success(t('marketing.runs.created'));
-      setNewRunRecipeId(null);
+      setCreateOpen(false);
+      setNewRunRecipeId('');
     } catch (e) {
       toast.error((e as Error).message || t('marketing.runs.saveFailed'));
     }
@@ -93,10 +103,18 @@ export function CreativeRunsTab({ projectId, tenantId }: Props) {
     }
   };
 
-  return (
+  const openCreate = () => {
+    setCreateOpen(false);
+    scheduleOpen(() => {
+      setNewRunRecipeId(recipes[0]?.id ?? '');
+      setCreateOpen(true);
+    });
+  };
+
+  const listContent = (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-end gap-2">
-        <Button onClick={() => setNewRunRecipeId(recipes[0]?.id ?? null)} disabled={recipes.length === 0}>
+        <Button {...triggerProps} onClick={openCreate} disabled={recipes.length === 0}>
           <Plus className="size-4" />{t('marketing.runs.create')}
         </Button>
       </div>
@@ -124,7 +142,7 @@ export function CreativeRunsTab({ projectId, tenantId }: Props) {
               {runs.map((r) => (
                 <tr
                   key={r.id}
-                  onClick={() => setSelected(r)}
+                  onClick={() => requestAnimationFrame(() => setSelected(r))}
                   className={cn(
                     'cursor-pointer border-b border-border last:border-b-0 transition-colors',
                     selected?.id === r.id ? 'bg-primary/5' : 'hover:bg-muted/30',
@@ -132,7 +150,7 @@ export function CreativeRunsTab({ projectId, tenantId }: Props) {
                 >
                   <td className="px-4 py-2.5 font-medium text-foreground">{recipeById.get(r.recipeId) ?? r.recipeId}</td>
                   <td className="px-4 py-2.5">
-                    <StatusBadge label={r.status} tone={statusTone(r.status)} />
+                    <StatusBadge label={t(`marketing.runs.status.${r.status}`)} tone={statusTone(r.status)} />
                   </td>
                 </tr>
               ))}
@@ -140,12 +158,16 @@ export function CreativeRunsTab({ projectId, tenantId }: Props) {
           </table>
         </Card>
       )}
+    </div>
+  );
 
+  return (
+    <>
       <DetailDrawer
         open={!!selected}
-        onOpenChange={(o) => (o ? null : setSelected(null))}
+        onOpenChange={(open) => { if (!open) setSelected(null); }}
         title={selected ? recipeById.get(selected.recipeId) ?? selected.recipeId : ''}
-        master={<div />}
+        master={listContent}
         footer={
           <div className="flex justify-end">
             <Button variant="outline" onClick={() => setSelected(null)}>{t('common.close')}</Button>
@@ -159,7 +181,9 @@ export function CreativeRunsTab({ projectId, tenantId }: Props) {
               <Select value={selected.status} onValueChange={(v) => void onUpdate({ status: v as RunStatus })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {RUN_STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  {RUN_STATUSES.map((s) => (
+                    <SelectItem key={s} value={s}>{t(`marketing.runs.status.${s}`)}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -201,32 +225,36 @@ export function CreativeRunsTab({ projectId, tenantId }: Props) {
         ) : null}
       </DetailDrawer>
 
-      <DetailDrawer
-        open={newRunRecipeId !== null}
-        onOpenChange={(o) => (o ? null : setNewRunRecipeId(null))}
-        title={t('marketing.runs.create')}
-        master={<div />}
-        footer={
-          <div className="flex items-center justify-end gap-2">
-            <Button variant="outline" onClick={() => setNewRunRecipeId(null)}>{t('common.cancel')}</Button>
-            <Button onClick={() => void onCreate()} disabled={createMutation.isPending || !newRunRecipeId}>
+      <FormDialog
+        open={createOpen}
+        onOpenChange={(open) => {
+          setCreateOpen(open);
+          if (!open) setNewRunRecipeId('');
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('marketing.runs.create')}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 py-2">
+            <div className="flex flex-col gap-1.5">
+              <Label>{t('marketing.runs.fieldRecipe')}</Label>
+              <Select value={newRunRecipeId} onValueChange={setNewRunRecipeId}>
+                <SelectTrigger><SelectValue placeholder={t('marketing.runs.selectRecipe')} /></SelectTrigger>
+                <SelectContent>
+                  {recipes.map((r) => <SelectItem key={r.id} value={r.id}>{r.title}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" type="button" onClick={() => setCreateOpen(false)}>{t('common.cancel')}</Button>
+            <Button type="button" onClick={() => void onCreate()} disabled={createMutation.isPending || !newRunRecipeId}>
               {createMutation.isPending ? t('common.loading') : t('common.save')}
             </Button>
-          </div>
-        }
-      >
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <Label>{t('marketing.runs.fieldRecipe')}</Label>
-            <Select value={newRunRecipeId ?? ''} onValueChange={(v) => setNewRunRecipeId(v)}>
-              <SelectTrigger><SelectValue placeholder={t('marketing.runs.selectRecipe')} /></SelectTrigger>
-              <SelectContent>
-                {recipes.map((r) => <SelectItem key={r.id} value={r.id}>{r.title}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </DetailDrawer>
-    </div>
+          </DialogFooter>
+        </DialogContent>
+      </FormDialog>
+    </>
   );
 }

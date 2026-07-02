@@ -47,7 +47,11 @@ function scopeKey(projectId: string, tenantId?: string): string {
   return tenantId ? `tenant:${tenantId}` : `project:${projectId}`;
 }
 
-export function useSocialPosts(projectId: string | undefined, tenantId?: string) {
+export function useSocialPosts(
+  projectId: string | undefined,
+  tenantId?: string,
+  enabled = true,
+) {
   const key = scopeKey(projectId ?? '', tenantId);
   return useQuery({
     queryKey: ['marketing', 'social-posts', key],
@@ -55,7 +59,7 @@ export function useSocialPosts(projectId: string | undefined, tenantId?: string)
       const rows = await api.get<SocialPost[]>(socialRoot(projectId!, tenantId));
       return { items: rows ?? [], total: rows?.length ?? 0 };
     },
-    enabled: !!projectId || !!tenantId,
+    enabled: enabled && (!!projectId || !!tenantId),
   });
 }
 

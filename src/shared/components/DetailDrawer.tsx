@@ -1,5 +1,6 @@
 import { Sheet, SheetContent } from '@/design-system/components/ui/sheet';
-import { useIsWide } from '@/shared/hooks/use-is-wide';
+import { useRadixOpenGuard } from '@/shared/hooks/radix-dismiss-guard';
+import { useStableWide } from '@/shared/hooks/use-is-wide';
 import { cn } from '@/design-system/lib/utils';
 import { X } from 'lucide-react';
 import { type ReactNode } from 'react';
@@ -32,7 +33,9 @@ export function DetailDrawer({
   master,
   className,
 }: DetailDrawerProps) {
-  const isWide = useIsWide();
+  const isWide = useStableWide(open);
+  const { createGuardedOnOpenChange, dismissGuardProps } = useRadixOpenGuard(open);
+  const handleOpenChange = createGuardedOnOpenChange(onOpenChange);
 
   if (isWide && master !== undefined) {
     return (
@@ -45,7 +48,7 @@ export function DetailDrawer({
             <DrawerInner
               title={title}
               description={description}
-              onClose={() => onOpenChange(false)}
+              onClose={() => handleOpenChange(false)}
               footer={footer}
             >
               {children}
@@ -59,16 +62,17 @@ export function DetailDrawer({
   return (
     <>
       {master}
-      <Sheet open={open} onOpenChange={onOpenChange}>
+      <Sheet open={open} onOpenChange={handleOpenChange}>
         <SheetContent
           side="right"
           showClose={false}
           className="w-full max-w-[440px] border-l border-border bg-card p-0"
+          {...dismissGuardProps}
         >
           <DrawerInner
             title={title}
             description={description}
-            onClose={() => onOpenChange(false)}
+            onClose={() => handleOpenChange(false)}
             footer={footer}
           >
             {children}

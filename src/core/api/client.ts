@@ -146,7 +146,7 @@ export async function apiRequest<T>(path: string, opts: RequestOptions = {}): Pr
     emitUnauthorized();
   }
 
-  if (res.status === 204) return undefined as T;
+  if (res.status === 204) return null as T;
 
   const text = await res.text();
   let parsed: unknown = undefined;
