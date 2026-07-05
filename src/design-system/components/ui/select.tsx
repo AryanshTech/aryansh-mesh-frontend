@@ -11,12 +11,7 @@ import {
   shouldBlockSelectDismiss,
 } from "@/shared/hooks/select-dismiss-guard"
 
-const Select = ({
-  modal = false,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Root>) => (
-  <SelectPrimitive.Root modal={modal} {...props} />
-)
+const Select = SelectPrimitive.Root
 
 const SelectGroup = SelectPrimitive.Group
 
@@ -91,8 +86,6 @@ const SelectContent = React.forwardRef<
   position = "popper",
   onCloseAutoFocus,
   onPointerDownOutside,
-  onInteractOutside,
-  onFocusOutside,
   ...props
 }, ref) => {
   const portalContainer = useOverlayPortalContainer()
@@ -118,18 +111,6 @@ const SelectContent = React.forwardRef<
             e.preventDefault()
           }
           onPointerDownOutside?.(e)
-        }}
-        onInteractOutside={(e) => {
-          if (shouldBlockSelectDismiss()) {
-            e.preventDefault()
-          }
-          onInteractOutside?.(e)
-        }}
-        onFocusOutside={(e) => {
-          if (shouldBlockSelectDismiss()) {
-            e.preventDefault()
-          }
-          onFocusOutside?.(e)
         }}
         {...props}
       >
