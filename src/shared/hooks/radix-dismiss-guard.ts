@@ -6,7 +6,7 @@ export function isSelectPopoverTarget(target: EventTarget | null): boolean {
   const el = target as HTMLElement | null;
   return Boolean(
     el?.closest(
-      '[data-radix-select-viewport], [role="listbox"], [data-radix-popper-content-wrapper]',
+      '[data-radix-select-viewport], [data-radix-select-content], [role="listbox"], [data-radix-popper-content-wrapper], [data-radix-select-trigger]',
     ),
   );
 }
@@ -45,6 +45,10 @@ export function useRadixOpenGuard(open: boolean) {
 
   const dismissGuardProps = {
     onPointerDownOutside: (e: Event) => {
+      if (isSelectPopoverTarget(e.target)) {
+        e.preventDefault();
+        return;
+      }
       if (shouldBlockRadixDismiss(openedAtRef.current)) {
         e.preventDefault();
       }

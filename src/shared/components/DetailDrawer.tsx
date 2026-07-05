@@ -1,4 +1,5 @@
 import { Sheet, SheetContent } from '@/design-system/components/ui/sheet';
+import { OverlayPortalTarget } from '@/shared/components/OverlayPortalTarget';
 import { useRadixOpenGuard } from '@/shared/hooks/radix-dismiss-guard';
 import { useStableWide } from '@/shared/hooks/use-is-wide';
 import { cn } from '@/design-system/lib/utils';
@@ -44,7 +45,7 @@ export function DetailDrawer({
           {master}
         </div>
         {open ? (
-          <aside className="w-[440px] shrink-0 rounded-xl border border-border bg-card shadow-card">
+          <aside className="relative w-[440px] shrink-0 overflow-visible rounded-xl border border-border bg-card shadow-card">
             <DrawerInner
               title={title}
               description={description}
@@ -98,7 +99,7 @@ function DrawerInner({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="flex h-full flex-col">
+    <OverlayPortalTarget className="flex h-full flex-col">
       <header className="flex items-start justify-between gap-2 border-b border-border px-5 py-4">
         <div className="flex flex-col gap-0.5 min-w-0">
           <h2 className="typo-card-title text-foreground truncate">{title}</h2>
@@ -119,6 +120,6 @@ function DrawerInner({
       {footer ? (
         <footer className="border-t border-border bg-card px-5 py-3">{footer}</footer>
       ) : null}
-    </div>
+    </OverlayPortalTarget>
   );
 }

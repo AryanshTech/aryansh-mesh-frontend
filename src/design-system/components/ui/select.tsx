@@ -5,8 +5,18 @@ import * as SelectPrimitive from "@radix-ui/react-select"
 import { Check, ChevronDown, ChevronUp } from "lucide-react"
 
 import { cn } from "@/design-system/lib/utils"
+import { useOverlayPortalContainer } from "@/shared/components/OverlayPortalTarget"
+import {
+  stampSelectOpen,
+  shouldBlockSelectDismiss,
+} from "@/shared/hooks/select-dismiss-guard"
 
-const Select = SelectPrimitive.Root
+const Select = ({
+  modal = false,
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Root>) => (
+  <SelectPrimitive.Root modal={modal} {...props} />
+)
 
 const SelectGroup = SelectPrimitive.Group
 
@@ -15,13 +25,18 @@ const SelectValue = SelectPrimitive.Value
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
+>(({ className, children, onPointerDown, ...props }, ref) => (
   <SelectPrimitive.Trigger
     ref={ref}
+    data-radix-select-trigger=""
     className={cn(
       "flex h-9 w-full items-center justify-between rounded-sm border border-border bg-card px-3 py-2 text-sm text-foreground ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
       className
     )}
+    onPointerDown={(e) => {
+      stampSelectOpen()
+      onPointerDown?.(e)
+    }}
     {...props}
   >
     {children}
@@ -70,33 +85,69 @@ SelectScrollDownButton.displayName =
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
->(({ className, children, position = "popper", ...props }, ref) => (
-  <SelectPrimitive.Portal>
-    <SelectPrimitive.Content
-      ref={ref}
-      className={cn(
-        "relative z-[300] max-h-96 min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border bg-popover text-popover-foreground shadow-floating data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-select-content-transform-origin]",
-        position === "popper" &&
-          "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
-        className
-      )}
-      position={position}
-      {...props}
-    >
-      <SelectScrollUpButton />
-      <SelectPrimitive.Viewport
+>(({
+  className,
+  children,
+  position = "popper",
+  onCloseAutoFocus,
+  onPointerDownOutside,
+  onInteractOutside,
+  onFocusOutside,
+  ...props
+}, ref) => {
+  const portalContainer = useOverlayPortalContainer()
+
+  return (
+    <SelectPrimitive.Portal container={portalContainer ?? undefined}>
+      <SelectPrimitive.Content
+        ref={ref}
+        data-radix-select-content=""
         className={cn(
-          "p-1",
+          "relative z-[300] max-h-96 min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border bg-popover text-popover-foreground shadow-floating data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-select-content-transform-origin]",
           position === "popper" &&
-            "w-full min-w-[var(--radix-select-trigger-width)]"
+            "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
+          className
         )}
+        position={position}
+        onCloseAutoFocus={(e) => {
+          e.preventDefault()
+          onCloseAutoFocus?.(e)
+        }}
+        onPointerDownOutside={(e) => {
+          if (shouldBlockSelectDismiss()) {
+            e.preventDefault()
+          }
+          onPointerDownOutside?.(e)
+        }}
+        onInteractOutside={(e) => {
+          if (shouldBlockSelectDismiss()) {
+            e.preventDefault()
+          }
+          onInteractOutside?.(e)
+        }}
+        onFocusOutside={(e) => {
+          if (shouldBlockSelectDismiss()) {
+            e.preventDefault()
+          }
+          onFocusOutside?.(e)
+        }}
+        {...props}
       >
-        {children}
-      </SelectPrimitive.Viewport>
-      <SelectScrollDownButton />
-    </SelectPrimitive.Content>
-  </SelectPrimitive.Portal>
-))
+        <SelectScrollUpButton />
+        <SelectPrimitive.Viewport
+          className={cn(
+            "p-1",
+            position === "popper" &&
+              "w-full min-w-[var(--radix-select-trigger-width)]"
+          )}
+        >
+          {children}
+        </SelectPrimitive.Viewport>
+        <SelectScrollDownButton />
+      </SelectPrimitive.Content>
+    </SelectPrimitive.Portal>
+  )
+})
 SelectContent.displayName = SelectPrimitive.Content.displayName
 
 const SelectLabel = React.forwardRef<
