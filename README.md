@@ -93,6 +93,19 @@ Legacy invite URL `/accept-invite` redirects to `/auth/accept-invite`.
 - **Tenant scope**: business and marketing data are tenant-scoped; active tenant is managed by `ActiveTenantContext`.
 - **Detail UX**: list pages use `DetailDrawer` (Sheet on narrow viewports, split pane on wide). Prefer drawer forms over nested dialogs for create/edit flows.
 
+### Overlays inside drawers and dialogs
+
+Radix Select menus and similar popovers must stay inside the drawer/dialog DOM subtree. Otherwise parent Sheet/Dialog layers treat them as outside clicks and collapse immediately.
+
+| Pattern | Location |
+|---------|----------|
+| `OverlayPortalTarget` | Wraps drawer/dialog content; provides a local portal container |
+| `SelectContent` | Portals into that container when present (falls back to document body) |
+| `DetailDrawer` | Uses `OverlayPortalTarget` for create/edit forms |
+| `DialogContent` | Same for FormDialog flows |
+
+For new create flows on list pages, use **`DetailDrawer`** (not a nested `FormDialog` on top of a drawer). See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#shared-ui-patterns).
+
 ## Documentation
 
 | Doc | Purpose |
