@@ -147,21 +147,28 @@ html.light {
 }
 
 .dialog-overlay[data-state="closed"] {
-  pointer-events: none;
+  pointer-events: none !important;
+  opacity: 0;
 }
 
-[class*="fade-in-0"] { animation-name: fade-in; }
-[class*="fade-out-0"] { animation-name: fade-out; }
-[class*="slide-in-from-right"] { animation-name: slide-in-from-right; }
-[class*="slide-out-to-right"] { animation-name: slide-out-to-right; }
-[class*="slide-in-from-left"] { animation-name: slide-in-from-left; }
-[class*="slide-out-to-left"] { animation-name: slide-out-to-left; }
-[class*="slide-in-from-top"] { animation-name: slide-in-from-top; }
-[class*="slide-out-to-top"] { animation-name: slide-out-to-top; }
-[class*="slide-in-from-bottom"] { animation-name: slide-in-from-bottom; }
-[class*="slide-out-to-bottom"] { animation-name: slide-out-to-bottom; }
-[class*="zoom-in-95"] { animation-name: zoom-in; }
-[class*="zoom-out-95"] { animation-name: zoom-out; }
+/* Map Tailwind animate utility classes to keyframes, gated by data-state.
+   Radix elements carry BOTH the open (slide-in) and closed (slide-out) variant
+   classes at once (e.g. `data-[state=open]:slide-in-from-right` and
+   `data-[state=closed]:slide-out-to-right`), so these rules MUST be scoped by
+   [data-state] — otherwise the later `slide-out` rule wins the cascade and an
+   open drawer animates itself off-screen. */
+[data-state="open"][class*="fade-in-0"] { animation-name: fade-in; }
+[data-state="closed"][class*="fade-out-0"] { animation-name: fade-out; }
+[data-state="open"][class*="slide-in-from-right"] { animation-name: slide-in-from-right; }
+[data-state="closed"][class*="slide-out-to-right"] { animation-name: slide-out-to-right; }
+[data-state="open"][class*="slide-in-from-left"] { animation-name: slide-in-from-left; }
+[data-state="closed"][class*="slide-out-to-left"] { animation-name: slide-out-to-left; }
+[data-state="open"][class*="slide-in-from-top"] { animation-name: slide-in-from-top; }
+[data-state="closed"][class*="slide-out-to-top"] { animation-name: slide-out-to-top; }
+[data-state="open"][class*="slide-in-from-bottom"] { animation-name: slide-in-from-bottom; }
+[data-state="closed"][class*="slide-out-to-bottom"] { animation-name: slide-out-to-bottom; }
+[data-state="open"][class*="zoom-in-95"] { animation-name: zoom-in; }
+[data-state="closed"][class*="zoom-out-95"] { animation-name: zoom-out; }
 
 /* Base reset */
 html,
@@ -368,10 +375,5 @@ body {
   }
 }
 
-/* Button :active press feedback (handled per-component, but global default) */
-button:active:not(:disabled) {
-  transform: scale(0.97);
-}
-button {
-  transition: transform 100ms var(--ease-out);
-}
+/* Button press feedback is handled per-component via shadcn Button's `active:scale-[0.97]`.
+   No global button:active rule — it would apply to every native <button> and fight the component. */
