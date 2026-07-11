@@ -6,7 +6,12 @@ import { X } from "lucide-react"
 import { cn } from "@/design-system/lib/utils"
 import { typographyClasses } from "@/design-system/tokens/typography"
 
-const Sheet = SheetPrimitive.Root
+const Sheet = ({
+  modal = true,
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Root>) => (
+  <SheetPrimitive.Root modal={modal} {...props} />
+)
 
 const SheetTrigger = SheetPrimitive.Trigger
 
