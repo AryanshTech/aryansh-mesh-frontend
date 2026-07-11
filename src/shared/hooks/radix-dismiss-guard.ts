@@ -32,9 +32,6 @@ export function useRadixOpenGuard(open: boolean) {
 
   const createGuardedOnOpenChange = useCallback(
     (onOpenChange: (next: boolean) => void) => (next: boolean) => {
-      if (!next && shouldBlockRadixDismiss(openedAtRef.current)) {
-        return;
-      }
       if (next) {
         openedAtRef.current = performance.now();
       }
@@ -73,5 +70,11 @@ export function useRadixOpenGuard(open: boolean) {
     },
   };
 
-  return { createGuardedOnOpenChange, dismissGuardProps };
+  const captureStampProps = {
+    onPointerDownCapture: () => {
+      openedAtRef.current = performance.now();
+    },
+  };
+
+  return { createGuardedOnOpenChange, dismissGuardProps, captureStampProps };
 }
