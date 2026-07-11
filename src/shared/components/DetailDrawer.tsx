@@ -1,7 +1,15 @@
-import { Sheet, SheetContent } from '@/design-system/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+  SheetClose,
+} from '@/design-system/components/ui/sheet';
+import { Button } from '@/design-system/components/ui/button';
 import { OverlayPortalTarget } from '@/shared/components/OverlayPortalTarget';
 import { useRadixOpenGuard } from '@/shared/hooks/radix-dismiss-guard';
-import { useStableWide } from '@/shared/hooks/use-is-wide';
 import { cn } from '@/design-system/lib/utils';
 import { X } from 'lucide-react';
 import { type ReactNode } from 'react';
@@ -14,15 +22,14 @@ interface DetailDrawerProps {
   description?: string;
   children: ReactNode;
   footer?: ReactNode;
-  /** Rendered to the left of the drawer when on a wide screen as the inline split master pane. */
+  /** Rendered as the underlying content. The drawer slides in over it (non-modal). */
   master?: ReactNode;
   className?: string;
 }
 
 /**
- * Responsive detail drawer.
- *   < 1280px → shadcn Sheet from the right
- *   ≥ 1280px → inline split-pane (drawer pinned beside the list)
+ * Detail drawer — a shadcn Sheet that slides in from the right over the master content.
+ * Non-modal, so the master pane stays interactive and its layout is never squeezed.
  */
 export function DetailDrawer({
   open,
@@ -34,92 +41,51 @@ export function DetailDrawer({
   master,
   className,
 }: DetailDrawerProps) {
-  const isWide = useStableWide(open);
-  const { createGuardedOnOpenChange, dismissGuardProps } = useRadixOpenGuard(open);
+  const { t } = useTranslation();
+  const { createGuardedOnOpenChange, dismissGuardProps, captureStampProps } = useRadixOpenGuard(open);
   const handleOpenChange = createGuardedOnOpenChange(onOpenChange);
 
-  if (isWide && master !== undefined) {
-    return (
-      <div className={cn('flex w-full gap-6', className)}>
-        <div className={cn('flex-1 min-w-0', open ? 'max-w-[calc(100%-460px)]' : '')}>
-          {master}
-        </div>
-        {open ? (
-          <aside className="relative w-[440px] shrink-0 overflow-visible rounded-xl border border-border bg-card shadow-card">
-            <DrawerInner
-              title={title}
-              description={description}
-              onClose={() => handleOpenChange(false)}
-              footer={footer}
-            >
-              {children}
-            </DrawerInner>
-          </aside>
-        ) : null}
-      </div>
-    );
-  }
-
   return (
-    <>
+    <div {...captureStampProps} className={className}>
       {master}
-      <Sheet open={open} onOpenChange={handleOpenChange}>
+      <Sheet open={open} onOpenChange={handleOpenChange} modal={false}>
         <SheetContent
           side="right"
           showClose={false}
-          className="w-full max-w-[440px] border-l border-border bg-card p-0"
+          className={cn(
+            'flex w-full max-w-[440px] flex-col gap-0 border-l border-border bg-card p-0',
+          )}
           {...dismissGuardProps}
         >
-          <DrawerInner
-            title={title}
-            description={description}
-            onClose={() => handleOpenChange(false)}
-            footer={footer}
-          >
-            {children}
-          </DrawerInner>
+          <OverlayPortalTarget className="flex h-full flex-col">
+            <SheetHeader className="flex-row items-start justify-between gap-2 space-y-0 border-b border-border px-5 py-4 text-left">
+              <div className="flex min-w-0 flex-col gap-0.5">
+                <SheetTitle className="truncate">{title}</SheetTitle>
+                {description ? (
+                  <SheetDescription className="truncate">{description}</SheetDescription>
+                ) : null}
+              </div>
+              <SheetClose asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  aria-label={t('common.close')}
+                  className="size-7 shrink-0"
+                >
+                  <X className="size-4" />
+                </Button>
+              </SheetClose>
+            </SheetHeader>
+            <div className="flex-1 overflow-y-auto px-5 py-5">{children}</div>
+            {footer ? (
+              <SheetFooter className="border-t border-border bg-card px-5 py-3 sm:justify-end">
+                {footer}
+              </SheetFooter>
+            ) : null}
+          </OverlayPortalTarget>
         </SheetContent>
       </Sheet>
-    </>
-  );
-}
-
-function DrawerInner({
-  title,
-  description,
-  onClose,
-  children,
-  footer,
-}: {
-  title: string;
-  description?: string;
-  onClose: () => void;
-  children: ReactNode;
-  footer?: ReactNode;
-}) {
-  const { t } = useTranslation();
-  return (
-    <OverlayPortalTarget className="flex h-full flex-col">
-      <header className="flex items-start justify-between gap-2 border-b border-border px-5 py-4">
-        <div className="flex flex-col gap-0.5 min-w-0">
-          <h2 className="typo-card-title text-foreground truncate">{title}</h2>
-          {description ? (
-            <p className="typo-body-sm text-muted-foreground truncate">{description}</p>
-          ) : null}
-        </div>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label={t('common.close')}
-          className="inline-flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-        >
-          <X className="size-4" />
-        </button>
-      </header>
-      <div className="flex-1 overflow-y-auto px-5 py-5">{children}</div>
-      {footer ? (
-        <footer className="border-t border-border bg-card px-5 py-3">{footer}</footer>
-      ) : null}
-    </OverlayPortalTarget>
+    </div>
   );
 }
