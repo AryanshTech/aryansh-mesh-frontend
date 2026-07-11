@@ -28,6 +28,7 @@ import {
   type LocalPackageInput,
   type AssetType,
 } from '@/modules/marketing/api/use-creative';
+import { useDeferredOverlayOpen } from '@/shared/hooks/radix-dismiss-guard';
 
 interface Props {
   projectId: string;
@@ -59,6 +60,7 @@ export function CreativeRecipesTab({ projectId, tenantId }: Props) {
   const { data, isLoading, isError, refetch } = useCreativeRecipes(projectId, tenantId);
   const createMutation = useCreateCreativeRecipe(projectId, tenantId);
   const generateMutation = useGenerateLocalPackage(projectId, tenantId);
+  const { scheduleOpen } = useDeferredOverlayOpen();
 
   const [panelMode, setPanelMode] = useState<PanelMode | null>(null);
   const [selected, setSelected] = useState<CreativeRecipe | null>(null);
@@ -76,17 +78,21 @@ export function CreativeRecipesTab({ projectId, tenantId }: Props) {
   };
 
   const openCreate = () => {
-    setSelected(null);
-    setDraftPackage(null);
-    setDraftRecipe({ ...NEW_RECIPE });
-    setPanelMode('create');
+    scheduleOpen(() => {
+      setSelected(null);
+      setDraftPackage(null);
+      setDraftRecipe({ ...NEW_RECIPE });
+      setPanelMode('create');
+    });
   };
 
   const openGenerate = () => {
-    setSelected(null);
-    setDraftRecipe(null);
-    setDraftPackage({ ...NEW_PACKAGE });
-    setPanelMode('generate');
+    scheduleOpen(() => {
+      setSelected(null);
+      setDraftRecipe(null);
+      setDraftPackage({ ...NEW_PACKAGE });
+      setPanelMode('generate');
+    });
   };
 
   const openRecipe = (recipe: CreativeRecipe) => {

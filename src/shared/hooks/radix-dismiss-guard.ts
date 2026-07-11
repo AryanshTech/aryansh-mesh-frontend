@@ -78,3 +78,12 @@ export function useRadixOpenGuard(open: boolean) {
 
   return { createGuardedOnOpenChange, dismissGuardProps, captureStampProps };
 }
+
+/** Defer drawer open until after the opening click finishes (avoids Radix dismiss race). */
+export function useDeferredOverlayOpen() {
+  const scheduleOpen = (open: () => void) => {
+    queueMicrotask(open);
+  };
+
+  return { scheduleOpen };
+}
