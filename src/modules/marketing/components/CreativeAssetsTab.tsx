@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
   Check,
+  Download,
   Folder,
   Image as ImageIcon,
   Loader2,
@@ -44,6 +45,7 @@ import {
   type ApprovalStatus,
 } from '@/modules/marketing/api/use-creative';
 import { resolveCreativeAssetUrl } from '@/modules/marketing/api/resolve-creative-asset-url';
+import { downloadCreativeMedia } from '@/modules/marketing/lib/download-creative-media';
 import {
   BRAND_STARTER_FOLDERS,
   brandAssetsInFolder,
@@ -86,6 +88,7 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadLabel, setUploadLabel] = useState('');
   const [renameValue, setRenameValue] = useState('');
+  const [downloading, setDownloading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { scheduleOpen, triggerProps } = useFormDialogOpen();
 
@@ -197,6 +200,24 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
       );
     } catch (e) {
       toast.error((e as Error).message || t('marketing.assets.statusUpdateFailed'));
+    }
+  };
+
+  const onDownload = async () => {
+    if (!selected) return;
+    const url = resolveCreativeAssetUrl(selected.url);
+    if (!url) {
+      toast.error(t('marketing.assets.downloadFailed'));
+      return;
+    }
+    setDownloading(true);
+    try {
+      await downloadCreativeMedia(url, selected.label || 'creative-asset');
+      toast.success(t('marketing.assets.downloaded'));
+    } catch (e) {
+      toast.error((e as Error).message || t('marketing.assets.downloadFailed'));
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -413,9 +434,15 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
               <p className="typo-eyebrow text-muted-foreground">
                 {folderLabel(resolveFolderPath(selected))}
               </p>
-              {resolveAssetScope(selected) === SCOPE_BRAND || area === 'brand' ? (
+              {resolveAssetScope(selected) === SCOPE_BRAND ||
+              area === 'brand' ||
+              resolveAssetScope(selected) === 'generated' ? (
                 <div className="flex flex-col gap-1.5">
-                  <Label>{t('marketing.assets.moveTo')}</Label>
+                  <Label>
+                    {resolveAssetScope(selected) === 'generated'
+                      ? t('marketing.assets.saveToBrand')
+                      : t('marketing.assets.moveTo')}
+                  </Label>
                   <Select
                     value={
                       isBrandFolder(resolveFolderPath(selected))
@@ -425,7 +452,13 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
                     onValueChange={(v) => void onMove(v)}
                   >
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue
+                        placeholder={
+                          resolveAssetScope(selected) === 'generated'
+                            ? t('marketing.assets.saveToBrandPlaceholder')
+                            : undefined
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {BRAND_STARTER_FOLDERS.map((path) => (
@@ -462,6 +495,19 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
                 </div>
               ) : null}
               <div className="mt-auto flex flex-wrap gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={downloading}
+                  onClick={() => void onDownload()}
+                >
+                  {downloading ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Download className="size-4" />
+                  )}
+                  {t('marketing.assets.download')}
+                </Button>
                 <Button
                   type="button"
                   variant="destructive"

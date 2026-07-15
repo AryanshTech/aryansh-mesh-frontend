@@ -485,7 +485,12 @@
       "pickerTitle": "Références marque",
       "pickerHint": "{{count}} auto",
       "pickerAuto": "Auto",
-      "pickerEmpty": "Ajoutez des images marque dans Assets → Brand pour Nano Banana et les agents."
+      "pickerEmpty": "Ajoutez des images marque dans Assets → Brand pour Nano Banana et les agents.",
+      "download": "Télécharger",
+      "downloaded": "Téléchargé",
+      "downloadFailed": "Impossible de télécharger",
+      "saveToBrand": "Enregistrer dans Brand",
+      "saveToBrandPlaceholder": "Choisir un dossier Brand"
     },
     "brand": {
       "cadenceDays": "Cadence (jours)",
@@ -1013,6 +1018,13 @@
       "pixelGenerated": "Image générée et enregistrée dans Assets",
       "pixelFailed": "Échec de Nano Banana — modifiez la direction image et réessayez",
       "pixelUnavailable": "Génération d’image indisponible — redémarrez l’API locale, puis réessayez",
+      "downloadImage": "Télécharger",
+      "saveImageToBrand": "Enregistrer dans Brand",
+      "imageDownloaded": "Image téléchargée",
+      "imageDownloadFailed": "Impossible de télécharger l’image",
+      "imageSavedToBrand": "Enregistrée dans Brand → Product",
+      "imageSaveFailed": "Impossible d’enregistrer dans Brand",
+      "imageSaveUnavailable": "Image pas encore disponible à enregistrer",
       "queueDays": "File de la semaine",
       "queueDaysHint": "Choisissez un jour pour éditer sa légende et sa direction image.",
       "queueGenerated": "File de {{count}} jours prête — choisissez un jour ci-dessous",

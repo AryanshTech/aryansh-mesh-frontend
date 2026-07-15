@@ -7,6 +7,7 @@ import {
   Check,
   Copy,
   Download,
+  FolderInput,
   Image as ImageIcon,
   Loader2,
   MessageSquare,
@@ -28,6 +29,7 @@ import {
   useCreativeRecipes,
   useUpdateCreativeRun,
   useGenerateCreativeImage,
+  useUpdateCreativeAsset,
   type CreativeRun,
   type CreativeRecipe,
   type RunStatus,
@@ -68,6 +70,7 @@ import {
   type ProfilePlatform,
 } from '@/modules/marketing/lib/platform-profile';
 import { resolveCreativeAssetUrl } from '@/modules/marketing/api/resolve-creative-asset-url';
+import { downloadCreativeMedia } from '@/modules/marketing/lib/download-creative-media';
 import { useContentFeedbackRating } from '@/modules/marketing/api/use-content-feedback';
 import {
   buildCaptionGenerationPrompt,
@@ -182,6 +185,7 @@ export function MarketingDeskTab({
   const createThread = useCreateThread(projectId, tenantId);
   const createSocialPost = useCreateSocialPost(projectId, tenantId);
   const generateImage = useGenerateCreativeImage(projectId, tenantId);
+  const updateAsset = useUpdateCreativeAsset(projectId, tenantId);
   const rateFeedback = useContentFeedbackRating(projectId, tenantId);
 
   const recipeById = useMemo(() => {
@@ -200,6 +204,10 @@ export function MarketingDeskTab({
   const [generatingPixel, setGeneratingPixel] = useState(false);
   const [brandRefIds, setBrandRefIds] = useState<string[]>([]);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
+  const [generatedAssetId, setGeneratedAssetId] = useState<string | null>(null);
+  const [generatedAssetLabel, setGeneratedAssetLabel] = useState<string | null>(null);
+  const [downloadingImage, setDownloadingImage] = useState(false);
+  const [savingImageToBrand, setSavingImageToBrand] = useState(false);
   const [queuePosts, setQueuePosts] = useState<QueuePost[]>([]);
   const [activeQueueIndex, setActiveQueueIndex] = useState(0);
   const [runRating, setRunRating] = useState<'like' | 'dislike' | null>(null);
@@ -269,6 +277,8 @@ export function MarketingDeskTab({
         : briefFromRecipe(selectedRecipe?.goal, selectedRecipe?.title),
     );
     setGeneratedImageUrl(null);
+    setGeneratedAssetId(null);
+    setGeneratedAssetLabel(null);
     setRunRating(null);
     setReviseCaptionOpen(false);
     if (selected.resultSummary?.trim()) {
@@ -645,6 +655,8 @@ export function MarketingDeskTab({
         return;
       }
       setGeneratedImageUrl(url);
+      setGeneratedAssetId(asset?.id ?? null);
+      setGeneratedAssetLabel(asset?.label ?? null);
       toast.success(t('marketing.desk.pixelGenerated'));
     } catch (e) {
       // Stay on Create — never navigate away or remount the hub on image failure.
@@ -657,6 +669,44 @@ export function MarketingDeskTab({
       }
     } finally {
       setGeneratingPixel(false);
+    }
+  };
+
+  const onDownloadGeneratedImage = async () => {
+    if (!generatedImageUrl) return;
+    setDownloadingImage(true);
+    try {
+      await downloadCreativeMedia(
+        generatedImageUrl,
+        generatedAssetLabel?.trim() || 'nano-banana-image',
+      );
+      toast.success(t('marketing.desk.imageDownloaded'));
+    } catch (e) {
+      toast.error((e as Error).message || t('marketing.desk.imageDownloadFailed'));
+    } finally {
+      setDownloadingImage(false);
+    }
+  };
+
+  const onSaveGeneratedImageToBrand = async () => {
+    if (!generatedAssetId) {
+      toast.error(t('marketing.desk.imageSaveUnavailable'));
+      return;
+    }
+    setSavingImageToBrand(true);
+    try {
+      await updateAsset.mutateAsync({
+        assetId: generatedAssetId,
+        input: {
+          runId: null,
+          metadata: { scope: 'brand', folderPath: '/Brand/Product' },
+        },
+      });
+      toast.success(t('marketing.desk.imageSavedToBrand'));
+    } catch (e) {
+      toast.error((e as Error).message || t('marketing.desk.imageSaveFailed'));
+    } finally {
+      setSavingImageToBrand(false);
     }
   };
 
@@ -1610,12 +1660,44 @@ export function MarketingDeskTab({
                     {t('marketing.desk.imageHintNano')}
                   </p>
                   {generatedImageUrl ? (
-                    <div className="overflow-hidden rounded-xl border border-border bg-muted/30">
-                      <img
-                        src={generatedImageUrl}
-                        alt=""
-                        className="max-h-72 w-full object-contain"
-                      />
+                    <div className="flex flex-col gap-2">
+                      <div className="overflow-hidden rounded-xl border border-border bg-muted/30">
+                        <img
+                          src={generatedImageUrl}
+                          alt=""
+                          className="max-h-72 w-full object-contain"
+                        />
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          disabled={downloadingImage}
+                          onClick={() => void onDownloadGeneratedImage()}
+                        >
+                          {downloadingImage ? (
+                            <Loader2 className="size-3.5 animate-spin" />
+                          ) : (
+                            <Download className="size-3.5" />
+                          )}
+                          {t('marketing.desk.downloadImage')}
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          disabled={!generatedAssetId || savingImageToBrand}
+                          onClick={() => void onSaveGeneratedImageToBrand()}
+                        >
+                          {savingImageToBrand ? (
+                            <Loader2 className="size-3.5 animate-spin" />
+                          ) : (
+                            <FolderInput className="size-3.5" />
+                          )}
+                          {t('marketing.desk.saveImageToBrand')}
+                        </Button>
+                      </div>
                     </div>
                   ) : null}
                 </div>

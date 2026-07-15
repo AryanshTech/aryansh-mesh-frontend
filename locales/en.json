@@ -485,7 +485,12 @@
       "pickerTitle": "Brand references",
       "pickerHint": "{{count}} auto-attached",
       "pickerAuto": "Auto",
-      "pickerEmpty": "Add brand images under Assets → Brand for Nano Banana and agents to use."
+      "pickerEmpty": "Add brand images under Assets → Brand for Nano Banana and agents to use.",
+      "download": "Download",
+      "downloaded": "Downloaded",
+      "downloadFailed": "Could not download",
+      "saveToBrand": "Save to Brand",
+      "saveToBrandPlaceholder": "Choose a Brand folder"
     },
     "brand": {
       "cadenceDays": "Cadence (days)",
@@ -746,6 +751,13 @@
       "pixelGenerated": "Image generated and saved to Assets",
       "pixelFailed": "Failed to generate image with Nano Banana — you can edit the image direction and try again",
       "pixelUnavailable": "Image generation is unavailable — restart the local API, then try again",
+      "downloadImage": "Download",
+      "saveImageToBrand": "Save to Brand",
+      "imageDownloaded": "Image downloaded",
+      "imageDownloadFailed": "Could not download image",
+      "imageSavedToBrand": "Saved to Brand → Product",
+      "imageSaveFailed": "Could not save to Brand",
+      "imageSaveUnavailable": "Image is not available to save yet",
       "queueDays": "Week queue",
       "queueDaysHint": "Pick a day to edit its caption and image direction. Calendar save uses the selected day.",
       "queueGenerated": "{{count}}-day queue ready — pick a day below",
