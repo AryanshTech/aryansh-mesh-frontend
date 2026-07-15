@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Send } from 'lucide-react';
+import { Briefcase, Loader2, Send } from 'lucide-react';
 import { ApiError } from '@/core/api/client';
 import { PageShell } from '@/shared/components/PageShell';
 import { PageHeader } from '@/shared/components/PageHeader';
@@ -38,6 +38,7 @@ export default function ThreadWorkspacePage() {
   const { t } = useTranslation();
   const { projectId: urlProjectId, threadId } = useParams<{ projectId: string; threadId: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
   const { tenantId } = useTenantPath();
   const {
     projectId,
@@ -58,10 +59,12 @@ export default function ThreadWorkspacePage() {
   const initialPromptSent = useRef(false);
 
   useEffect(() => {
-    if (!streaming && data?.items) {
+    // Do not clobber in-flight stream tokens with a stale cache snapshot.
+    if (streaming || sendMutation.isPending) return;
+    if (data?.items) {
       setLocalMessages(data.items);
     }
-  }, [data?.items, streaming]);
+  }, [data?.items, streaming, sendMutation.isPending]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -69,7 +72,7 @@ export default function ThreadWorkspacePage() {
 
   const onSend = useCallback(async (overrideContent?: string) => {
     const trimmed = (overrideContent ?? text).trim();
-    if (!trimmed || !threadId) return;
+    if (!trimmed || !threadId || !tenantId || !queriesEnabled) return;
 
     if (!overrideContent) setText('');
     setLocalMessages((prev) => [...prev, createOptimisticUserMessage(trimmed)]);
@@ -77,6 +80,7 @@ export default function ThreadWorkspacePage() {
 
     let assistantId = '';
     let assistantContent = '';
+    let sawAssistant = false;
 
     try {
       await sendMutation.mutateAsync({
@@ -85,6 +89,7 @@ export default function ThreadWorkspacePage() {
           if (event === 'message_start') {
             const start = payload as { messageId: string };
             assistantId = start.messageId;
+            sawAssistant = true;
             setLocalMessages((prev) => [...prev, createOptimisticAssistantMessage(assistantId)]);
           }
 
@@ -108,6 +113,10 @@ export default function ThreadWorkspacePage() {
           }
         },
       });
+
+      if (!sawAssistant || !assistantContent.trim()) {
+        toast.error(t('marketing.threads.emptyReply'));
+      }
     } catch (e) {
       const status = e instanceof ApiError ? e.status : undefined;
       const fallback =
@@ -122,16 +131,36 @@ export default function ThreadWorkspacePage() {
     } finally {
       setStreaming(false);
     }
-  }, [sendMutation, t, text, threadId]);
+  }, [queriesEnabled, sendMutation, t, tenantId, text, threadId]);
 
   const isSending = sendMutation.isPending || streaming;
 
   useEffect(() => {
     const initialPrompt = (location.state as { initialPrompt?: string } | null)?.initialPrompt;
-    if (!initialPrompt || initialPromptSent.current || isLoading || isSending) return;
+    if (
+      !initialPrompt ||
+      initialPromptSent.current ||
+      isLoading ||
+      isSending ||
+      !queriesEnabled ||
+      !tenantId
+    ) {
+      return;
+    }
     initialPromptSent.current = true;
+    // Drop one-shot navigation state so refresh does not resend.
+    navigate(location.pathname, { replace: true, state: null });
     void onSend(initialPrompt);
-  }, [location.state, isLoading, isSending, onSend]);
+  }, [
+    isLoading,
+    isSending,
+    location.pathname,
+    location.state,
+    navigate,
+    onSend,
+    queriesEnabled,
+    tenantId,
+  ]);
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -157,6 +186,15 @@ export default function ThreadWorkspacePage() {
           title={t('marketing.threadsTitle')}
           description={t('marketing.threadsSubtitle')}
         />
+        <div className="mb-4 flex flex-col gap-2 rounded-xl border border-border bg-muted/40 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="typo-body-sm text-muted-foreground">{t('marketing.desk.threadBanner')}</p>
+          <Button asChild size="sm" variant="outline" className="shrink-0">
+            <Link to="/marketing?tab=social">
+              <Briefcase className="size-3.5" />
+              {t('marketing.desk.openDesk')}
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -209,7 +247,9 @@ export default function ThreadWorkspacePage() {
                       : 'bg-muted text-foreground rounded-bl-sm',
                   )}
                 >
-                  <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                  <p className="whitespace-pre-wrap break-words">
+                    {msg.content || (streaming && msg.role === 'assistant' ? '…' : '')}
+                  </p>
                   <p
                     className={cn(
                       'mt-1 typo-eyebrow typo-tabular',
@@ -225,7 +265,10 @@ export default function ThreadWorkspacePage() {
               </div>
             ))}
             {streaming ? (
-              <span className="sr-only">{t('marketing.threads.streaming')}</span>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Loader2 className="size-3.5 animate-spin" />
+                <span className="typo-body-sm">{t('marketing.threads.streaming')}</span>
+              </div>
             ) : null}
             <div ref={bottomRef} />
           </div>
@@ -246,7 +289,7 @@ export default function ThreadWorkspacePage() {
             placeholder={t('marketing.messagePlaceholder')}
             rows={1}
             className="flex-1 resize-none min-h-[40px] max-h-[160px] overflow-y-auto"
-            disabled={isSending}
+            disabled={isSending || !queriesEnabled}
           />
           <Button
             type="button"
@@ -256,7 +299,7 @@ export default function ThreadWorkspacePage() {
             className="shrink-0"
             aria-label={t('marketing.sendMessage')}
           >
-            <Send className="size-4" />
+            {isSending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
           </Button>
         </div>
         </div>

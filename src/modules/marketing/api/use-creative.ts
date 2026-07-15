@@ -71,6 +71,7 @@ export interface CreativeRunPatchInput {
   status?: RunStatus;
   localExecutorNotes?: string;
   resultSummary?: string;
+  sourcePrompt?: string;
 }
 
 export interface CreativeAsset {
@@ -224,6 +225,22 @@ export function useUploadCreativeAsset(projectId: string, tenantId?: string) {
         form,
       );
     },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: creativeKeys.assets(projectId) });
+      void qc.invalidateQueries({ queryKey: creativeKeys.runs(projectId) });
+    },
+  });
+}
+
+export function useGenerateCreativeImage(projectId: string, tenantId?: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { prompt: string; runId?: string; label?: string }) =>
+      api.post<CreativeAsset>(`${creativeRoot(projectId, tenantId)}/assets/generate-image`, {
+        prompt: input.prompt,
+        runId: input.runId,
+        label: input.label,
+      }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: creativeKeys.assets(projectId) });
       void qc.invalidateQueries({ queryKey: creativeKeys.runs(projectId) });

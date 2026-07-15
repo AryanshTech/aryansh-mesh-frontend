@@ -8,7 +8,7 @@ import {
   SheetTrigger,
 } from '@/design-system/components/ui/sheet';
 import { useAuth } from '@/core/auth/use-auth';
-import { NAV_ITEMS, SECTION_LABELS, type NavSection } from '@/shell/navigation';
+import { NAV_ITEMS, SECTION_LABELS, resolveActiveNavTo, type NavSection } from '@/shell/navigation';
 import { cn } from '@/design-system/lib/utils';
 
 const SECTIONS: NavSection[] = ['workspace', 'content', 'marketing', 'admin'];
@@ -21,17 +21,11 @@ export function MobileNav() {
 
   const isAdmin = user?.role === 'PLATFORM_ADMIN';
 
-  const matchingItems = NAV_ITEMS.filter(
-    (it) => location.pathname === it.to || location.pathname.startsWith(it.to + '/'),
-  );
-  const activeTo = matchingItems.reduce<string | null>(
-    (best, it) => (best === null || it.to.length > best.length ? it.to : best),
-    null,
-  );
+  const activeTo = resolveActiveNavTo(NAV_ITEMS, location.pathname, location.search);
 
   useEffect(() => {
     setOpen(false);
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>

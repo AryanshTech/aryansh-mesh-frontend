@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { RefreshCw, Sparkles, Eye } from 'lucide-react';
@@ -46,48 +45,62 @@ export function BrandPerceptionTab({ projectId, tenantId }: Props) {
   };
 
   if (isLoading) return <Skeleton className="h-96 w-full rounded-xl" />;
-  if (isError) return <ErrorState title={t('marketing.brandPerception.errorTitle')} onRetry={() => void refetch()} />;
+  if (isError) {
+    return (
+      <ErrorState title={t('marketing.brandPerception.errorTitle')} onRetry={() => void refetch()} />
+    );
+  }
 
   if (!hasPreview) {
     return (
-      <EmptyState
-        icon={<Eye />}
-        title={t('marketing.brandPerception.emptyTitle')}
-        description={t('marketing.brandPerception.emptyDescription')}
-        action={
-          <Button onClick={() => void onRefresh()} disabled={isFetching}>
-            <RefreshCw className="size-4" />
-            {isFetching ? t('common.loading') : t('marketing.brandPerception.refreshPreview')}
-          </Button>
-        }
-      />
+      <div className="flex flex-col gap-4">
+        <Card className="p-5 flex flex-col gap-3 max-w-2xl">
+          <p className="typo-eyebrow-upper text-faint">{t('marketing.brandPerception.spyEyebrow')}</p>
+          <h3 className="typo-display-md text-foreground">{t('marketing.brandPerception.spyTitle')}</h3>
+          <p className="typo-body-sm text-muted-foreground">
+            {t('marketing.brandPerception.spyDescription')}
+          </p>
+          <div className="flex flex-wrap gap-2 pt-1">
+            <Button onClick={() => void onRefresh()} disabled={isFetching}>
+              <Eye className="size-4" />
+              {isFetching ? t('common.loading') : t('marketing.brandPerception.runSpy')}
+            </Button>
+          </div>
+        </Card>
+        <EmptyState
+          icon={<Eye />}
+          title={t('marketing.brandPerception.emptyTitle')}
+          description={t('marketing.brandPerception.emptyDescription')}
+        />
+      </div>
     );
   }
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-end gap-2">
-        <Button variant="outline" onClick={() => void onRefresh()} disabled={isFetching}>
-          <RefreshCw className="size-4" />
-          {isFetching ? t('common.loading') : t('marketing.brandPerception.refreshPreview')}
-        </Button>
-        <Button onClick={() => void onSave()} disabled={saveMutation.isPending}>
-          <Sparkles className="size-4" />
-          {saveMutation.isPending ? t('common.loading') : t('marketing.brandPerception.generate')}
-        </Button>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div className="max-w-xl">
+          <p className="typo-eyebrow-upper text-faint">{t('marketing.brandPerception.spyEyebrow')}</p>
+          <p className="typo-body-sm text-muted-foreground mt-1">
+            {t('marketing.brandPerception.spyDescription')}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <Button variant="outline" onClick={() => void onRefresh()} disabled={isFetching}>
+            <RefreshCw className="size-4" />
+            {isFetching ? t('common.loading') : t('marketing.brandPerception.refreshPreview')}
+          </Button>
+          <Button onClick={() => void onSave()} disabled={saveMutation.isPending}>
+            <Sparkles className="size-4" />
+            {saveMutation.isPending ? t('common.loading') : t('marketing.brandPerception.generate')}
+          </Button>
+        </div>
       </div>
       <Card className="p-6 max-h-[70vh] overflow-y-auto">
         <pre className="whitespace-pre-wrap font-mono text-sm text-foreground leading-relaxed">
           {data?.contentMarkdown}
         </pre>
       </Card>
-      {saveMutation.isSuccess ? (
-        <Button variant="link" className="h-auto self-start p-0" asChild>
-          <Link to={`/marketing/projects/${projectId}/brand-memory`}>
-            {t('marketing.brandMemory.viewLink')}
-          </Link>
-        </Button>
-      ) : null}
     </div>
   );
 }

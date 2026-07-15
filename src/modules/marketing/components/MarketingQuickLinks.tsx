@@ -20,12 +20,12 @@ export function MarketingQuickLinks({ projectId, className }: Props) {
 
   const links: QuickLink[] = [
     {
-      to: `/marketing/projects/${projectId}/brand-memory`,
+      to: `/marketing?tab=brand&section=voice`,
       icon: Brain,
       labelKey: 'marketing.studio.types.memory.title',
     },
     {
-      to: `/marketing/projects/${projectId}/social`,
+      to: `/marketing?tab=calendar`,
       icon: CalendarDays,
       labelKey: 'marketing.studio.types.social.title',
     },

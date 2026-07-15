@@ -5,7 +5,6 @@ import {
   SheetTitle,
   SheetDescription,
   SheetFooter,
-  SheetClose,
 } from '@/design-system/components/ui/sheet';
 import { Button } from '@/design-system/components/ui/button';
 import { OverlayPortalTarget } from '@/shared/components/OverlayPortalTarget';
@@ -45,6 +44,10 @@ export function DetailDrawer({
   const { createGuardedOnOpenChange, dismissGuardProps, captureStampProps } = useRadixOpenGuard(open);
   const handleOpenChange = createGuardedOnOpenChange(onOpenChange);
 
+  const close = () => {
+    handleOpenChange(false);
+  };
+
   return (
     <div {...captureStampProps} className={className}>
       {master}
@@ -52,8 +55,9 @@ export function DetailDrawer({
         <SheetContent
           side="right"
           showClose={false}
+          showOverlay={false}
           className={cn(
-            'flex w-full max-w-[440px] flex-col gap-0 border-l border-border bg-card p-0',
+            'flex w-full max-w-[440px] flex-col gap-0 border-l border-border bg-card p-0 shadow-floating',
           )}
           {...dismissGuardProps}
         >
@@ -65,17 +69,25 @@ export function DetailDrawer({
                   <SheetDescription className="truncate">{description}</SheetDescription>
                 ) : null}
               </div>
-              <SheetClose asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  aria-label={t('common.close')}
-                  className="size-7 shrink-0"
-                >
-                  <X className="size-4" />
-                </Button>
-              </SheetClose>
+              {/* Explicit close — SheetClose+asChild was unreliable with controlled non-modal sheets */}
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label={t('common.close')}
+                className="size-7 shrink-0"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  close();
+                }}
+                onPointerDown={(e) => {
+                  // Keep the dismiss guard from treating this gesture as an outside interact.
+                  e.stopPropagation();
+                }}
+              >
+                <X className="size-4" />
+              </Button>
             </SheetHeader>
             <div className="flex-1 overflow-y-auto px-5 py-5">{children}</div>
             {footer ? (

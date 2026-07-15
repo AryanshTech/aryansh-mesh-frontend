@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/core/api/client';
-import { streamThreadChat, type ThreadChatEventHandler } from '@/modules/marketing/api/stream-thread-chat';
+import { ApiError, api } from '@/core/api/client';
+import {
+  streamThreadChat,
+  syncThreadChat,
+  type ThreadChatEventHandler,
+} from '@/modules/marketing/api/stream-thread-chat';
 
 export interface Thread {
   id: string;
@@ -134,11 +138,55 @@ export interface StreamMessageInput {
 
 export function useSendMessage(threadId: string, tenantId?: string) {
   const qc = useQueryClient();
+  const messagesKey = ['marketing', 'messages', threadId, tenantId ?? 'project'] as const;
+
   return useMutation({
-    mutationFn: ({ content, onEvent }: StreamMessageInput) =>
-      streamThreadChat(threadId, { content }, onEvent, tenantId),
-    onSettled: () => {
-      void qc.invalidateQueries({ queryKey: ['marketing', 'messages', threadId, tenantId ?? 'project'] });
+    mutationFn: async ({ content, onEvent }: StreamMessageInput) => {
+      try {
+        await streamThreadChat(threadId, { content }, onEvent, tenantId);
+      } catch (err) {
+        const status = err instanceof ApiError ? err.status : 0;
+        const code = err instanceof ApiError ? err.code : undefined;
+
+        if (code === 'TENANT_REQUIRED') {
+          throw err;
+        }
+
+        // Broken SSE after HTTP 200 often already saved the user message.
+        // Nudge sync so GCP LLM replies without duplicating the prompt.
+        const continuation =
+          code === 'STREAM_EMPTY'
+            ? 'Please reply to my previous message now. Return only the finished draft.'
+            : null;
+
+        const shouldFallback =
+          continuation !== null ||
+          status === 0 ||
+          status === 403 ||
+          status === 502 ||
+          status === 503;
+
+        if (!shouldFallback) {
+          throw err;
+        }
+
+        const result = await syncThreadChat(
+          threadId,
+          { content: continuation ?? content },
+          tenantId,
+        );
+        onEvent('message_start', { messageId: result.assistantMessageId });
+        if (result.content) {
+          onEvent('token', { text: result.content });
+        }
+        onEvent('message_end', {
+          messageId: result.assistantMessageId,
+          complete: result.complete,
+        });
+      }
+    },
+    onSettled: async () => {
+      await qc.invalidateQueries({ queryKey: messagesKey });
     },
   });
 }

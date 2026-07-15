@@ -4,7 +4,7 @@ import { useShellCommandPalette } from '@/shell/CommandPaletteContext';
 import { UserMenu } from '@/shell/UserMenu';
 import { BusinessSelector } from '@/shell/BusinessSelector';
 import { MobileNav } from '@/shell/MobileNav';
-import { NAV_ITEMS } from '@/shell/navigation';
+import { NAV_ITEMS, resolveActiveNavTo } from '@/shell/navigation';
 import { ChevronRight, Search } from 'lucide-react';
 import { useHeaderActions } from '@/shell/HeaderActionsContext';
 
@@ -14,9 +14,8 @@ export function Header() {
   const location = useLocation();
   const { actions, title } = useHeaderActions();
 
-  const active = NAV_ITEMS.find(
-    (it) => it.to === location.pathname || location.pathname.startsWith(it.to + '/'),
-  );
+  const activeTo = resolveActiveNavTo(NAV_ITEMS, location.pathname, location.search);
+  const active = NAV_ITEMS.find((it) => it.to === activeTo);
 
   const breadcrumbTitle = title ?? (active ? t(active.labelKey) : t('common.appName'));
 

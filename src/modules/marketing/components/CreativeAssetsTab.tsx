@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Upload, Image as ImageIcon, Check, X } from 'lucide-react';
@@ -30,15 +30,18 @@ import {
   useCreativeAssets,
   useUploadCreativeAsset,
   useUpdateCreativeAssetStatus,
+  useCreativeRuns,
+  useCreativeRecipes,
   type CreativeAsset,
   type AssetType,
   type ApprovalStatus,
 } from '@/modules/marketing/api/use-creative';
-import { useCreativeRuns } from '@/modules/marketing/api/use-creative';
+import { resolveCreativeAssetUrl } from '@/modules/marketing/api/resolve-creative-asset-url';
 
 interface Props {
   projectId: string;
   tenantId?: string;
+  initialRunId?: string;
 }
 
 const ASSET_TYPES: AssetType[] = ['IMAGE', 'VIDEO', 'REMOTION_PROJECT', 'PROMPT_PACK', 'OTHER'];
@@ -49,10 +52,11 @@ function approvalTone(status: ApprovalStatus): 'success' | 'danger' | 'warning' 
   return 'warning';
 }
 
-export function CreativeAssetsTab({ projectId, tenantId }: Props) {
+export function CreativeAssetsTab({ projectId, tenantId, initialRunId }: Props) {
   const { t } = useTranslation();
   const { data, isLoading, isError, refetch } = useCreativeAssets(projectId, tenantId);
   const { data: runsData } = useCreativeRuns(projectId, tenantId);
+  const { data: recipesData } = useCreativeRecipes(projectId, tenantId);
   const uploadMutation = useUploadCreativeAsset(projectId, tenantId);
   const statusMutation = useUpdateCreativeAssetStatus(projectId, tenantId);
 
@@ -67,11 +71,24 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
 
   const assets = data ?? [];
   const runs = runsData ?? [];
-  const runById = useMemo(() => {
+  const recipes = recipesData ?? [];
+  const recipeTitleById = useMemo(() => {
     const map = new Map<string, string>();
-    for (const r of runs) map.set(r.id, r.id.slice(0, 8));
+    for (const r of recipes) map.set(r.id, r.title);
     return map;
-  }, [runs]);
+  }, [recipes]);
+  const runLabelById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const r of runs) {
+      const title = recipeTitleById.get(r.recipeId) ?? r.recipeId.slice(0, 8);
+      map.set(r.id, `${title} · ${r.status}`);
+    }
+    return map;
+  }, [runs, recipeTitleById]);
+
+  useEffect(() => {
+    if (initialRunId) setUploadRunId(initialRunId);
+  }, [initialRunId]);
 
   const resetUpload = () => {
     setUploadFile(null);
@@ -154,15 +171,18 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
                 selected?.id === a.id ? 'border-primary/50 ring-1 ring-primary/30' : 'border-border',
               )}
             >
-              {a.assetType === 'IMAGE' && a.url ? (
+              {(() => {
+                const previewUrl = resolveCreativeAssetUrl(a.url);
+                return a.assetType === 'IMAGE' && previewUrl ? (
                 <div className="aspect-video w-full overflow-hidden rounded-md bg-muted">
-                  <img src={a.url} alt={a.label} className="size-full object-cover" />
+                  <img src={previewUrl} alt={a.label} className="size-full object-cover" />
                 </div>
               ) : (
                 <div className="aspect-video w-full overflow-hidden rounded-md bg-muted flex items-center justify-center">
                   <ImageIcon className="size-8 text-muted-foreground" />
                 </div>
-              )}
+              );
+              })()}
               <div className="flex items-center justify-between gap-2">
                 <p className="typo-card-title text-foreground line-clamp-1">{a.label}</p>
                 <StatusBadge label={t(`marketing.assets.status${a.approvalStatus.charAt(0).toUpperCase() + a.approvalStatus.slice(1)}`)} tone={approvalTone(a.approvalStatus)} />
@@ -208,21 +228,33 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
       >
         {selected ? (
           <div className="flex flex-col gap-4">
-            {selected.assetType === 'IMAGE' && selected.url ? (
-              <Card className="overflow-hidden p-0">
-                <img src={selected.url} alt={selected.label} className="w-full object-contain" />
-              </Card>
-            ) : selected.assetType === 'VIDEO' && selected.url ? (
-              <Card className="overflow-hidden p-0">
-                <video src={selected.url} controls className="w-full" />
-              </Card>
-            ) : selected.url ? (
-              <Card className="p-3">
-                <a href={selected.url} target="_blank" rel="noreferrer" className="text-primary break-all underline">
-                  {selected.url}
-                </a>
-              </Card>
-            ) : null}
+            {(() => {
+              const previewUrl = resolveCreativeAssetUrl(selected.url);
+              if (selected.assetType === 'IMAGE' && previewUrl) {
+                return (
+                  <Card className="overflow-hidden p-0">
+                    <img src={previewUrl} alt={selected.label} className="w-full object-contain" />
+                  </Card>
+                );
+              }
+              if (selected.assetType === 'VIDEO' && previewUrl) {
+                return (
+                  <Card className="overflow-hidden p-0">
+                    <video src={previewUrl} controls className="w-full" />
+                  </Card>
+                );
+              }
+              if (previewUrl) {
+                return (
+                  <Card className="p-3">
+                    <a href={previewUrl} target="_blank" rel="noreferrer" className="text-primary break-all underline">
+                      {previewUrl}
+                    </a>
+                  </Card>
+                );
+              }
+              return null;
+            })()}
             <Card className="p-4 flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <span className="typo-eyebrow-upper text-faint">{t('marketing.assets.fieldType')}</span>
@@ -233,9 +265,11 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
                 <StatusBadge label={selected.approvalStatus} tone={approvalTone(selected.approvalStatus)} />
               </div>
               {selected.runId ? (
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <span className="typo-eyebrow-upper text-faint">{t('marketing.assets.fieldRunId')}</span>
-                  <span className="typo-body-sm text-foreground">{runById.get(selected.runId) ?? selected.runId}</span>
+                  <span className="typo-body-sm text-foreground text-right">
+                    {runLabelById.get(selected.runId) ?? selected.runId}
+                  </span>
                 </div>
               ) : null}
             </Card>
@@ -286,7 +320,11 @@ export function CreativeAssetsTab({ projectId, tenantId }: Props) {
                 <Select value={uploadRunId} onValueChange={setUploadRunId}>
                   <SelectTrigger id="a-run"><SelectValue placeholder={t('marketing.assets.noRun')} /></SelectTrigger>
                   <SelectContent>
-                    {runs.map((r) => <SelectItem key={r.id} value={r.id}>{r.id.slice(0, 8)} — {r.status}</SelectItem>)}
+                    {runs.map((r) => (
+                      <SelectItem key={r.id} value={r.id}>
+                        {runLabelById.get(r.id) ?? r.id}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
