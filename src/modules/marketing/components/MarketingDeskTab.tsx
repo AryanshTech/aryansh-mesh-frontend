@@ -6,6 +6,7 @@ import {
   CalendarDays,
   Check,
   Copy,
+  Download,
   Image as ImageIcon,
   Loader2,
   MessageSquare,
@@ -38,7 +39,16 @@ import {
   type SocialPlatform,
 } from '@/modules/marketing/api/use-social-posts';
 import { useCurrentBrandIdentity } from '@/modules/marketing/api/use-brand-identity';
-import { buildBrandImagePromptRequest } from '@/modules/marketing/lib/brand-image-prompt';
+import {
+  buildBrandImagePromptRequest,
+  formatVisualKitForImagePrompt,
+} from '@/modules/marketing/lib/brand-image-prompt';
+import {
+  formatBrandContextForPrompt,
+  withBrandContext,
+} from '@/modules/marketing/lib/brand-context';
+import { buildRevisionPrompt } from '@/modules/marketing/lib/revise-prompt';
+import { ReviseWithFeedback } from '@/modules/marketing/components/ReviseWithFeedback';
 import { buildLinkedInCommentPrompt, buildPromptFromGenerationBrief, displayRecipeTitle } from '@/modules/marketing/lib/social-content';
 import {
   briefFromRecipe,
@@ -49,7 +59,8 @@ import {
   type RunNotes,
 } from '@/modules/marketing/lib/run-notes';
 import { SocialPlatformActions } from '@/modules/marketing/components/SocialPlatformActions';
-import { useBrandMemory } from '@/modules/marketing/api/use-brand-memory';
+import { VideoPlanActions } from '@/modules/marketing/components/VideoPlanActions';
+import { useBrandMemory, useSaveBrandMemory } from '@/modules/marketing/api/use-brand-memory';
 import {
   addDaysIso,
   getCadenceDays,
@@ -59,10 +70,21 @@ import { resolveCreativeAssetUrl } from '@/modules/marketing/api/resolve-creativ
 import { useContentFeedbackRating } from '@/modules/marketing/api/use-content-feedback';
 import {
   buildCaptionGenerationPrompt,
+  cleanSocialCaption,
   formatQueuePostsAsMarkdown,
   parseQueuePosts,
   type QueuePost,
 } from '@/modules/marketing/lib/parse-social-output';
+import {
+  appendGenerationFeedbackToMemory,
+  isStrongGenerationFeedback,
+} from '@/modules/marketing/lib/generation-feedback';
+import {
+  downloadMarkdown,
+  isVideoRecipe,
+  isVideoRun,
+  splitMarkdownSections,
+} from '@/modules/marketing/lib/video-plan';
 import { Input } from '@/design-system/components/ui/input';
 import {
   Select,
@@ -146,6 +168,15 @@ export function MarketingDeskTab({
   const { data: recipesData } = useCreativeRecipes(projectId, tenantId);
   const { data: identity } = useCurrentBrandIdentity(projectId, tenantId);
   const { data: brandMemory } = useBrandMemory(projectId, tenantId);
+  const saveBrandMemory = useSaveBrandMemory(projectId, tenantId);
+  const brandContext = useMemo(
+    () =>
+      formatBrandContextForPrompt({
+        memoryMarkdown: brandMemory?.contentMarkdown,
+        identity: identity ?? null,
+      }),
+    [brandMemory?.contentMarkdown, identity],
+  );
   const updateRun = useUpdateCreativeRun(projectId, tenantId);
   const createThread = useCreateThread(projectId, tenantId);
   const createSocialPost = useCreateSocialPost(projectId, tenantId);
@@ -157,16 +188,6 @@ export function MarketingDeskTab({
     for (const r of recipesData ?? []) map.set(r.id, r);
     return map;
   }, [recipesData]);
-
-  const runs = useMemo(() => {
-    const list = [...(runsData ?? [])];
-    list.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-    if (!lockedPlatform) return list;
-    return list.filter((run) => {
-      const channel = recipeById.get(run.recipeId)?.channel ?? '';
-      return channelToPlatform(channel) === lockedPlatform;
-    });
-  }, [runsData, lockedPlatform, recipeById]);
 
   const [selectedId, setSelectedId] = useState<string | null>(initialRunId ?? null);
   const [caption, setCaption] = useState('');
@@ -180,8 +201,10 @@ export function MarketingDeskTab({
   const [queuePosts, setQueuePosts] = useState<QueuePost[]>([]);
   const [activeQueueIndex, setActiveQueueIndex] = useState(0);
   const [runRating, setRunRating] = useState<'like' | 'dislike' | null>(null);
+  const [reviseCaptionOpen, setReviseCaptionOpen] = useState(false);
   const [genBrief, setGenBrief] = useState<GenerationBrief>(emptyGenerationBrief());
   const autoGenerateFired = useRef(false);
+  const videoGenerateFired = useRef<string | null>(null);
   const notesRef = useRef<RunNotes>({
     imageBrief: '',
     comments: '',
@@ -189,22 +212,45 @@ export function MarketingDeskTab({
   });
   const hydratedRunId = useRef<string | null>(null);
 
+  const runs = useMemo(() => {
+    const list = [...(runsData ?? [])];
+    list.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    if (!lockedPlatform) return list;
+    return list.filter((run) => {
+      if (initialRunId && run.id === initialRunId) return true;
+      if (selectedId && run.id === selectedId) return true;
+      const recipe = recipeById.get(run.recipeId);
+      if (isVideoRecipe(recipe) || isVideoRun(run, recipe)) return true;
+      if (!recipe) return true;
+      const channel = recipe.channel ?? '';
+      return channelToPlatform(channel) === lockedPlatform;
+    });
+  }, [runsData, lockedPlatform, recipeById, initialRunId, selectedId]);
+
   useEffect(() => {
     if (initialRunId) {
       setSelectedId(initialRunId);
       autoGenerateFired.current = false;
+      videoGenerateFired.current = null;
     }
   }, [initialRunId]);
 
   const selected: CreativeRun | null = useMemo(() => {
     if (!selectedId) return runs[0] ?? null;
-    return runs.find((r) => r.id === selectedId) ?? runs[0] ?? null;
-  }, [runs, selectedId]);
+    const inView = runs.find((r) => r.id === selectedId);
+    if (inView) return inView;
+    return (runsData ?? []).find((r) => r.id === selectedId) ?? runs[0] ?? null;
+  }, [runs, selectedId, runsData]);
 
   const selectedRecipe = selected ? recipeById.get(selected.recipeId) : undefined;
   const accent = platformAccent(selectedRecipe?.channel);
+  const isVideoPlan = isVideoRun(selected, selectedRecipe);
   const isLinkedIn =
-    (selectedRecipe?.channel ?? '').trim().toLowerCase() === 'linkedin';
+    !isVideoPlan && (selectedRecipe?.channel ?? '').trim().toLowerCase() === 'linkedin';
+  const videoSections = useMemo(
+    () => (isVideoPlan ? splitMarkdownSections(caption) : []),
+    [isVideoPlan, caption],
+  );
 
   // Hydrate composer only when switching posts — keep generated copy on screen across note saves.
   useEffect(() => {
@@ -222,9 +268,17 @@ export function MarketingDeskTab({
     );
     setGeneratedImageUrl(null);
     setRunRating(null);
+    setReviseCaptionOpen(false);
+    if (selected.resultSummary?.trim()) {
+      videoGenerateFired.current = selected.id;
+    } else if (videoGenerateFired.current === selected.id) {
+      /* keep fired so we don't double-kick mid-request */
+    } else {
+      videoGenerateFired.current = null;
+    }
 
     const posts = parseQueuePosts(selected.resultSummary);
-    if (posts.length >= 2) {
+    if (!isVideoRecipe(selectedRecipe) && posts.length >= 2) {
       setQueuePosts(posts);
       setActiveQueueIndex(0);
       setCaption(posts[0].copy);
@@ -232,10 +286,14 @@ export function MarketingDeskTab({
     } else {
       setQueuePosts([]);
       setActiveQueueIndex(0);
-      setCaption(selected.resultSummary ?? '');
+      setCaption(
+        isVideoRun(selected, selectedRecipe)
+          ? (selected.resultSummary ?? '')
+          : cleanSocialCaption(selected.resultSummary ?? ''),
+      );
       setImageBrief(notes.imageBrief);
     }
-  }, [selected, selectedRecipe?.goal, selectedRecipe?.title]);
+  }, [selected, selectedRecipe?.goal, selectedRecipe?.title, selectedRecipe]);
 
   // If backend fills resultSummary after mount (e.g. createRun), adopt it once when caption empty.
   useEffect(() => {
@@ -245,12 +303,12 @@ export function MarketingDeskTab({
     if (posts.length >= 2) {
       setQueuePosts(posts);
       setActiveQueueIndex(0);
-      setCaption(posts[0].copy);
+      setCaption(cleanSocialCaption(posts[0].copy));
       if (!imageBrief.trim() && posts[0].visualSuggestion) {
         setImageBrief(posts[0].visualSuggestion);
       }
     } else {
-      setCaption(selected.resultSummary);
+      setCaption(cleanSocialCaption(selected.resultSummary));
     }
   }, [selected?.id, selected?.resultSummary, generatingCaption, caption, imageBrief]);
 
@@ -319,9 +377,64 @@ export function MarketingDeskTab({
           ? t('marketing.desk.feedbackLiked')
           : t('marketing.desk.feedbackDisliked'),
       );
+      if (rating === 'dislike' && caption.trim()) {
+        setReviseCaptionOpen(true);
+      }
     } catch (e) {
       toast.error((e as Error).message || t('marketing.desk.feedbackFailed'));
     }
+  };
+
+  const persistStrongFeedback = async (feedback: string, surface: string, channel?: string) => {
+    if (!isStrongGenerationFeedback(feedback)) return;
+    try {
+      const next = appendGenerationFeedbackToMemory(brandMemory?.contentMarkdown ?? '', {
+        feedback,
+        surface,
+        channel,
+      });
+      if (next === (brandMemory?.contentMarkdown ?? '').trim()) return;
+      await saveBrandMemory.mutateAsync(next);
+      toast.success(t('marketing.revise.feedbackSaved'));
+    } catch {
+      /* non-blocking — revise still succeeded */
+    }
+  };
+
+  const applyCaptionResult = async (
+    run: CreativeRun,
+    text: string,
+    sourcePrompt: string,
+    brief: GenerationBrief,
+  ) => {
+    const recipe = recipeById.get(run.recipeId);
+    const posts = parseQueuePosts(text).map((p) => ({
+      ...p,
+      copy: cleanSocialCaption(p.copy),
+    }));
+    const single = cleanSocialCaption(text.replace(/```json|```/gi, '').trim());
+    const stored =
+      posts.length >= 2 ? formatQueuePostsAsMarkdown(posts) : single;
+
+    const updated = await updateRun.mutateAsync({
+      runId: run.id,
+      input: { resultSummary: stored, status: 'UPLOADED', sourcePrompt },
+    });
+    setRunRating(null);
+
+    if (posts.length >= 2) {
+      setQueuePosts(posts);
+      setActiveQueueIndex(0);
+      setCaption(posts[0].copy);
+      setImageBrief(posts[0].visualSuggestion);
+      await persistNotes(run.id, { imageBrief: posts[0].visualSuggestion, brief });
+      return { kind: 'queue' as const, captionText: posts[0].copy, recipe };
+    }
+
+    setQueuePosts([]);
+    const captionText = cleanSocialCaption(updated.resultSummary ?? stored);
+    setCaption(captionText);
+    return { kind: 'single' as const, captionText, recipe };
   };
 
   const onGenerateCaption = async (run: CreativeRun) => {
@@ -336,7 +449,10 @@ export function MarketingDeskTab({
       return;
     }
 
-    const prompt = buildPromptFromGenerationBrief(channel, brief);
+    const prompt = withBrandContext(
+      buildPromptFromGenerationBrief(channel, brief),
+      brandContext,
+    );
 
     setGeneratingCaption(true);
     selectRun(run.id);
@@ -359,40 +475,22 @@ export function MarketingDeskTab({
         return;
       }
 
-      const posts = parseQueuePosts(text);
-      const stored =
-        posts.length >= 2 ? formatQueuePostsAsMarkdown(posts) : text.replace(/```json|```/gi, '').trim();
-
-      const updated = await updateRun.mutateAsync({
-        runId: run.id,
-        input: { resultSummary: stored, status: 'UPLOADED', sourcePrompt: prompt },
-      });
-      setRunRating(null);
-
-      if (posts.length >= 2) {
-        setQueuePosts(posts);
-        setActiveQueueIndex(0);
-        setCaption(posts[0].copy);
-        setImageBrief(posts[0].visualSuggestion);
-        await persistNotes(run.id, { imageBrief: posts[0].visualSuggestion, brief });
+      const result = await applyCaptionResult(run, text, prompt, brief);
+      if (result.kind === 'queue') {
+        const posts = parseQueuePosts(text);
         toast.success(t('marketing.desk.queueGenerated', { count: posts.length }));
         setGeneratingCaption(false);
-        if ((recipe?.channel ?? '').trim().toLowerCase() === 'linkedin') {
-          await onGenerateComments(run, posts[0].copy);
+        if ((result.recipe?.channel ?? '').trim().toLowerCase() === 'linkedin') {
+          await onGenerateComments(run, result.captionText);
         }
         return;
       }
 
-      setQueuePosts([]);
-      setCaption(updated.resultSummary ?? stored);
       toast.success(t('marketing.desk.captionGenerated'));
-
       setGeneratingCaption(false);
-      const captionText = updated.resultSummary ?? stored;
-      await onGenerateImageBrief(run, captionText);
-
-      if ((recipe?.channel ?? '').trim().toLowerCase() === 'linkedin') {
-        await onGenerateComments(run, captionText);
+      await onGenerateImageBrief(run, result.captionText);
+      if ((result.recipe?.channel ?? '').trim().toLowerCase() === 'linkedin') {
+        await onGenerateComments(run, result.captionText);
       }
     } catch (e) {
       toast.error((e as Error).message || t('marketing.desk.generateFailed'));
@@ -410,6 +508,85 @@ export function MarketingDeskTab({
     }
   };
 
+  const onReviseCaption = async (feedback: string) => {
+    if (!selected) return;
+    const recipe = recipeById.get(selected.recipeId);
+    const channel = recipe?.channel || 'LinkedIn';
+    const brief = genBrief.topic.trim()
+      ? genBrief
+      : briefFromRecipe(recipe?.goal, recipe?.title);
+    const previous =
+      queuePosts.length >= 2
+        ? formatQueuePostsAsMarkdown(queuePosts)
+        : caption.trim();
+    if (!previous) {
+      toast.error(t('marketing.revise.needDraft'));
+      return;
+    }
+
+    const reviseCore = buildRevisionPrompt({
+      deliverable: `${channel} post copy`,
+      previousOutput: previous,
+      feedback,
+      taskReminder: brief.topic.trim()
+        ? [
+            `Topic: ${brief.topic}`,
+            brief.angle && `Angle: ${brief.angle}`,
+            brief.audience && `Audience: ${brief.audience}`,
+            brief.cta && `CTA: ${brief.cta}`,
+            brief.tone && `Tone: ${brief.tone}`,
+          ]
+            .filter(Boolean)
+            .join('\n')
+        : recipe?.goal,
+      outputInstructions:
+        queuePosts.length >= 2 || brief.format === 'week'
+          ? [
+              `Return a revised ${channel} Mon–Fri pack in ---POST--- format only.`,
+              'Each block: Day, Type, Caption, Image.',
+              'No JSON, no preamble.',
+            ].join('\n')
+          : `Return ONLY the revised ready-to-publish ${channel} post body. No preamble, no markdown titles, max 3 hashtags.`,
+    });
+    const prompt = withBrandContext(reviseCore, brandContext);
+
+    setGeneratingCaption(true);
+    selectRun(selected.id);
+    try {
+      await updateRun.mutateAsync({
+        runId: selected.id,
+        input: { status: 'RUNNING_LOCALLY', sourcePrompt: prompt },
+      });
+      const text = await runVertex(
+        buildCaptionGenerationPrompt(prompt, channel),
+        `Revise caption · ${brief.topic || recipe?.title || selected.id}`,
+      );
+      if (!text) {
+        toast.error(t('marketing.desk.emptyReply'));
+        await updateRun.mutateAsync({
+          runId: selected.id,
+          input: { status: 'READY_TO_RUN_LOCALLY' },
+        });
+        return;
+      }
+      await applyCaptionResult(selected, text, prompt, brief);
+      toast.success(t('marketing.revise.success'));
+      await persistStrongFeedback(feedback, 'caption', channel);
+    } catch (e) {
+      toast.error((e as Error).message || t('marketing.revise.failed'));
+      try {
+        await updateRun.mutateAsync({
+          runId: selected.id,
+          input: { status: 'READY_TO_RUN_LOCALLY' },
+        });
+      } catch {
+        /* ignore */
+      }
+    } finally {
+      setGeneratingCaption(false);
+    }
+  };
+
   const onGenerateImageBrief = async (run: CreativeRun, captionOverride?: string) => {
     const recipe = recipeById.get(run.recipeId);
     const topic = genBrief.topic.trim() || recipe?.goal || recipe?.title || 'Brand post';
@@ -421,6 +598,7 @@ export function MarketingDeskTab({
       topic,
       caption: captionForImage,
       identity: identity ?? null,
+      memoryMarkdown: brandMemory?.contentMarkdown,
     });
 
     setGeneratingImage(true);
@@ -443,7 +621,10 @@ export function MarketingDeskTab({
 
   const onGeneratePixelImage = async (run: CreativeRun) => {
     const fromNotes = parseRunNotes(run.localExecutorNotes).imageBrief.trim();
-    const prompt = (imageBrief.trim() || fromNotes).slice(0, 2500);
+    const visualKit = formatVisualKitForImagePrompt(identity);
+    const base = (imageBrief.trim() || fromNotes).trim();
+    const withKit = visualKit ? `${base}\n\n${visualKit}` : base;
+    const prompt = withKit.slice(0, 2500);
     if (!prompt) {
       toast.error(t('marketing.desk.needImageBrief'));
       return;
@@ -455,12 +636,22 @@ export function MarketingDeskTab({
         runId: run.id,
         label: `Nano Banana · ${displayRecipeTitle(recipeById.get(run.recipeId))}`,
       });
-      const url = resolveCreativeAssetUrl(asset.url);
-      setGeneratedImageUrl(url || null);
+      const url = resolveCreativeAssetUrl(asset?.url);
+      if (!url) {
+        toast.error(t('marketing.desk.pixelFailed'));
+        return;
+      }
+      setGeneratedImageUrl(url);
       toast.success(t('marketing.desk.pixelGenerated'));
     } catch (e) {
       // Stay on Create — never navigate away or remount the hub on image failure.
-      toast.error((e as Error).message || t('marketing.desk.pixelFailed'));
+      const status = (e as { status?: number } | null)?.status;
+      const msg = (e as Error)?.message?.trim();
+      if (status === 404) {
+        toast.error(t('marketing.desk.pixelUnavailable'));
+      } else {
+        toast.error(msg || t('marketing.desk.pixelFailed'));
+      }
     } finally {
       setGeneratingPixel(false);
     }
@@ -474,10 +665,13 @@ export function MarketingDeskTab({
       return;
     }
     const recipe = recipeById.get(run.recipeId);
-    const prompt = buildLinkedInCommentPrompt({
-      postCaption,
-      context: recipe?.goal,
-    });
+    const prompt = withBrandContext(
+      buildLinkedInCommentPrompt({
+        postCaption,
+        context: recipe?.goal,
+      }),
+      brandContext,
+    );
 
     setGeneratingComments(true);
     selectRun(run.id);
@@ -497,8 +691,243 @@ export function MarketingDeskTab({
     }
   };
 
+  const onReviseImageBrief = async (feedback: string) => {
+    if (!selected || !imageBrief.trim()) {
+      toast.error(t('marketing.revise.needDraft'));
+      return;
+    }
+    const recipe = recipeById.get(selected.recipeId);
+    const topic = genBrief.topic.trim() || recipe?.goal || recipe?.title || 'Brand post';
+    const channel = recipe?.channel || 'Instagram';
+    const prompt = withBrandContext(
+      buildRevisionPrompt({
+        deliverable: `${channel} image-generation prompt`,
+        previousOutput: imageBrief.trim(),
+        feedback,
+        taskReminder: [
+          `Topic: ${topic}`,
+          caption.trim() && `Caption to support:\n${caption.trim()}`,
+        ]
+          .filter(Boolean)
+          .join('\n\n'),
+        outputInstructions: [
+          'Return ONLY one revised ready-to-paste image-generation prompt.',
+          'Match brand visual style and colors. No preamble.',
+        ].join('\n'),
+      }),
+      brandContext,
+    );
+
+    setGeneratingImage(true);
+    selectRun(selected.id);
+    try {
+      const text = await runVertex(prompt, `Revise image · ${recipe?.title ?? selected.id}`);
+      if (!text) {
+        toast.error(t('marketing.desk.emptyImageBrief'));
+        return;
+      }
+      setImageBrief(text);
+      await persistNotes(selected.id, { imageBrief: text });
+      toast.success(t('marketing.revise.success'));
+      await persistStrongFeedback(feedback, 'image brief', recipe?.channel);
+    } catch (e) {
+      toast.error((e as Error).message || t('marketing.revise.failed'));
+    } finally {
+      setGeneratingImage(false);
+    }
+  };
+
+  const onReviseComments = async (feedback: string) => {
+    if (!selected || !commentDrafts.trim()) {
+      toast.error(t('marketing.revise.needDraft'));
+      return;
+    }
+    const recipe = recipeById.get(selected.recipeId);
+    const prompt = withBrandContext(
+      buildRevisionPrompt({
+        deliverable: 'LinkedIn comment drafts',
+        previousOutput: commentDrafts.trim(),
+        feedback,
+        taskReminder: caption.trim()
+          ? `Post context:\n${caption.trim()}`
+          : recipe?.goal,
+        outputInstructions: [
+          'Return 4 revised short LinkedIn comment drafts, numbered 1–4.',
+          'Professional, specific, on-brand. No hashtags. No preamble.',
+        ].join('\n'),
+      }),
+      brandContext,
+    );
+
+    setGeneratingComments(true);
+    selectRun(selected.id);
+    try {
+      const text = await runVertex(prompt, `Revise comments · ${recipe?.title ?? selected.id}`);
+      if (!text) {
+        toast.error(t('marketing.desk.emptyComments'));
+        return;
+      }
+      setCommentDrafts(text);
+      await persistNotes(selected.id, { comments: text });
+      toast.success(t('marketing.revise.success'));
+      await persistStrongFeedback(feedback, 'LinkedIn comments', recipe?.channel);
+    } catch (e) {
+      toast.error((e as Error).message || t('marketing.revise.failed'));
+    } finally {
+      setGeneratingComments(false);
+    }
+  };
+
+  const onReviseVideoPlan = async (feedback: string) => {
+    if (!selected || !caption.trim()) {
+      toast.error(t('marketing.revise.needDraft'));
+      return;
+    }
+    const recipe = recipeById.get(selected.recipeId);
+    const founders = /##\s+Founders video script/i.test(caption);
+    const outputInstructions = founders
+      ? [
+          'Return a single revised markdown document with exactly these H2 sections:',
+          '## Founders video script',
+          '## Interstitial prompts',
+          '## Remotion generation prompt',
+          'No preamble. No code fence around the whole document.',
+        ].join('\n')
+      : [
+          'Return a single revised markdown document with exactly these H2 sections:',
+          '## Video script package',
+          '## Remotion generation prompt',
+          'No preamble. No code fence around the whole document.',
+        ].join('\n');
+
+    const prompt = withBrandContext(
+      buildRevisionPrompt({
+        deliverable: founders ? 'founders video markdown package' : 'product video markdown package',
+        previousOutput: caption.trim(),
+        feedback,
+        taskReminder: recipe?.goal || recipe?.promptMarkdown?.slice(0, 1500),
+        outputInstructions,
+      }),
+      brandContext,
+    );
+
+    setGeneratingCaption(true);
+    selectRun(selected.id);
+    try {
+      await updateRun.mutateAsync({
+        runId: selected.id,
+        input: { status: 'RUNNING_LOCALLY', sourcePrompt: prompt },
+      });
+      const text = await runVertex(prompt, `Revise video · ${recipe?.title ?? selected.id}`);
+      if (!text) {
+        toast.error(t('marketing.desk.emptyReply'));
+        await updateRun.mutateAsync({
+          runId: selected.id,
+          input: { status: 'READY_TO_RUN_LOCALLY' },
+        });
+        return;
+      }
+      const cleaned = text.replace(/^```(?:markdown|md)?\s*|\s*```$/gi, '').trim();
+      setCaption(cleaned);
+      setQueuePosts([]);
+      await updateRun.mutateAsync({
+        runId: selected.id,
+        input: { resultSummary: cleaned, status: 'UPLOADED', sourcePrompt: prompt },
+      });
+      toast.success(t('marketing.revise.success'));
+      await persistStrongFeedback(feedback, 'video plan', recipe?.channel);
+    } catch (e) {
+      toast.error((e as Error).message || t('marketing.revise.failed'));
+      try {
+        await updateRun.mutateAsync({
+          runId: selected.id,
+          input: { status: 'READY_TO_RUN_LOCALLY' },
+        });
+      } catch {
+        /* ignore */
+      }
+    } finally {
+      setGeneratingCaption(false);
+    }
+  };
+
+  const onGenerateVideoPlan = async (run: CreativeRun) => {
+    const recipe = recipeById.get(run.recipeId);
+    const base =
+      (run.sourcePrompt || recipe?.promptMarkdown || '').trim() ||
+      [
+        'Plan a product / feature Remotion video for our brand.',
+        '',
+        `Goal: ${recipe?.goal || recipe?.title || 'Product video'}`,
+        '',
+        'Return a single markdown document with exactly these H2 sections:',
+        '## Video script package',
+        '## Remotion generation prompt',
+      ].join('\n');
+    const founders =
+      /founders/i.test(base) ||
+      /founder/i.test(recipe?.title ?? '') ||
+      /founder/i.test(recipe?.channel ?? '');
+    const reinforced = [
+      base,
+      '',
+      'Output requirements (mandatory):',
+      founders
+        ? 'Return markdown with H2 sections exactly: ## Founders video script, ## Interstitial prompts, ## Remotion generation prompt'
+        : 'Return markdown with H2 sections exactly: ## Video script package, ## Remotion generation prompt',
+      'No preamble. No code fence around the whole document.',
+      'Follow brand memory and visual identity. Do not invent another company.',
+    ].join('\n');
+    const prompt = withBrandContext(reinforced, brandContext);
+
+    setGeneratingCaption(true);
+    selectRun(run.id);
+    try {
+      await updateRun.mutateAsync({
+        runId: run.id,
+        input: { status: 'RUNNING_LOCALLY', sourcePrompt: prompt },
+      });
+      const text = await runVertex(
+        prompt,
+        `Video plan · ${recipe?.title ?? run.id}`,
+      );
+      if (!text) {
+        toast.error(t('marketing.desk.emptyReply'));
+        await updateRun.mutateAsync({
+          runId: run.id,
+          input: { status: 'READY_TO_RUN_LOCALLY' },
+        });
+        return;
+      }
+      const cleaned = text.replace(/^```(?:markdown|md)?\s*|\s*```$/gi, '').trim();
+      setCaption(cleaned);
+      setQueuePosts([]);
+      await updateRun.mutateAsync({
+        runId: run.id,
+        input: { resultSummary: cleaned, status: 'UPLOADED', sourcePrompt: prompt },
+      });
+      toast.success(t('marketing.video.generated'));
+    } catch (e) {
+      toast.error((e as Error).message || t('marketing.video.generateFailed'));
+      try {
+        await updateRun.mutateAsync({
+          runId: run.id,
+          input: { status: 'READY_TO_RUN_LOCALLY' },
+        });
+      } catch {
+        /* ignore */
+      }
+    } finally {
+      setGeneratingCaption(false);
+    }
+  };
+
   useEffect(() => {
     if (!autoGenerate || autoGenerateFired.current || !selected || generatingCaption) return;
+    if (isVideoRecipe(recipeById.get(selected.recipeId))) {
+      onClearAutoGenerate?.();
+      return;
+    }
     if (selected.resultSummary?.trim()) {
       onClearAutoGenerate?.();
       return;
@@ -507,6 +936,18 @@ export function MarketingDeskTab({
     void onGenerateCaption(selected);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoGenerate, selected?.id]);
+
+  // If createRun returned empty (or old backend), generate the video MD package on the desk.
+  useEffect(() => {
+    if (!selected || generatingCaption) return;
+    const recipe = recipeById.get(selected.recipeId);
+    if (!isVideoRecipe(recipe) && !isVideoRun(selected, recipe)) return;
+    if (selected.resultSummary?.trim() || caption.trim()) return;
+    if (videoGenerateFired.current === selected.id) return;
+    videoGenerateFired.current = selected.id;
+    void onGenerateVideoPlan(selected);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected?.id, selected?.resultSummary, caption, recipeById]);
 
   const persistCaption = async () => {
     if (!selected) return;
@@ -607,8 +1048,13 @@ export function MarketingDeskTab({
           <p className="mt-1 max-w-2xl typo-body-sm text-muted-foreground">
             {t('marketing.desk.heroSubtitle')}
           </p>
-          <div className="mt-4">
+          <div className="mt-4 flex flex-col gap-3">
             <SocialPlatformActions
+              projectId={projectId}
+              tenantId={tenantId}
+              lockedPlatform={lockedPlatform}
+            />
+            <VideoPlanActions
               projectId={projectId}
               tenantId={tenantId}
               lockedPlatform={lockedPlatform}
@@ -630,8 +1076,13 @@ export function MarketingDeskTab({
           ) : null}
         </section>
       ) : (
-        <div>
+        <div className="flex flex-col gap-3">
           <SocialPlatformActions
+            projectId={projectId}
+            tenantId={tenantId}
+            lockedPlatform={lockedPlatform}
+          />
+          <VideoPlanActions
             projectId={projectId}
             tenantId={tenantId}
             lockedPlatform={lockedPlatform}
@@ -722,6 +1173,143 @@ export function MarketingDeskTab({
                 </div>
               </div>
 
+              {isVideoPlan ? (
+                <div className="flex flex-col gap-4">
+                  <p className="typo-body-sm text-muted-foreground">{t('marketing.video.deskHint')}</p>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => selected && void onGenerateVideoPlan(selected)}
+                    >
+                      {generatingCaption ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <Sparkles className="size-4" />
+                      )}
+                      {caption.trim()
+                        ? t('marketing.video.regenerate')
+                        : t('marketing.video.generate')}
+                    </Button>
+                    <ReviseWithFeedback
+                      hasContent={Boolean(caption.trim())}
+                      busy={generatingCaption}
+                      disabled={busy && !generatingCaption}
+                      onRevise={onReviseVideoPlan}
+                      size="default"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={!caption.trim()}
+                      onClick={() => void onCopy(caption, 'marketing.video.copiedFull')}
+                    >
+                      <Copy className="size-4" />
+                      {t('marketing.video.copyFull')}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={!caption.trim()}
+                      onClick={() => {
+                        const slug = (selectedRecipe?.title || 'video-plan')
+                          .toLowerCase()
+                          .replace(/[^a-z0-9]+/g, '-')
+                          .replace(/^-|-$/g, '');
+                        downloadMarkdown(`${slug || 'video-plan'}.md`, caption);
+                        toast.success(t('marketing.video.downloaded'));
+                      }}
+                    >
+                      <Download className="size-4" />
+                      {t('marketing.video.download')}
+                    </Button>
+                  </div>
+                  {generatingCaption ? (
+                    <span className="inline-flex items-center gap-1.5 typo-eyebrow text-muted-foreground">
+                      <Loader2 className="size-3.5 animate-spin" />
+                      {t('marketing.video.writing')}
+                    </span>
+                  ) : null}
+                  {videoSections.length > 0 ? (
+                    <div className="flex flex-col gap-3">
+                      {videoSections.map((section) => (
+                        <div
+                          key={section.heading}
+                          className="rounded-xl border border-border bg-muted/20 p-3 md:p-4"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <h4 className="typo-body-sm font-medium text-foreground">
+                              {section.heading}
+                            </h4>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="ghost"
+                              disabled={!section.body.trim()}
+                              onClick={() =>
+                                void onCopy(
+                                  `## ${section.heading}\n\n${section.body}`,
+                                  'marketing.video.copiedSection',
+                                )
+                              }
+                            >
+                              <Copy className="size-3.5" />
+                              {t('marketing.video.copySection')}
+                            </Button>
+                          </div>
+                          <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap typo-body-sm text-muted-foreground">
+                            {section.body || '—'}
+                          </pre>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <Textarea
+                      rows={16}
+                      value={caption}
+                      onChange={(e) => setCaption(e.target.value)}
+                      onBlur={() => {
+                        if (selected && caption !== (selected.resultSummary ?? '')) {
+                          void persistCaption().catch(() => undefined);
+                        }
+                      }}
+                      placeholder={t('marketing.video.packagePlaceholder')}
+                      disabled={generatingCaption}
+                      className="min-h-[320px] resize-y font-mono text-sm"
+                    />
+                  )}
+                  {caption.trim() && videoSections.length > 0 ? (
+                    <details className="rounded-xl border border-border p-3">
+                      <summary className="cursor-pointer typo-body-sm font-medium">
+                        {t('marketing.video.editFull')}
+                      </summary>
+                      <Textarea
+                        rows={14}
+                        value={caption}
+                        onChange={(e) => setCaption(e.target.value)}
+                        onBlur={() => {
+                          if (selected && caption !== (selected.resultSummary ?? '')) {
+                            void persistCaption().catch(() => undefined);
+                          }
+                        }}
+                        disabled={generatingCaption}
+                        className="mt-3 min-h-[280px] resize-y font-mono text-sm"
+                      />
+                    </details>
+                  ) : null}
+                  <div className="flex flex-wrap gap-2 border-t border-border pt-4">
+                    <Button
+                      type="button"
+                      onClick={() => void onApprove()}
+                      disabled={busy || !caption.trim()}
+                    >
+                      <Check className="size-4" />
+                      {t('marketing.desk.approve')}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+              <>
               <div className="rounded-xl border border-border bg-muted/20 p-3 md:p-4">
                 <p className="typo-body-sm font-medium text-foreground">
                   {t('marketing.desk.customizeTitle')}
@@ -892,6 +1480,14 @@ export function MarketingDeskTab({
                         ? t('marketing.desk.rewriteCaption')
                         : t('marketing.desk.writeCaption')}
                     </Button>
+                    <ReviseWithFeedback
+                      hasContent={Boolean(caption.trim())}
+                      busy={generatingCaption}
+                      disabled={busy && !generatingCaption}
+                      open={reviseCaptionOpen}
+                      onOpenChange={setReviseCaptionOpen}
+                      onRevise={onReviseCaption}
+                    />
                     <Button
                       type="button"
                       size="sm"
@@ -971,6 +1567,12 @@ export function MarketingDeskTab({
                         ? t('marketing.desk.rewriteImage')
                         : t('marketing.desk.writeImage')}
                     </Button>
+                    <ReviseWithFeedback
+                      hasContent={Boolean(imageBrief.trim())}
+                      busy={generatingImage}
+                      disabled={busy && !generatingImage}
+                      onRevise={onReviseImageBrief}
+                    />
                     <Button
                       type="button"
                       size="sm"
@@ -1059,6 +1661,12 @@ export function MarketingDeskTab({
                         ? t('marketing.desk.rewriteComments')
                         : t('marketing.desk.writeComments')}
                     </Button>
+                    <ReviseWithFeedback
+                      hasContent={Boolean(commentDrafts.trim())}
+                      busy={generatingComments}
+                      disabled={(busy && !generatingComments) || !caption.trim()}
+                      onRevise={onReviseComments}
+                    />
                     <Button
                       type="button"
                       size="sm"
@@ -1088,11 +1696,13 @@ export function MarketingDeskTab({
                   {t('marketing.desk.toCalendar')}
                 </Button>
               </div>
+              </>
+              )}
             </div>
           ) : null}
 
-          {/* Live preview */}
-          {selected ? (
+          {/* Live preview — social posts only */}
+          {selected && !isVideoPlan ? (
             <aside className="hidden xl:flex flex-col items-center gap-3">
               <p className="self-start typo-eyebrow-upper text-faint">
                 {t('marketing.desk.preview')}

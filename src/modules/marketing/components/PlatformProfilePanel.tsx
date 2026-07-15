@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Loader2, Save, Sparkles } from 'lucide-react';
@@ -12,6 +12,19 @@ import { useBrandMemory, useSaveBrandMemory } from '@/modules/marketing/api/use-
 import { useCurrentBrandIdentity } from '@/modules/marketing/api/use-brand-identity';
 import { useCreateThread } from '@/modules/marketing/api/use-threads';
 import { syncThreadChat } from '@/modules/marketing/api/stream-thread-chat';
+import { ReviseWithFeedback } from '@/modules/marketing/components/ReviseWithFeedback';
+import {
+  buildRevisionPrompt,
+  formatProfileDraftForRevision,
+} from '@/modules/marketing/lib/revise-prompt';
+import {
+  formatBrandContextForPrompt,
+  withBrandContext,
+} from '@/modules/marketing/lib/brand-context';
+import {
+  appendGenerationFeedbackToMemory,
+  isStrongGenerationFeedback,
+} from '@/modules/marketing/lib/generation-feedback';
 import {
   buildPlatformProfilePrompt,
   parsePlatformProfile,
@@ -29,6 +42,18 @@ interface Props {
 
 const EMPTY: PlatformProfile = { field1: '', field2: '', field3: '', cadenceDays: 7 };
 
+function profileOutputInstructions(platform: ProfilePlatform): string {
+  const label =
+    platform === 'LINKEDIN' ? 'LinkedIn' : platform === 'INSTAGRAM' ? 'Instagram' : 'X';
+  return [
+    `Return revised ${label} profile copy in exactly this format:`,
+    'FIELD1: ...',
+    'FIELD2: ...',
+    'FIELD3: ...',
+    'No preamble. Stay on this brand only.',
+  ].join('\n');
+}
+
 export function PlatformProfilePanel({ projectId, tenantId, platform }: Props) {
   const { t } = useTranslation();
   const { data: memory, isLoading, isError, refetch } = useBrandMemory(projectId, tenantId);
@@ -38,35 +63,48 @@ export function PlatformProfilePanel({ projectId, tenantId, platform }: Props) {
 
   const [draft, setDraft] = useState<PlatformProfile>(EMPTY);
   const [generating, setGenerating] = useState(false);
+  /** Keep AI/edits on screen until save — don't let memory refetch wipe them. */
+  const localEditsRef = useRef(false);
 
   useEffect(() => {
+    localEditsRef.current = false;
+    setDraft(parsePlatformProfile(platform, memory?.contentMarkdown));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- platform switch only
+  }, [platform]);
+
+  useEffect(() => {
+    if (localEditsRef.current) return;
     setDraft(parsePlatformProfile(platform, memory?.contentMarkdown));
   }, [memory?.contentMarkdown, memory?.id, platform]);
+
+  const updateDraft = (
+    patch: Partial<PlatformProfile> | ((d: PlatformProfile) => PlatformProfile),
+  ) => {
+    localEditsRef.current = true;
+    setDraft((d) => (typeof patch === 'function' ? patch(d) : { ...d, ...patch }));
+  };
+
+  const hasDraft = Boolean(draft.field1.trim() || draft.field2.trim() || draft.field3.trim());
 
   const onSave = async () => {
     try {
       const next = upsertPlatformProfile(platform, memory?.contentMarkdown ?? '', draft);
       await saveMemory.mutateAsync(next);
+      localEditsRef.current = false;
+      setDraft(parsePlatformProfile(platform, next));
       toast.success(t('marketing.brand.profileSaved'));
     } catch (e) {
       toast.error((e as Error).message || t('marketing.brand.profileSaveFailed'));
     }
   };
 
-  const onGenerate = async () => {
+  const runProfilePrompt = async (prompt: string, successKey: string) => {
     if (!tenantId) {
       toast.error(t('marketing.desk.tenantRequired'));
       return;
     }
     setGenerating(true);
     try {
-      const prompt = buildPlatformProfilePrompt(platform, {
-        mission: identity?.mission,
-        vision: identity?.vision,
-        audience: identity?.audience,
-        voiceTone: identity?.voiceTone,
-        pillars: identity?.contentPillars,
-      });
       const thread = await createThread.mutateAsync({
         title: t('marketing.brand.profileGenerateTitle', {
           platform: t(`marketing.social.platforms.${platform}`),
@@ -78,12 +116,72 @@ export function PlatformProfilePanel({ projectId, tenantId, platform }: Props) {
         toast.error(t('marketing.brand.profileEmpty'));
         return;
       }
+      localEditsRef.current = true;
       setDraft((d) => ({ ...d, ...parsed }));
-      toast.success(t('marketing.brand.profileGenerated'));
+      toast.success(t(successKey));
     } catch (e) {
       toast.error((e as Error).message || t('marketing.brand.profileGenerateFailed'));
     } finally {
       setGenerating(false);
+    }
+  };
+
+  const onGenerate = async () => {
+    const memoryMd = memory?.contentMarkdown?.trim() ?? '';
+    if (!memoryMd) {
+      toast.error(t('marketing.brand.profileNeedMemory'));
+      return;
+    }
+    const prompt = buildPlatformProfilePrompt(platform, {
+      mission: identity?.mission,
+      vision: identity?.vision,
+      audience: identity?.audience,
+      voiceTone: identity?.voiceTone,
+      pillars: identity?.contentPillars,
+      visualStyle: identity?.visualStyle,
+      brandMemoryMarkdown: memoryMd,
+    });
+    await runProfilePrompt(prompt, 'marketing.brand.profileGenerated');
+  };
+
+  const onRevise = async (feedback: string) => {
+    const memoryMd = memory?.contentMarkdown?.trim() ?? '';
+    if (!memoryMd) {
+      toast.error(t('marketing.brand.profileNeedMemory'));
+      return;
+    }
+    if (!hasDraft) {
+      toast.error(t('marketing.revise.needDraft'));
+      return;
+    }
+    const brandContext = formatBrandContextForPrompt({
+      memoryMarkdown: memoryMd,
+      identity: identity ?? null,
+    });
+    const prompt = withBrandContext(
+      buildRevisionPrompt({
+        deliverable: `${t(`marketing.social.platforms.${platform}`)} profile copy`,
+        previousOutput: formatProfileDraftForRevision(draft),
+        feedback,
+        outputInstructions: profileOutputInstructions(platform),
+      }),
+      brandContext,
+    );
+    await runProfilePrompt(prompt, 'marketing.revise.success');
+    if (isStrongGenerationFeedback(feedback)) {
+      try {
+        const next = appendGenerationFeedbackToMemory(memoryMd, {
+          feedback,
+          surface: 'profile',
+          channel: t(`marketing.social.platforms.${platform}`),
+        });
+        if (next !== memoryMd.trim()) {
+          await saveMemory.mutateAsync(next);
+          toast.success(t('marketing.revise.feedbackSaved'));
+        }
+      } catch {
+        /* non-blocking */
+      }
     }
   };
 
@@ -139,7 +237,7 @@ export function PlatformProfilePanel({ projectId, tenantId, platform }: Props) {
           <Input
             id={`pp-f1-${platform}`}
             value={draft.field1}
-            onChange={(e) => setDraft((d) => ({ ...d, field1: e.target.value }))}
+            onChange={(e) => updateDraft({ field1: e.target.value })}
             placeholder={labels.p1}
           />
         </div>
@@ -149,7 +247,7 @@ export function PlatformProfilePanel({ projectId, tenantId, platform }: Props) {
             id={`pp-f2-${platform}`}
             rows={8}
             value={draft.field2}
-            onChange={(e) => setDraft((d) => ({ ...d, field2: e.target.value }))}
+            onChange={(e) => updateDraft({ field2: e.target.value })}
             placeholder={labels.p2}
             className="min-h-[160px] resize-y"
           />
@@ -159,7 +257,7 @@ export function PlatformProfilePanel({ projectId, tenantId, platform }: Props) {
           <Input
             id={`pp-f3-${platform}`}
             value={draft.field3}
-            onChange={(e) => setDraft((d) => ({ ...d, field3: e.target.value }))}
+            onChange={(e) => updateDraft({ field3: e.target.value })}
             placeholder={labels.p3}
           />
         </div>
@@ -172,10 +270,9 @@ export function PlatformProfilePanel({ projectId, tenantId, platform }: Props) {
             max={90}
             value={draft.cadenceDays}
             onChange={(e) =>
-              setDraft((d) => ({
-                ...d,
+              updateDraft({
                 cadenceDays: Math.max(1, Number.parseInt(e.target.value, 10) || 7),
-              }))
+              })
             }
           />
           <p className="typo-eyebrow text-muted-foreground">{t('marketing.brand.cadenceHint')}</p>
@@ -191,6 +288,13 @@ export function PlatformProfilePanel({ projectId, tenantId, platform }: Props) {
           {generating ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
           {generating ? t('common.loading') : t('marketing.brand.profileGenerate')}
         </Button>
+        <ReviseWithFeedback
+          hasContent={hasDraft}
+          busy={generating}
+          disabled={saveMemory.isPending}
+          onRevise={onRevise}
+          size="default"
+        />
         <Button
           type="button"
           variant="outline"

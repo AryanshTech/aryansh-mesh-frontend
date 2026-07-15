@@ -45,9 +45,10 @@ export function buildSocialAiPrompt({
   if (tone?.trim()) parts.push(`Tone: ${tone.trim()}`);
   parts.push(
     '',
-    'Use our brand memory and identity for voice, tone, and structure.',
+    'Follow the brand memory and visual identity block (appended separately) as source of truth.',
     `If brand memory includes a "${platformLabel} post style" section, follow it exactly.`,
     'Stay tightly on the given topic and angle — do not switch subjects.',
+    'Do not invent another company, category, or product line.',
   );
   if (format === 'week') {
     parts.push(
@@ -55,7 +56,10 @@ export function buildSocialAiPrompt({
       'No JSON and no PROMPT_PACK wrapper.',
     );
   } else {
-    parts.push('Return only the post copy ready to publish.');
+    parts.push(
+      'Return ONLY the post body ready to paste into the platform.',
+      'No preamble ("Here is…"), no **Post Copy** title, no markdown fences, max 3 hashtags.',
+    );
   }
   return parts.join('\n');
 }
@@ -114,8 +118,9 @@ export function buildLinkedInCommentPrompt(input: {
   context?: string;
 }): string {
   const parts = [
-    'You are our LinkedIn community manager.',
+    'You are our LinkedIn community manager for THIS brand only.',
     'Write 4 short, high-signal LinkedIn comment drafts we can post under relevant posts.',
+    'Match voice, audience, and product from brand memory / identity (appended separately).',
     '',
     'Our post / thread context:',
     input.postCaption.trim(),
@@ -127,6 +132,7 @@ export function buildLinkedInCommentPrompt(input: {
     '',
     'Rules:',
     '- Professional, warm, specific — no generic “Great post!”',
+    '- Stay on-brand; do not invent another company or category',
     '- 1–3 sentences each; ask a thoughtful question or add a useful insight',
     '- Match B2B LinkedIn norms; no hashtags in comments',
     '- Number them 1–4',

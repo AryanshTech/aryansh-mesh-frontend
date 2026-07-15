@@ -112,13 +112,62 @@ export function buildCaptionGenerationPrompt(basePrompt: string, channel: string
       '- One post per day Mon–Fri (or as requested)',
       '- Caption must be paste-ready for the platform',
       '- No JSON, no code fences, no preamble',
+      '- Never say "Here is your post" or wrap copy in **LinkedIn Post Copy**',
     ].join('\n');
   }
 
   return [
     basePrompt.trim(),
     '',
-    `Return ONLY the ready-to-publish ${channel} post copy.`,
-    'No JSON wrappers, no PROMPT_PACK object, no preamble or markdown fences.',
+    `Return ONLY the ready-to-publish ${channel} post body.`,
+    'Hard rules:',
+    '- First character is the start of the post (hook line) — no preamble',
+    '- Do NOT write "Here is…", "Ready-to-publish", "**LinkedIn Post Copy**", or markdown titles',
+    '- Do NOT use markdown bold/italics or code fences',
+    '- Max 3 hashtags total, at the end only',
+    '- Short paragraphs with white space; concrete and on-brief',
   ].join('\n');
+}
+
+/**
+ * Strip model preamble / wrappers so captions are paste-ready.
+ */
+export function cleanSocialCaption(text: string | null | undefined): string {
+  if (!text?.trim()) return '';
+  let t = text.trim();
+
+  t = t.replace(/^```(?:markdown|md|text|plain)?\s*/i, '').replace(/\s*```$/i, '');
+
+  // Drop common assistant preambles (first 1–3 lines).
+  t = t.replace(
+    /^(?:here(?:'s| is)|below is|ready[- ]to[- ]publish)[^\n]*\n+/i,
+    '',
+  );
+  t = t.replace(
+    /^(?:the )?(?:ready[- ]to[- ]publish )?(?:linkedin |instagram |x )?post(?: copy)?[:\s]*\n*/i,
+    '',
+  );
+  t = t.replace(/^\*\*[^*]*post[^*]*\*\*\s*\n*/i, '');
+  t = t.replace(/^#{1,3}\s+[^\n]*post[^\n]*\n+/i, '');
+  t = t.replace(/^---+\s*\n*/g, '');
+  t = t.replace(/\n*---+\s*$/g, '');
+
+  // Unwrap bold/italic markdown for paste-ready social copy.
+  t = t.replace(/\*\*([^*]+)\*\*/g, '$1');
+  t = t.replace(/(^|[^\w*])\*([^*\n]+)\*(?=[^\w*]|$)/g, '$1$2');
+
+  // Cap trailing hashtags to 3.
+  const lines = t.trim().split('\n');
+  if (lines.length) {
+    const last = lines[lines.length - 1].trim();
+    if (/^#\w/.test(last) || (/#\w/.test(last) && last.split(/\s+/).every((w) => w.startsWith('#')))) {
+      const tags = last.match(/#\w[\w]*/g) ?? [];
+      if (tags.length > 3) {
+        lines[lines.length - 1] = tags.slice(0, 3).join(' ');
+        t = lines.join('\n');
+      }
+    }
+  }
+
+  return t.trim();
 }

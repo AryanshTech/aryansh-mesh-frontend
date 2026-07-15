@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { Copy, FileUp, Globe, Info, Loader2 } from 'lucide-react';
+import { Copy, FileUp, Globe, Info, Loader2, Undo2 } from 'lucide-react';
 import { Button } from '@/design-system/components/ui/button';
 import { Input } from '@/design-system/components/ui/input';
 import { Label } from '@/design-system/components/ui/label';
@@ -13,7 +13,11 @@ import {
   DialogTitle,
 } from '@/design-system/components/ui/dialog';
 import { FormDialog } from '@/shared/components/FormDialog';
-import { useSaveBrandMemory } from '@/modules/marketing/api/use-brand-memory';
+import {
+  useBrandMemory,
+  useSaveBrandMemory,
+  useSetCurrentBrandMemory,
+} from '@/modules/marketing/api/use-brand-memory';
 import {
   useSaveBrandIdentity,
   type BrandIdentityInput,
@@ -21,6 +25,7 @@ import {
 import { useCreateThread } from '@/modules/marketing/api/use-threads';
 import { syncThreadChat } from '@/modules/marketing/api/stream-thread-chat';
 import { BRAND_KIT_MD_PROMPT } from '@/modules/marketing/lib/brand-kit-prompt';
+import { mergePreservingPlatformProfiles } from '@/modules/marketing/lib/platform-profile';
 
 interface Props {
   projectId: string;
@@ -65,10 +70,14 @@ export function BrandIngestPanel({ projectId, tenantId }: Props) {
   const { t } = useTranslation();
   const fileRef = useRef<HTMLInputElement>(null);
   const [websiteUrl, setWebsiteUrl] = useState('');
-  const [busy, setBusy] = useState<'md' | 'web' | null>(null);
+  const [busy, setBusy] = useState<'md' | 'web' | 'revert' | null>(null);
   const [promptOpen, setPromptOpen] = useState(false);
+  const [revertMemoryId, setRevertMemoryId] = useState<string | null>(null);
+  const [revertVersion, setRevertVersion] = useState<number | null>(null);
 
+  const { data: currentMemory } = useBrandMemory(projectId, tenantId);
   const saveMemory = useSaveBrandMemory(projectId, tenantId);
+  const setCurrentMemory = useSetCurrentBrandMemory(projectId, tenantId);
   const saveIdentity = useSaveBrandIdentity(projectId, tenantId);
   const createThread = useCreateThread(projectId, tenantId);
 
@@ -88,6 +97,42 @@ export function BrandIngestPanel({ projectId, tenantId }: Props) {
     }
   };
 
+  const offerRevert = (previousId: string | undefined, previousVersion: number | undefined) => {
+    if (!previousId) {
+      setRevertMemoryId(null);
+      setRevertVersion(null);
+      return;
+    }
+    setRevertMemoryId(previousId);
+    setRevertVersion(previousVersion ?? null);
+    toast.success(t('marketing.brand.ingestMdDone'), {
+      description: t('marketing.brand.ingestKeepProfiles'),
+      action: {
+        label: t('marketing.brand.ingestRevert'),
+        onClick: () => {
+          void onRevert(previousId);
+        },
+      },
+      duration: 12000,
+    });
+  };
+
+  const onRevert = async (memoryId?: string) => {
+    const id = memoryId ?? revertMemoryId;
+    if (!id) return;
+    setBusy('revert');
+    try {
+      await setCurrentMemory.mutateAsync(id);
+      setRevertMemoryId(null);
+      setRevertVersion(null);
+      toast.success(t('marketing.brand.ingestReverted'));
+    } catch (e) {
+      toast.error((e as Error).message || t('marketing.brand.ingestRevertFailed'));
+    } finally {
+      setBusy(null);
+    }
+  };
+
   const onImportMd = async (file: File) => {
     setBusy('md');
     try {
@@ -96,23 +141,44 @@ export function BrandIngestPanel({ projectId, tenantId }: Props) {
         toast.error(t('marketing.brand.ingestEmptyFile'));
         return;
       }
-      await saveMemory.mutateAsync(text);
+      const previousId = currentMemory?.id;
+      const previousVersion = currentMemory?.version;
+      const merged = mergePreservingPlatformProfiles(
+        text,
+        currentMemory?.contentMarkdown ?? '',
+      );
+      await saveMemory.mutateAsync(merged);
       const prompt = [
         'Extract a structured brand identity from this markdown brand kit / memory.',
         IDENTITY_SCHEMA,
         '',
         'Markdown:',
-        text.slice(0, 12000),
+        merged.slice(0, 12000),
       ].join('\n');
       const reply = await runVertex(prompt, t('marketing.brand.ingestMdTitle'));
       const parsed = parseIdentityJson(reply);
       if (!parsed) {
-        toast.success(t('marketing.brand.ingestMdMemoryOnly'));
+        toast.success(t('marketing.brand.ingestMdMemoryOnly'), {
+          description: t('marketing.brand.ingestKeepProfiles'),
+          action: previousId
+            ? {
+                label: t('marketing.brand.ingestRevert'),
+                onClick: () => {
+                  void onRevert(previousId);
+                },
+              }
+            : undefined,
+          duration: 12000,
+        });
+        if (previousId) {
+          setRevertMemoryId(previousId);
+          setRevertVersion(previousVersion ?? null);
+        }
         return;
       }
-      parsed.sourceMarkdown = text.slice(0, 8000);
+      parsed.sourceMarkdown = merged.slice(0, 8000);
       await saveIdentity.mutateAsync(parsed);
-      toast.success(t('marketing.brand.ingestMdDone'));
+      offerRevert(previousId, previousVersion);
     } catch (e) {
       toast.error((e as Error).message || t('marketing.brand.ingestFailed'));
     } finally {
@@ -129,6 +195,8 @@ export function BrandIngestPanel({ projectId, tenantId }: Props) {
     }
     setBusy('web');
     try {
+      const previousId = currentMemory?.id;
+      const previousVersion = currentMemory?.version;
       const prompt = [
         'You are a brand designer. Infer visual + verbal brand identity from this website / landing page.',
         `Website URL: ${url}`,
@@ -153,8 +221,10 @@ export function BrandIngestPanel({ projectId, tenantId }: Props) {
         '',
         parsed.visualStyle || '',
       ].join('\n');
-      await saveMemory.mutateAsync(memoryNote);
-      toast.success(t('marketing.brand.ingestWebDone'));
+      const existing = currentMemory?.contentMarkdown?.trim() ?? '';
+      const toSave = existing ? `${existing}\n\n${memoryNote}` : memoryNote;
+      await saveMemory.mutateAsync(toSave);
+      offerRevert(previousId, previousVersion);
     } catch (e) {
       toast.error((e as Error).message || t('marketing.brand.ingestFailed'));
     } finally {
@@ -195,15 +265,38 @@ export function BrandIngestPanel({ projectId, tenantId }: Props) {
               if (file) void onImportMd(file);
             }}
           />
-          <Button
-            type="button"
-            variant="outline"
-            disabled={busy !== null}
-            onClick={() => fileRef.current?.click()}
-          >
-            {busy === 'md' ? <Loader2 className="size-4 animate-spin" /> : <FileUp className="size-4" />}
-            {busy === 'md' ? t('common.loading') : t('marketing.brand.ingestMdButton')}
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={busy !== null}
+              onClick={() => fileRef.current?.click()}
+            >
+              {busy === 'md' ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <FileUp className="size-4" />
+              )}
+              {busy === 'md' ? t('common.loading') : t('marketing.brand.ingestMdButton')}
+            </Button>
+            {revertMemoryId ? (
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={busy !== null}
+                onClick={() => void onRevert()}
+              >
+                {busy === 'revert' ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Undo2 className="size-4" />
+                )}
+                {revertVersion != null
+                  ? t('marketing.brand.ingestRevertTo', { version: revertVersion })
+                  : t('marketing.brand.ingestRevert')}
+              </Button>
+            ) : null}
+          </div>
         </div>
 
         <div className="flex flex-col gap-3 rounded-xl border border-border bg-muted/20 p-4">

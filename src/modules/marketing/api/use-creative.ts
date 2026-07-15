@@ -135,7 +135,14 @@ export function useCreateCreativeRecipe(projectId: string, tenantId?: string) {
   return useMutation({
     mutationFn: (input: CreativeRecipeInput) =>
       api.post<CreativeRecipe>(`${creativeRoot(projectId, tenantId)}/recipes`, input),
-    onSuccess: () => {
+    onSuccess: (created) => {
+      qc.setQueryData(
+        creativeKeys.recipes(projectId),
+        (prev: CreativeRecipe[] | { items?: CreativeRecipe[] } | undefined) => {
+          const list = Array.isArray(prev) ? prev : prev?.items ?? [];
+          return [created, ...list.filter((r) => r.id !== created.id)];
+        },
+      );
       void qc.invalidateQueries({ queryKey: creativeKeys.recipes(projectId) });
     },
   });
@@ -170,7 +177,14 @@ export function useCreateCreativeRun(projectId: string, tenantId?: string) {
   return useMutation({
     mutationFn: (input: CreativeRunInput) =>
       api.post<CreativeRun>(`${creativeRoot(projectId, tenantId)}/runs`, input),
-    onSuccess: () => {
+    onSuccess: (created) => {
+      qc.setQueryData(
+        creativeKeys.runs(projectId),
+        (prev: CreativeRun[] | { items?: CreativeRun[] } | undefined) => {
+          const list = Array.isArray(prev) ? prev : prev?.items ?? [];
+          return [created, ...list.filter((r) => r.id !== created.id)];
+        },
+      );
       void qc.invalidateQueries({ queryKey: creativeKeys.runs(projectId) });
     },
   });
@@ -242,8 +256,8 @@ export function useGenerateCreativeImage(projectId: string, tenantId?: string) {
         label: input.label,
       }),
     onSuccess: () => {
+      // Only refresh assets — invalidating runs remounts Create and wipes the desk.
       void qc.invalidateQueries({ queryKey: creativeKeys.assets(projectId) });
-      void qc.invalidateQueries({ queryKey: creativeKeys.runs(projectId) });
     },
   });
 }

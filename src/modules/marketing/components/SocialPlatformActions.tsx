@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -28,6 +28,12 @@ import {
   useCreateCreativeRecipe,
   useCreateCreativeRun,
 } from '@/modules/marketing/api/use-creative';
+import { useBrandMemory } from '@/modules/marketing/api/use-brand-memory';
+import { useCurrentBrandIdentity } from '@/modules/marketing/api/use-brand-identity';
+import {
+  formatBrandContextForPrompt,
+  withBrandContext,
+} from '@/modules/marketing/lib/brand-context';
 import {
   buildSocialAiPrompt,
   buildThreadTitle,
@@ -62,6 +68,16 @@ export function SocialPlatformActions({
   const navigate = useNavigate();
   const createRecipe = useCreateCreativeRecipe(projectId, tenantId);
   const createRun = useCreateCreativeRun(projectId, tenantId);
+  const { data: brandMemory } = useBrandMemory(projectId, tenantId);
+  const { data: identity } = useCurrentBrandIdentity(projectId, tenantId);
+  const brandContext = useMemo(
+    () =>
+      formatBrandContextForPrompt({
+        memoryMarkdown: brandMemory?.contentMarkdown,
+        identity: identity ?? null,
+      }),
+    [brandMemory?.contentMarkdown, identity],
+  );
 
   const [open, setOpen] = useState(false);
   const [platform, setPlatform] = useState<SocialPlatform>(lockedPlatform ?? 'LINKEDIN');
@@ -141,7 +157,7 @@ export function SocialPlatformActions({
         channel: platformToChannel(input.platform),
         assetType: 'PROMPT_PACK',
         toolType: 'vertex',
-        promptMarkdown: buildSocialAiPrompt(input),
+        promptMarkdown: withBrandContext(buildSocialAiPrompt(input), brandContext),
         expectedOutputs:
           input.format === 'week'
             ? ['Mon–Fri post queue']
