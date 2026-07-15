@@ -216,7 +216,7 @@ export function MarketingDeskTab({
     notesRef.current = notes;
     setCommentDrafts(notes.comments);
     setGenBrief(
-      notes.brief.topic.trim()
+      notes.brief?.topic?.trim()
         ? notes.brief
         : briefFromRecipe(selectedRecipe?.goal, selectedRecipe?.title),
     );
@@ -261,7 +261,7 @@ export function MarketingDeskTab({
     const merged: RunNotes = {
       imageBrief: next.imageBrief ?? notesRef.current.imageBrief,
       comments: next.comments ?? notesRef.current.comments,
-      brief: next.brief ?? notesRef.current.brief,
+      brief: next.brief ?? notesRef.current.brief ?? emptyGenerationBrief(),
     };
     notesRef.current = merged;
     const serialized = serializeRunNotes(merged);
@@ -546,6 +546,7 @@ export function MarketingDeskTab({
           localExecutorNotes: serializeRunNotes({
             imageBrief,
             comments: commentDrafts,
+            brief: genBrief,
           }),
           status: 'APPROVED',
         },

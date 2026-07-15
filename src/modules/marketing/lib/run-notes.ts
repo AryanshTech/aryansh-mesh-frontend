@@ -16,7 +16,7 @@ export interface GenerationBrief {
 export interface RunNotes {
   imageBrief: string;
   comments: string;
-  brief: GenerationBrief;
+  brief?: GenerationBrief;
 }
 
 export function emptyGenerationBrief(): GenerationBrief {
