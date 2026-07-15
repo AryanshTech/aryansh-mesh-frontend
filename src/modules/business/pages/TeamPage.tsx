@@ -28,6 +28,7 @@ import {
   DialogTrigger,
 } from '@/design-system/components/ui/dialog';
 import { Badge } from '@/design-system/components/ui/badge';
+import { ApiError } from '@/core/api/client';
 import { useTenantPath } from '@/modules/business/api/use-tenant-path';
 import { useMembers, useInviteMember } from '@/modules/marketing/api/use-members';
 import { toastInviteResult } from '@/modules/business/lib/invite-toast';
@@ -63,7 +64,11 @@ export default function TeamPage() {
       form.reset();
       setDialogOpen(false);
     } catch (e) {
-      toast.error((e as Error).message || t('team.inviteFailed'));
+      if (e instanceof ApiError && e.status === 409) {
+        toast.error(e.message || t('team.inviteAlreadyHasBusiness'));
+      } else {
+        toast.error((e as Error).message || t('team.inviteFailed'));
+      }
     }
   };
 

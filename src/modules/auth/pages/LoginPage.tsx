@@ -58,6 +58,8 @@ export default function LoginPage() {
     } catch (e) {
       if (e instanceof ApiError && inviteToken && e.status === 403) {
         setError(e.message || t('invite.emailMismatch'));
+      } else if (e instanceof ApiError && inviteToken && e.status === 409) {
+        setError(e.message || t('invite.alreadyHasBusiness'));
       } else {
         const msg = (e as Error).message ?? t('auth.loginFailed');
         setError(msg);

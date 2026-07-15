@@ -89,7 +89,9 @@ export default function SignUpPage() {
       navigate(resolveLandingPath(user), { replace: true });
     } catch (e) {
       if (e instanceof ApiError && e.status === 403) {
-        setError(t('invite.emailMismatch'));
+        setError(e.message || t('invite.emailMismatch'));
+      } else if (e instanceof ApiError && e.status === 409) {
+        setError(e.message || t('invite.alreadyHasBusiness'));
       } else {
         setError((e as Error).message ?? t('auth.signUpFailed'));
       }

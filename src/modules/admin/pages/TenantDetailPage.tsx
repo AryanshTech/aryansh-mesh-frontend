@@ -29,6 +29,7 @@ import {
   type InviteInput,
 } from '@/modules/marketing/api/use-members';
 import { toastInviteResult } from '@/modules/business/lib/invite-toast';
+import { ApiError } from '@/core/api/client';
 
 const ROLES = ['TENANT_OWNER', 'TENANT_ADMIN', 'TENANT_EDITOR', 'TENANT_VIEWER'];
 
@@ -77,7 +78,11 @@ export default function TenantDetailPage() {
       await toastInviteResult(t, inviteForm.email.trim(), result);
       setInviteForm({ email: '', role: 'TENANT_OWNER' });
     } catch (e) {
-      toast.error((e as Error).message || t('team.inviteFailed'));
+      if (e instanceof ApiError && e.status === 409) {
+        toast.error(e.message || t('team.inviteAlreadyHasBusiness'));
+      } else {
+        toast.error((e as Error).message || t('team.inviteFailed'));
+      }
     }
   };
 

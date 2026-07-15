@@ -6,16 +6,18 @@ import { Button } from '@/design-system/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/design-system/components/ui/alert';
 import { useAuth } from '@/core/auth/use-auth';
 import { resolveLandingPath } from '@/core/auth/landing';
+import { ApiError } from '@/core/api/client';
 import { useInvitePreview } from '@/modules/marketing/api/use-invite-preview';
 
 export default function AcceptInvitePage() {
   const { t } = useTranslation();
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const { status, acceptInvite } = useAuth();
+  const { status, user, acceptInvite, logout } = useAuth();
   const token = params.get('token');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [emailMismatch, setEmailMismatch] = useState(false);
 
   const preview = useInvitePreview(token ?? undefined);
 
@@ -27,18 +29,34 @@ export default function AcceptInvitePage() {
   useEffect(() => {
     if (status !== 'authenticated' || !token) return;
 
+    const invitedEmail = preview.data?.email?.trim().toLowerCase();
+    const signedInEmail = user?.email?.trim().toLowerCase();
+    if (invitedEmail && signedInEmail && invitedEmail !== signedInEmail) {
+      setEmailMismatch(true);
+      setError(t('invite.emailMismatchSignedIn', { email: preview.data!.email }));
+      return;
+    }
+
     let cancelled = false;
     async function accept() {
       setSubmitting(true);
       setError(null);
+      setEmailMismatch(false);
       try {
-        const user = await acceptInvite(token!);
+        const nextUser = await acceptInvite(token!);
         if (cancelled) return;
         toast.success(t('auth.inviteAccepted'));
-        navigate(resolveLandingPath(user), { replace: true });
+        navigate(resolveLandingPath(nextUser), { replace: true });
       } catch (e) {
         if (cancelled) return;
-        setError((e as Error).message ?? t('auth.inviteFailed'));
+        if (e instanceof ApiError && e.status === 403) {
+          setEmailMismatch(true);
+          setError(e.message || t('invite.emailMismatch'));
+        } else if (e instanceof ApiError && e.status === 409) {
+          setError(e.message || t('invite.alreadyHasBusiness'));
+        } else {
+          setError((e as Error).message ?? t('auth.inviteFailed'));
+        }
       } finally {
         if (!cancelled) setSubmitting(false);
       }
@@ -48,7 +66,7 @@ export default function AcceptInvitePage() {
     return () => {
       cancelled = true;
     };
-  }, [status, token, acceptInvite, navigate, t]);
+  }, [status, token, acceptInvite, navigate, t, preview.data?.email, user?.email]);
 
   if (!token) {
     return (
@@ -72,6 +90,19 @@ export default function AcceptInvitePage() {
           <Alert variant="destructive" className="mb-4 text-left">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
+        ) : null}
+        {emailMismatch ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={() => {
+              logout();
+              navigate(loginHref, { replace: true });
+            }}
+          >
+            {t('invite.signOutAndContinue')}
+          </Button>
         ) : null}
       </div>
     );
