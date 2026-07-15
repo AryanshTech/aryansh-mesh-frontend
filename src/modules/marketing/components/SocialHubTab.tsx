@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { FlaskConical, PenLine, Play, UserRound } from 'lucide-react';
+import { FlaskConical, GraduationCap, PenLine, Play, UserRound } from 'lucide-react';
 import { Button } from '@/design-system/components/ui/button';
 import { cn } from '@/design-system/lib/utils';
 import { platformColors } from '@/design-system/tokens/platformColors';
@@ -12,6 +12,7 @@ import {
 } from '@/modules/marketing/api/use-creative';
 import { PlatformProfilePanel } from '@/modules/marketing/components/PlatformProfilePanel';
 import { MarketingDeskTab } from '@/modules/marketing/components/MarketingDeskTab';
+import { LinkedInTrainPanel } from '@/modules/marketing/components/LinkedInTrainPanel';
 import type { ProfilePlatform } from '@/modules/marketing/lib/platform-profile';
 import { displayRecipeTitle } from '@/modules/marketing/lib/social-content';
 
@@ -28,7 +29,7 @@ interface Props {
   onOpenCalendar?: (platform?: string) => void;
 }
 
-type HubSection = 'profile' | 'create' | 'recipes';
+type HubSection = 'profile' | 'train' | 'create' | 'recipes';
 
 function channelMatches(recipe: CreativeRecipe, platform: ProfilePlatform): boolean {
   const c = recipe.channel.trim().toLowerCase();
@@ -62,6 +63,10 @@ export function SocialHubTab({
     if (initialRunId || autoGenerate) setSection('create');
   }, [initialRunId, autoGenerate]);
 
+  useEffect(() => {
+    if (platform !== 'LINKEDIN' && section === 'train') setSection('profile');
+  }, [platform, section]);
+
   const recipes = useMemo(
     () => (recipesData ?? []).filter((r) => channelMatches(r, platform)),
     [recipesData, platform],
@@ -82,6 +87,9 @@ export function SocialHubTab({
 
   const sections: Array<{ id: HubSection; icon: typeof UserRound; label: string }> = [
     { id: 'profile', icon: UserRound, label: t('marketing.socialHub.sectionProfile') },
+    ...(platform === 'LINKEDIN'
+      ? [{ id: 'train' as const, icon: GraduationCap, label: t('marketing.socialHub.sectionTrain') }]
+      : []),
     { id: 'create', icon: PenLine, label: t('marketing.socialHub.sectionCreate') },
     { id: 'recipes', icon: FlaskConical, label: t('marketing.socialHub.sectionRecipes') },
   ];
@@ -136,6 +144,10 @@ export function SocialHubTab({
 
       {section === 'profile' ? (
         <PlatformProfilePanel projectId={projectId} tenantId={tenantId} platform={platform} />
+      ) : null}
+
+      {section === 'train' && platform === 'LINKEDIN' ? (
+        <LinkedInTrainPanel projectId={projectId} tenantId={tenantId} />
       ) : null}
 
       {section === 'recipes' ? (

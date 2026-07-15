@@ -25,6 +25,7 @@ import {
   appendGenerationFeedbackToMemory,
   isStrongGenerationFeedback,
 } from '@/modules/marketing/lib/generation-feedback';
+import { LinkedInConnectCard } from '@/modules/marketing/components/LinkedInConnectCard';
 import {
   buildPlatformProfilePrompt,
   parsePlatformProfile,
@@ -230,6 +231,12 @@ export function PlatformProfilePanel({ projectId, tenantId, platform }: Props) {
       <p className="mt-1 max-w-2xl typo-body-sm text-muted-foreground">
         {t('marketing.brand.profileSubtitle')}
       </p>
+
+      {platform === 'LINKEDIN' ? (
+        <div className="mt-4">
+          <LinkedInConnectCard projectId={projectId} tenantId={tenantId} />
+        </div>
+      ) : null}
 
       <div className="mt-5 flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">

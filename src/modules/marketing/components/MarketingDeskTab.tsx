@@ -63,6 +63,7 @@ import {
 } from '@/modules/marketing/lib/run-notes';
 import { SocialPlatformActions } from '@/modules/marketing/components/SocialPlatformActions';
 import { VideoPlanActions } from '@/modules/marketing/components/VideoPlanActions';
+import { LinkedInPipelinePanel } from '@/modules/marketing/components/LinkedInPipelinePanel';
 import { useBrandMemory, useSaveBrandMemory } from '@/modules/marketing/api/use-brand-memory';
 import {
   addDaysIso,
@@ -1130,6 +1131,29 @@ export function MarketingDeskTab({
         </section>
       ) : (
         <div className="flex flex-col gap-3">
+          {lockedPlatform === 'LINKEDIN' ? (
+            <LinkedInPipelinePanel
+              projectId={projectId}
+              tenantId={tenantId}
+              onApplyDrafts={(captions) => {
+                if (captions.length >= 2) {
+                  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+                  const posts = captions.slice(0, 5).map((copy, i) => ({
+                    day: days[i] ?? `Day ${i + 1}`,
+                    copy,
+                    visualSuggestion: '',
+                  }));
+                  setQueuePosts(posts);
+                  setActiveQueueIndex(0);
+                  setCaption(posts[0]?.copy ?? '');
+                  setGenBrief((b) => ({ ...b, format: 'week' }));
+                } else if (captions[0]) {
+                  setQueuePosts([]);
+                  setCaption(captions[0]);
+                }
+              }}
+            />
+          ) : null}
           <SocialPlatformActions
             projectId={projectId}
             tenantId={tenantId}

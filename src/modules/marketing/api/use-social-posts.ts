@@ -15,7 +15,13 @@ export type SocialPlatform =
   | 'PINTEREST'
   | 'REDDIT';
 
-export type SocialPostStatus = 'DRAFT' | 'PENDING_APPROVAL' | 'APPROVED' | 'SCHEDULED' | 'REJECTED';
+export type SocialPostStatus =
+  | 'DRAFT'
+  | 'PENDING_APPROVAL'
+  | 'APPROVED'
+  | 'SCHEDULED'
+  | 'PUBLISHED'
+  | 'REJECTED';
 
 export interface SocialPost {
   id: string;
@@ -26,6 +32,7 @@ export interface SocialPost {
   formatType?: string | null;
   status: SocialPostStatus;
   typefullyDraftId?: string | null;
+  externalPostId?: string | null;
   createdAt: string;
 }
 
@@ -110,6 +117,18 @@ export function useScheduleSocialPost(projectId: string, tenantId?: string) {
   return useMutation({
     mutationFn: (postId: string) =>
       api.post<SocialPost>(socialRoot(projectId, tenantId, `/${postId}/schedule`)),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['marketing', 'social-posts', key] });
+    },
+  });
+}
+
+export function usePublishSocialPost(projectId: string, tenantId?: string) {
+  const qc = useQueryClient();
+  const key = scopeKey(projectId, tenantId);
+  return useMutation({
+    mutationFn: (postId: string) =>
+      api.post<SocialPost>(socialRoot(projectId, tenantId, `/${postId}/publish`)),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['marketing', 'social-posts', key] });
     },

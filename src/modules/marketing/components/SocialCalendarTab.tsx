@@ -33,10 +33,12 @@ import {
   useApproveSocialPost,
   useRejectSocialPost,
   useScheduleSocialPost,
+  usePublishSocialPost,
   type SocialPost,
   type SocialPostInput,
   type SocialPlatform,
 } from '@/modules/marketing/api/use-social-posts';
+import { LinkedInConnectCard } from '@/modules/marketing/components/LinkedInConnectCard';
 import { useBrandMemory, useSaveBrandMemory } from '@/modules/marketing/api/use-brand-memory';
 import { appendPlatformStyleToMemory, buildSocialDraftContent } from '@/modules/marketing/lib/social-content';
 import {
@@ -96,6 +98,7 @@ export function SocialCalendarTab({ projectId, tenantId }: Props) {
   const approveMutation = useApproveSocialPost(projectId, tenantId);
   const rejectMutation = useRejectSocialPost(projectId, tenantId);
   const scheduleMutation = useScheduleSocialPost(projectId, tenantId);
+  const publishMutation = usePublishSocialPost(projectId, tenantId);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [draft, setDraft] = useState<SocialPostInput>({ ...NEW_POST });
@@ -228,6 +231,18 @@ export function SocialCalendarTab({ projectId, tenantId }: Props) {
     }
   };
 
+  const onPublish = async (postId: string) => {
+    setBusyId(postId);
+    try {
+      await publishMutation.mutateAsync(postId);
+      toast.success(t('marketing.linkedin.published'));
+    } catch (e) {
+      toast.error((e as Error).message || t('marketing.linkedin.publishFailed'));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   const onRememberStyle = async (post: SocialPost) => {
     setRememberPostId(post.id);
     try {
@@ -255,6 +270,9 @@ export function SocialCalendarTab({ projectId, tenantId }: Props) {
         <p className="mt-1 max-w-2xl typo-body-sm text-muted-foreground">
           {t('marketing.socialCalendarSubtitle')}
         </p>
+        <div className="mt-4">
+          <LinkedInConnectCard projectId={projectId} tenantId={tenantId} />
+        </div>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap gap-1.5">
             {FILTER_CHIPS.map((chip) => {
@@ -388,15 +406,26 @@ export function SocialCalendarTab({ projectId, tenantId }: Props) {
                     </>
                   ) : null}
                   {post.status === 'APPROVED' ? (
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      disabled={busy}
-                      onClick={() => void onSchedule(post.id)}
-                    >
-                      <CalendarDays className="size-3.5" />
-                      {t('marketing.desk.linkedinSchedule')}
-                    </Button>
+                    <>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        disabled={busy}
+                        onClick={() => void onSchedule(post.id)}
+                      >
+                        <CalendarDays className="size-3.5" />
+                        {t('marketing.desk.linkedinSchedule')}
+                      </Button>
+                      {post.platform === 'LINKEDIN' ? (
+                        <Button
+                          size="sm"
+                          disabled={busy}
+                          onClick={() => void onPublish(post.id)}
+                        >
+                          {t('marketing.linkedin.publishNow')}
+                        </Button>
+                      ) : null}
+                    </>
                   ) : null}
                   {post.status === 'APPROVED' || post.status === 'SCHEDULED' ? (
                     <Button

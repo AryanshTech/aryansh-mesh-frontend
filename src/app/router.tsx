@@ -6,6 +6,7 @@ import LoginPage from '@/modules/auth/pages/LoginPage';
 import SignUpPage from '@/modules/auth/pages/SignUpPage';
 import ForgotPasswordPage from '@/modules/auth/pages/ForgotPasswordPage';
 import AcceptInvitePage from '@/modules/auth/pages/AcceptInvitePage';
+import LinkedInCallbackPage from '@/modules/auth/pages/LinkedInCallbackPage';
 import { businessRoutes } from '@/modules/business/routes';
 import { marketingRoutes } from '@/modules/marketing/routes';
 import { adminRoutes } from '@/modules/admin/routes';
@@ -30,6 +31,7 @@ export function AppRouter() {
             <Route path="forgot-password" element={<ForgotPasswordPage />} />
           </Route>
           <Route path="accept-invite" element={<AcceptInvitePage />} />
+          <Route path="linkedin/callback" element={<LinkedInCallbackPage />} />
         </Route>
 
         <Route
