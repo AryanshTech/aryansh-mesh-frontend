@@ -1138,8 +1138,10 @@ export function MarketingDeskTab({
               onApplyDrafts={(captions) => {
                 if (captions.length >= 2) {
                   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+                  const types = ['hook', 'how-to', 'hot-take', 'story', 'cta'];
                   const posts = captions.slice(0, 5).map((copy, i) => ({
                     day: days[i] ?? `Day ${i + 1}`,
+                    type: types[i] ?? 'post',
                     copy,
                     visualSuggestion: '',
                   }));
