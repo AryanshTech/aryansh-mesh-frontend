@@ -103,6 +103,14 @@ export interface CreativeAssetUploadInput {
   label: string;
   runId?: string;
   assetType?: AssetType;
+  scope?: 'brand' | 'generated';
+  folderPath?: string;
+}
+
+export interface CreativeAssetPatchInput {
+  label?: string;
+  runId?: string | null;
+  metadata?: Record<string, unknown>;
 }
 
 export const creativeKeys = {
@@ -234,6 +242,8 @@ export function useUploadCreativeAsset(projectId: string, tenantId?: string) {
       form.append('label', input.label);
       if (input.runId) form.append('runId', input.runId);
       if (input.assetType) form.append('assetType', input.assetType);
+      if (input.scope) form.append('scope', input.scope);
+      if (input.folderPath) form.append('folderPath', input.folderPath);
       return api.upload<CreativeAsset>(
         `${creativeRoot(projectId, tenantId)}/assets/upload`,
         form,
@@ -249,14 +259,43 @@ export function useUploadCreativeAsset(projectId: string, tenantId?: string) {
 export function useGenerateCreativeImage(projectId: string, tenantId?: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: { prompt: string; runId?: string; label?: string }) =>
+    mutationFn: (input: {
+      prompt: string;
+      runId?: string;
+      label?: string;
+      referenceAssetIds?: string[];
+      skipBrandDefaults?: boolean;
+    }) =>
       api.post<CreativeAsset>(`${creativeRoot(projectId, tenantId)}/assets/generate-image`, {
         prompt: input.prompt,
         runId: input.runId,
         label: input.label,
+        referenceAssetIds: input.referenceAssetIds,
+        skipBrandDefaults: input.skipBrandDefaults,
       }),
     onSuccess: () => {
-      // Only refresh assets — invalidating runs remounts Create and wipes the desk.
+      void qc.invalidateQueries({ queryKey: creativeKeys.assets(projectId) });
+    },
+  });
+}
+
+export function useUpdateCreativeAsset(projectId: string, tenantId?: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ assetId, input }: { assetId: string; input: CreativeAssetPatchInput }) =>
+      api.patch<CreativeAsset>(`${creativeRoot(projectId, tenantId)}/assets/${assetId}`, input),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: creativeKeys.assets(projectId) });
+    },
+  });
+}
+
+export function useDeleteCreativeAsset(projectId: string, tenantId?: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (assetId: string) =>
+      api.delete<void>(`${creativeRoot(projectId, tenantId)}/assets/${assetId}`),
+    onSuccess: () => {
       void qc.invalidateQueries({ queryKey: creativeKeys.assets(projectId) });
     },
   });

@@ -49,6 +49,7 @@ import {
 } from '@/modules/marketing/lib/brand-context';
 import { buildRevisionPrompt } from '@/modules/marketing/lib/revise-prompt';
 import { ReviseWithFeedback } from '@/modules/marketing/components/ReviseWithFeedback';
+import { BrandAssetPicker } from '@/modules/marketing/components/BrandAssetPicker';
 import { buildLinkedInCommentPrompt, buildPromptFromGenerationBrief, displayRecipeTitle } from '@/modules/marketing/lib/social-content';
 import {
   briefFromRecipe,
@@ -197,6 +198,7 @@ export function MarketingDeskTab({
   const [generatingImage, setGeneratingImage] = useState(false);
   const [generatingComments, setGeneratingComments] = useState(false);
   const [generatingPixel, setGeneratingPixel] = useState(false);
+  const [brandRefIds, setBrandRefIds] = useState<string[]>([]);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
   const [queuePosts, setQueuePosts] = useState<QueuePost[]>([]);
   const [activeQueueIndex, setActiveQueueIndex] = useState(0);
@@ -635,6 +637,7 @@ export function MarketingDeskTab({
         prompt,
         runId: run.id,
         label: `Nano Banana · ${displayRecipeTitle(recipeById.get(run.recipeId))}`,
+        referenceAssetIds: brandRefIds.length ? brandRefIds : undefined,
       });
       const url = resolveCreativeAssetUrl(asset?.url);
       if (!url) {
@@ -1549,6 +1552,12 @@ export function MarketingDeskTab({
                     placeholder={t('marketing.desk.imageBriefPlaceholder')}
                     disabled={generatingImage}
                     className="min-h-[160px] resize-y"
+                  />
+                  <BrandAssetPicker
+                    projectId={projectId}
+                    tenantId={tenantId}
+                    selectedIds={brandRefIds}
+                    onChange={setBrandRefIds}
                   />
                   <div className="flex flex-wrap gap-2">
                     <Button
